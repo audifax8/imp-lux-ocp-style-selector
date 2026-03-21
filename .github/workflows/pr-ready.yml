@@ -1,0 +1,56 @@
+name: PR ready to be merged
+
+# Runs when a PR is ready to be merged (ie. stops being a draft)
+# - Calls the E2E testing workflow with the branch remote deployment URL
+on:
+  pull_request:
+    types: [ready_for_review]
+
+jobs:
+  e2e-test:
+    name: E2E Test on PR Branch deployment (GCP)
+    if: ${{ !startsWith(github.event.pull_request.head.ref, 'release-please--branches--') }}
+    uses: ConfigureID/gh-actions/.github/workflows/playwright-sharded.yml@v23
+    with:
+      shards: 4
+      trace: false
+      browser: chromium
+      base_url: ${{ format('https://{0}/{1}/branches/{2}', vars.BASE_URL, vars.NAMESPACE, github.event.pull_request.head.ref) }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  test-reports-pr:
+    name: Create test reports in PR
+    needs: e2e-test
+    if: ${{ always() && !cancelled() && !startsWith(github.event.pull_request.head.ref, 'release-please--branches--') }}
+    runs-on: ubuntu-latest
+    # Required to generate reports in the PR
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+
+    steps:
+      - name: Create test PR reports
+        uses: ConfigureID/gh-actions/test-report-pr@v23
+        with:
+          # Only E2E tests are run, so unit test reports should not be updated
+          unit: false
+
+  test-reports-html:
+    name: Upload HTML test reports
+    needs: e2e-test
+    if: always() && !cancelled() && (!startsWith(github.event.pull_request.head.ref, 'release-please--branches--') )
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Upload E2E Tests HTML Reports to Cloud
+        uses: ConfigureID/gh-actions/test-report-cloud@v23
+        with:
+          namespace: ${{ vars.NAMESPACE }}
+          environment_name: branches/${{ github.event.pull_request.head.ref }}
+
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET_DEV }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}

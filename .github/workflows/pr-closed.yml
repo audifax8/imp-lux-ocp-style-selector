@@ -1,0 +1,26 @@
+name: PR closed
+
+# Runs when a PR is closed (merged or not)
+# This is a cleanup task
+# Steps:
+# - Disables the associated environment
+# - Removes the associated files from GCS
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  prune:
+    name: Prune
+    if: ${{ !startsWith(github.event.pull_request.head.ref, 'release-please--branches--') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prunes environment and files
+        uses: ConfigureID/gh-actions/prune@v23
+        with:
+          namespace: ${{ vars.NAMESPACE }}
+          environment_name: branches/${{ github.event.pull_request.head.ref }}
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET_DEV }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}

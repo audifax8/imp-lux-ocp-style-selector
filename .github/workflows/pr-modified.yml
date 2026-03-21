@@ -1,0 +1,88 @@
+name: PR modified
+
+# Runs when commits are pushed to a branch associated with a PRs
+# - Checkouts the pushed branch
+# - Builds and tests the project
+# - Deploys the application to GCS
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  build:
+    name: Build
+    uses: ConfigureID/gh-actions/.github/workflows/npm-build.yml@v23
+    with:
+      dist_dir: dist
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to GCP
+        uses: ConfigureID/gh-actions/deploy@v23
+        with:
+          environment_name: branches/${{ github.event.pull_request.head.ref }}
+          base_url: ${{ vars.BASE_URL }}
+          namespace: ${{ vars.NAMESPACE }}
+
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET_DEV }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}
+
+          cache: false
+
+
+  e2e-remote:
+    name: E2E Tests
+    if: ${{ github.event.pull_request.draft == false }}
+    needs: deploy
+    uses: ConfigureID/gh-actions/.github/workflows/playwright-sharded.yml@v23
+    with:
+      shards: 4
+      trace: false
+      browser: chromium
+      base_url: ${{ format('https://{0}/{1}/branches/{2}', vars.BASE_URL, vars.NAMESPACE, github.event.pull_request.head.ref) }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  test-reports-pr:
+    name: Create test reports in PR
+    needs: e2e-remote
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    # Required to generate reports in the PR
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+
+    steps:
+      - name: Create test PR reports
+        uses: ConfigureID/gh-actions/test-report-pr@v23
+        with:
+          # If the PR is draft, E2E tests are not run
+          e2e: ${{ github.event.pull_request.draft == false }}
+
+  test-reports-html:
+    name: Upload HTML test reports
+    needs: e2e-remote
+    # If the PR is draft, E2E tests are not run
+    if: always() && !cancelled() && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Upload E2E Tests HTML Reports to Cloud
+        uses: ConfigureID/gh-actions/test-report-cloud@v23
+        with:
+          namespace: ${{ vars.NAMESPACE }}
+          environment_name: branches/${{ github.event.pull_request.head.ref }}
+
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET_DEV }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}

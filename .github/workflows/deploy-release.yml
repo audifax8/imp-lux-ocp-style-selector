@@ -1,0 +1,60 @@
+name: Deploy release and promote it to Staging
+run-name: Deploy release "${{ github.event.release.tag_name }}" and promote it to Staging
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Deploy Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy Release to GCP
+      uses: ConfigureID/gh-actions/deploy@v23
+      with:
+          release: ${{ github.event.release.tag_name }}
+          base_url: ${{ vars.BASE_URL }}
+          namespace: ${{ vars.NAMESPACE }}
+          environment_name: releases/${{ github.event.release.tag_name }}
+
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}
+          cloud_lb: ${{ secrets.CLOUD_LB }}
+
+          cache: true
+
+  promote:
+    name: Promote Release to Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Compare release version to Staging version
+        uses: ConfigureID/gh-actions/compare-version@v23
+        id: compare-version
+        with:
+          version: ${{ github.event.release.tag_name }}
+          environment_name: staging
+          namespace: ${{ vars.NAMESPACE }}
+          base_url: ${{ vars.BASE_URL }}
+
+      - name: Promote to Staging
+        uses: ConfigureID/gh-actions/deploy@v23
+        # Only auto promote to staging is the release version is greater than the one deployed on Staging
+        # This is done to avoid promoting a lower version (eg a hotfix from an older major).
+        # Any version can still be promoted using the manual workflow
+        if: ${{ steps.compare-version.outputs.greater == 'true' }}
+        with:
+          release: ${{ github.event.release.tag_name }}
+          base_url: ${{ vars.BASE_URL }}
+          namespace: ${{ vars.NAMESPACE }}
+          environment_name: staging
+
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}
+          cloud_lb: ${{ secrets.CLOUD_LB }}
+
+          cache: true

@@ -1,0 +1,33 @@
+name: Promote to Staging
+run-name: Promote release "${{ github.event.inputs.release-version }}" to Staging
+
+# Executed manually
+# - Downloads the specified release's artifact
+# - Deploys the artifact to staging (GCS)
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Release version tag'
+        required: true
+
+jobs:
+  promote:
+    name: Promote
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Promote to Staging
+        uses: ConfigureID/gh-actions/deploy@v23
+        with:
+          release: ${{ github.event.inputs.release-version }}
+          environment_name: staging
+          base_url: ${{ vars.BASE_URL }}
+          namespace: ${{ vars.NAMESPACE }}
+
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}
+          cloud_lb: ${{ secrets.CLOUD_LB }}
+
+          cache: true

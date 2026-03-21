@@ -1,0 +1,106 @@
+name: Build and deploy to dev
+
+# Runs when commits are pushed to the develop branch
+# - Checkouts the pushed branch
+# - Builds and tests the project
+# - Deploys the application to GCS
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    uses: ConfigureID/gh-actions/.github/workflows/npm-build.yml@v23
+    with:
+      dist_dir: dist
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  deploy:
+    name: Deploy implementation
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to GCP
+        uses: ConfigureID/gh-actions/deploy@v23
+        with:
+          environment_name: dev
+          base_url: ${{ vars.BASE_URL }}
+          namespace: ${{ vars.NAMESPACE }}
+
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET_DEV }}
+          cloud_service: gcp
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}
+
+          cache: false
+
+  e2e-test:
+    name: E2E Test (GCP)
+    needs: deploy
+    uses: ConfigureID/gh-actions/.github/workflows/playwright-sharded.yml@v23
+    with:
+      shards: 4
+      trace: true
+      browser: chromium
+      base_url: ${{ format('https://{0}/{1}/dev', vars.BASE_URL, vars.NAMESPACE) }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  test-reports:
+    name: Create test reports
+    needs: e2e-test
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    # Required to generate reports in the PR
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+
+    steps:
+      - name: Create test reports
+        uses: ConfigureID/gh-actions/test-report-pr@v23
+
+  test-reports-html:
+    name: Upload HTML test reports
+    needs: e2e-test
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Upload E2E Tests HTML Reports to Cloud
+        uses: ConfigureID/gh-actions/test-report-cloud@v23
+        with:
+          namespace: ${{ vars.NAMESPACE }}
+          environment_name: dev
+
+          cloud_service: gcp
+          cloud_bucket: ${{ secrets.CLOUD_BUCKET_DEV }}
+          cloud_credentials: ${{ secrets.GCP_CREDENTIALS }}
+
+  release:
+    name: Create Release (or Release PR)
+    runs-on: ubuntu-latest
+    needs: build
+
+    # Required to create/update the release PR and to create Releases
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      deployments: write
+
+    steps:
+      - name: Release Please Action
+        uses: google-github-actions/release-please-action@v4
+        id: release
+
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        uses: ConfigureID/gh-actions/attach-release-artifact@v23
+        with:
+          release_name: ${{ steps.release.outputs.tag_name }}
+          filename: ${{ github.event.repository.name }}-${{ steps.release.outputs.tag_name }}
