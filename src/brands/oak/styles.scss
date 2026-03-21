@@ -1,0 +1,20 @@
+// Brand: oak
+:root {
+  --accent: #92400e;
+  --accent-bg: rgba(146, 64, 14, 0.1);
+  --accent-border: rgba(146, 64, 14, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --accent: #d97706;
+    --accent-bg: rgba(217, 119, 6, 0.15);
+    --accent-border: rgba(217, 119, 6, 0.45);
+  }
+}
+
+:root[data-theme='dark'] {
+  --accent: #d97706;
+  --accent-bg: rgba(217, 119, 6, 0.15);
+  --accent-border: rgba(217, 119, 6, 0.45);
+}

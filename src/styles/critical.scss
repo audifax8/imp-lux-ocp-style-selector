@@ -1,0 +1,218 @@
+// =============================================================================
+// SCSS CRÍTICO — se incluye en el bundle principal
+// Contiene: variables (light + dark), reset, tipografía base, skeleton
+// =============================================================================
+
+// ── Mixin de variables dark ──────────────────────────────────────────────────
+// Centraliza los valores para no duplicarlos entre media query y [data-theme].
+@mixin dark-vars {
+  --text: #9ca3af;
+  --text-h: #f3f4f6;
+  --bg: #16171d;
+  --border: #2e303a;
+  --code-bg: #1f2028;
+  --social-bg: rgba(47, 48, 58, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
+    rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+}
+
+// ── Variables y tokens de diseño (light — default) ──────────────────────────
+:root {
+  --text: #4e4b58;
+  --text-h: #08060d;
+  --bg: #fff;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  // 112.5% = 18/16: mantiene la escala visual pero respeta la preferencia
+  // de tamaño del navegador del usuario (accesibilidad).
+  font: 112.5% / 145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 100%; // 16px en browsers con base 16
+  }
+}
+
+// ── Dark mode — fallback sin JS (respeta la preferencia del sistema) ─────────
+// :not([data-theme="light"]) evita conflicto cuando el usuario forzó light.
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include dark-vars;
+  }
+}
+
+// ── Dark mode — controlado por JS (toggle explícito del usuario) ─────────────
+// Prevalece sobre la media query por tener el atributo en :root.
+:root[data-theme='dark'] {
+  @include dark-vars;
+}
+
+// ── Reset y base ─────────────────────────────────────────────────────────────
+body {
+  margin: 0;
+}
+
+#imp-lux-ocp-style-selector {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-inline: 1px solid var(--border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 3.5rem;
+  letter-spacing: -1.68px;
+  margin: 2rem 0;
+
+  @media (max-width: 1024px) {
+    font-size: 2.25rem;
+    margin: 1.25rem 0;
+  }
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 0.5rem;
+
+  @media (max-width: 1024px) {
+    font-size: 1.25rem;
+  }
+}
+
+p {
+  margin: 0;
+}
+
+// ── Skeleton — animación shimmer para el estado de carga inicial ─────────────
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Mixin reutilizable para barras shimmer (evita duplicar gradient + animation)
+@mixin shimmer-bar {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--code-bg) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+// ── Utilidad screen-reader only ──────────────────────────────────────────────
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ── Prefers-reduced-motion (WCAG 2.3.3 AAA) ──────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.skeleton {
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  flex-grow: 1;
+
+  &__bar {
+    border-radius: 6px;
+    @include shimmer-bar;
+  }
+
+  &__title {
+    height: 3.25rem;
+    width: 55%;
+
+    @media (max-width: 1024px) {
+      height: 2.25rem;
+      width: 70%;
+    }
+  }
+
+  &__subtitle {
+    height: 1.25rem;
+    width: 35%;
+
+    @media (max-width: 1024px) {
+      width: 55%;
+    }
+  }
+
+  &__cards {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1.5rem;
+
+    @media (max-width: 1024px) {
+      flex-direction: column;
+    }
+  }
+
+  &__card {
+    flex: 1;
+    height: 8.75rem;
+    border-radius: 8px;
+    @include shimmer-bar;
+
+    &:nth-child(2) { animation-delay: 0.15s; }
+    &:nth-child(3) { animation-delay: 0.3s; }
+  }
+}

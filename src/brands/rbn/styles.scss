@@ -1,0 +1,22 @@
+// Brand: rbn
+:root {
+  --accent: #e63946;
+  --accent-bg: rgba(230, 57, 70, 0.1);
+  --accent-border: rgba(230, 57, 70, 0.45);
+}
+
+// Dark: fallback sin JS
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --accent: #ff6b74;
+    --accent-bg: rgba(255, 107, 116, 0.15);
+    --accent-border: rgba(255, 107, 116, 0.45);
+  }
+}
+
+// Dark: toggle explícito del usuario
+:root[data-theme='dark'] {
+  --accent: #ff6b74;
+  --accent-bg: rgba(255, 107, 116, 0.15);
+  --accent-border: rgba(255, 107, 116, 0.45);
+}

@@ -1,0 +1,20 @@
+// Brand: cdm
+:root {
+  --accent: #15803d;
+  --accent-bg: rgba(21, 128, 61, 0.1);
+  --accent-border: rgba(21, 128, 61, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --accent: #4ade80;
+    --accent-bg: rgba(74, 222, 128, 0.15);
+    --accent-border: rgba(74, 222, 128, 0.45);
+  }
+}
+
+:root[data-theme='dark'] {
+  --accent: #4ade80;
+  --accent-bg: rgba(74, 222, 128, 0.15);
+  --accent-border: rgba(74, 222, 128, 0.45);
+}

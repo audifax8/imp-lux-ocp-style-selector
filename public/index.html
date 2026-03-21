@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Style Selector</title>
+
+    <!--
+      Inline theme detection: aplica data-theme ANTES de que el CSS se pinte
+      para evitar cualquier flash de tema incorrecto. Lee localStorage igual
+      que darkMode.ts, pero sin importar ningún módulo.
+    -->
+    <script>
+      try {
+        var t = localStorage.getItem('imp-lux-theme')
+        if (t === 'dark' || t === 'light') {
+          document.documentElement.dataset.theme = t
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.dataset.theme = 'dark'
+        }
+      } catch (_) {}
+    </script>
+
+    <!--
+      Preloads: navegador descarga CSS y JS en paralelo desde el <head>,
+      antes de que el parser llegue al <link> y <script> del body.
+      El entry JS es muy pequeño (~4 KB); bootstrap + vendor cargan on-demand.
+    -->
+    <link rel="preload" href="imp-lux-ocp-style-selector.css" as="style" />
+    <link rel="preload" href="imp-lux-ocp-style-selector.js" as="script" crossorigin />
+
+    <link rel="stylesheet" href="imp-lux-ocp-style-selector.css" />
+  </head>
+  <body>
+    <!--
+      Skeleton estático: visible de inmediato (solo HTML + CSS, cero JS).
+      React monta aquí cuando el chunk bootstrap carga y reemplaza este markup.
+      Las clases step1-skeleton__card y wizard usan los mismos estilos de
+      critical.scss + wizard.scss que React usa — la transición es seamless.
+    -->
+    <div
+      id="imp-lux-ocp-style-selector"
+      role="region"
+      aria-label="Style Selector"
+    >
+      <div class="wizard">
+        <div class="wizard__toolbar"></div>
+        <div
+          class="step1-skeleton"
+          role="status"
+          aria-live="polite"
+          aria-label="Loading"
+        >
+          <div class="step1-skeleton__card"></div>
+          <div class="step1-skeleton__card"></div>
+          <div class="step1-skeleton__card"></div>
+        </div>
+      </div>
+    </div>
+
+    <!--
+      type="module" activa ES modules nativos.
+      El entry (~4 KB) hace el setup síncrono (tema, brand) y luego
+      dispara import('./bootstrap') que carga React + App de forma lazy.
+    -->
+    <script type="module" src="imp-lux-ocp-style-selector.js"></script>
+  </body>
+</html>
