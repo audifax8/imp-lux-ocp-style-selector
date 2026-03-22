@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
@@ -25,5 +25,10 @@ export default defineConfig({
     // CSS dividido por chunk: cada step lazy obtiene su propio .css que Vite
     // inyecta automáticamente al cargar el chunk. Los ?inline bypasean esto.
     cssCodeSplit: false,
+  },
+  test: {
+    environment: 'happy-dom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
   },
 })
