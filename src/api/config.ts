@@ -39,8 +39,8 @@ export const API_LANGUAGE: string = (() => {
 // Actualiza los valores cuando se conozcan los IDs reales de cada brand.
 export const BRAND_STORE_IDS: Record<Brand, string> = {
   rbn:  '10151',
-  oak:  '10151', // TODO: actualizar
-  sgh:  '10151', // TODO: actualizar
-  bliz: '10151', // TODO: actualizar
-  cdm:  '10151', // TODO: actualizar
+  oak:  '10151', // TODO
+  sgh:  '10151', // TODO
+  bliz: '10151', // TODO
+  cdm:  '10151', // TODO
 }
