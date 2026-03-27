@@ -11,16 +11,7 @@ import { useLabels } from '../labels/useLabels'
 
 const MOUNT_ID = 'imp-lux-ocp-style-selector'
 
-// Placeholder: reemplazar con las páginas reales del configurador
-const ConfiguratorPage = lazy(() =>
-  Promise.resolve({
-    default: () => (
-      <div style={{ padding: '2rem', color: 'var(--text)' }}>
-        Configurator — work in progress
-      </div>
-    ),
-  }),
-)
+const Model = lazy(() => import('./model/Model'))
 
 const Configurator = () => {
   const [theme, setTheme] = useState<Theme>(getCurrentTheme)
@@ -41,7 +32,7 @@ const Configurator = () => {
         />
       </div>
       <Suspense fallback={<ConfiguratorSkeleton />}>
-        <ConfiguratorPage />
+        <Model />
       </Suspense>
     </div>
   )

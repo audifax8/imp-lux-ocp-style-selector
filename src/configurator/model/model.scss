@@ -1,0 +1,87 @@
+// =============================================================================
+// SCSS MODEL — skeleton
+// Se inyecta a nivel de módulo cuando el chunk Model carga.
+// Cubre todo lo necesario para mostrar el skeleton de gafas antes de que
+// ModelContent resuelva.
+// =============================================================================
+
+@keyframes model-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@mixin shimmer($delay: 0s) {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--code-bg) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: model-shimmer 1.4s ease-in-out infinite $delay;
+}
+
+// ── Wrapper ───────────────────────────────────────────────────────────────────
+
+.model {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 2rem;
+  gap: 1.5rem;
+}
+
+// ── Skeleton de gafas ─────────────────────────────────────────────────────────
+
+.model-skeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem 2rem;
+
+  &__glasses {
+    display: flex;
+    align-items: center;
+  }
+
+  // Patillas (brazos laterales)
+  &__temple {
+    width: 52px;
+    height: 6px;
+    border-radius: 3px;
+    @include shimmer(0.1s);
+  }
+
+  // Cristales
+  &__lens {
+    width: 94px;
+    height: 64px;
+    border-radius: 24px;
+    @include shimmer;
+
+    & + & {
+      animation-delay: 0.12s;
+    }
+  }
+
+  // Puente nasal
+  &__bridge {
+    width: 48px;
+    height: 6px;
+    border-radius: 3px;
+    @include shimmer(0.06s);
+  }
+
+  // Etiqueta de marca
+  &__label {
+    width: 80px;
+    height: 0.875rem;
+    border-radius: 4px;
+    @include shimmer(0.2s);
+  }
+}

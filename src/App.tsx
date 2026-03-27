@@ -1,10 +1,14 @@
-import { LabelsProvider } from './labels/LabelsProvider'
+//import { LabelsProvider } from './labels/LabelsProvider'
 import Wizard from './wizard/Wizard'
 
 const App = () => (
+  <Wizard />
+)
+
+/*const App = () => (
   <LabelsProvider>
     <Wizard />
   </LabelsProvider>
-)
+)*/
 
 export default App

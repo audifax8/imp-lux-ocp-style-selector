@@ -14,6 +14,15 @@
   --shadow:
     rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
     rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+
+  --background-color: #1f1f24;
+  --skeleton-base: #3a3a3a;
+  --skeleton-highlight: #555;
+  --yr-margin-lr-base: 16px;
+  --yr-padding-base: 24px;
+  --yr-color-text-basic: #e2e2e5;
+  --customizer-background: rgb(0 0 0 / 50%);
+  --customizer-border: 1px solid #1f1f24;
 }
 
 :root {
@@ -33,6 +42,15 @@
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
+
+  --background-color: #f6f6f6;
+  --skeleton-base: #eee;
+  --skeleton-highlight: #ddd;
+  --yr-margin-lr-base: 16px;
+  --yr-padding-base: 24px;
+  --yr-color-text-basic: #1f1f24;
+  --customizer-background: rgb(255 255 255 / 60%);
+  --customizer-border: 1px solid #fff;
 
   font: 112.5% / 145% var(--sans);
   letter-spacing: 0.18px;
@@ -85,3 +103,93 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* =========================
+   RESET
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  line-height: 1;
+  background: #fff;
+}
+
+#configurator {
+  height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+  content: '';
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* =========================
+   SKELETON LOADING
+========================= */
+.yr-skeleton {
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+  color: transparent;
+  border-radius: 4px / 6.7px;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+

@@ -15,6 +15,12 @@ GitHub Actions → `.github/workflows/deploy.yml` → builds `dist/` → GitHub 
 - audifax8: `https://audifax8.github.io/imp-lux-ocp-style-selector/`
 - ConfigureID-Imp: `https://configureid-imp.github.io/imp-lux-ocp-style-selector/`
 
+## Node
+Version defined in `.node-version` (currently `22.22`). Always activate with nvm before running any node/npm/npx/vite command:
+```
+export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-version)
+```
+
 ## Build (Vite 8 / Rolldown)
 - Format: `es` (ES modules, real code splitting)
 - Entry: `imp-lux-ocp-style-selector.js` (tiny, ~2.6 KB)
@@ -51,7 +57,7 @@ All mode-specific CSS (including brand CSS) is `?inline` — injected by the boo
 **Configurator bootstrap** (`bootstrap-configurator.tsx`):
 - Injects `configurator/configurator.scss?inline` (container + typography + skeleton + configurator styles)
 - Injects active brand CSS via `brands/loader-configurator`
-- `createRoot` + `<AppConfigurator />` (LabelsProvider + Configurator)
+- `createRoot` + `<AppConfigurator />` (Configurator — LabelsProvider currently disabled)
 
 ## Brand system
 Brands: `rbn` (default), `oak`, `sgh`, `bliz`, `cdm`
@@ -71,13 +77,15 @@ Loaders:
 
 ## CSS architecture
 ```
-imp-lux-ocp-style-selector.css   ← theme.scss only (CSS vars, dark mode, reset, sr-only)
-                                     loaded via <link>, always — no mode-specific content
+imp-lux-ocp-style-selector.css        ← theme.scss only (CSS vars, dark mode, reset, sr-only)
+                                          loaded via <link>, always — no mode-specific content
 
-bootstrap.tsx (wizard)           ← wizard/wizard.scss?inline + brands/loader-wizard
-bootstrap-configurator.tsx       ← configurator/configurator.scss?inline + brands/loader-configurator
-WizardStep1.tsx                  ← WizardStep1.scss?inline (on-demand, when step loads)
-WizardStep2.tsx                  ← WizardStep2.scss?inline (on-demand, when step loads)
+bootstrap.tsx (wizard)                ← wizard/wizard.scss?inline + brands/loader-wizard
+bootstrap-configurator.tsx            ← configurator/configurator.scss?inline + brands/loader-configurator
+WizardStep1.tsx                       ← WizardStep1.scss?inline (on-demand, when step loads)
+WizardStep2.tsx                       ← WizardStep2.scss?inline (on-demand, when step loads)
+configurator/model/Model.tsx          ← model/model.scss?inline (skeleton de gafas)
+configurator/model/ModelContent.tsx   ← model/model-content.scss?inline (gafas reales, SOLO tras resolver skeleton)
 ```
 
 ## API config (no .env — runtime only)
@@ -107,9 +115,13 @@ Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 
 ## Configurator
-- `Configurator.tsx` — main chunk; dark mode toggle + lazy page (placeholder — work in progress)
-- `ConfiguratorSkeleton.tsx` — skeleton shown via Suspense while pages load
-- `configurator.scss` — critical CSS for configurator (container, typography, skeleton)
+- `Configurator.tsx` — main chunk; dark mode toggle + lazy `Model`
+- `ConfiguratorSkeleton.tsx` — skeleton shown via Suspense while Configurator chunk loads
+- `configurator.scss` — ?inline CSS (container, typography, skeleton del configurador)
+- `model/Model.tsx` — lazy chunk; inyecta `model.scss?inline`, muestra `ModelSkeleton` (gafas shimmer) mientras `ModelContent` carga
+- `model/ModelContent.tsx` — lazy chunk; inyecta `model-content.scss?inline`, muestra SVG gafas con colores del brand activo + badge de brand
+- `model/model.scss` — CSS del skeleton de gafas (keyframe + shapes shimmer)
+- `model/model-content.scss` — CSS de las gafas reales (hover, badge) — SOLO carga tras resolver el skeleton
 
 ## Dark mode
 `src/theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React.
@@ -132,7 +144,7 @@ src/
   bootstrap.tsx               — wizard bootstrap (CSS inject + brand + React mount)
   bootstrap-configurator.tsx  — configurator bootstrap (CSS inject + brand + React mount)
   App.tsx                     — LabelsProvider + Wizard (wizard mode)
-  AppConfigurator.tsx         — LabelsProvider + Configurator (configurator mode)
+  AppConfigurator.tsx         — Configurator (configurator mode; LabelsProvider disabled temporalmente)
   brands/detect.ts            — brand singleton
   brands/loader-wizard.ts     — injects wizard brand CSS (?inline)
   brands/loader-configurator.ts — injects configurator brand CSS (?inline)
@@ -151,9 +163,15 @@ src/
     WizardStep1.scss          — on-demand CSS (?inline)
     WizardStep2.scss          — on-demand CSS (?inline)
   configurator/
-    Configurator.tsx          — main chunk, theme toggle + lazy page
-    ConfiguratorSkeleton.tsx  — skeleton component
+    Configurator.tsx          — main chunk, theme toggle + lazy Model
+    ConfiguratorSkeleton.tsx  — skeleton while Configurator chunk loads
     configurator.scss         — ?inline CSS (container, typography, skeleton)
+    model/
+      Model.tsx               — lazy chunk; skeleton de gafas mientras ModelContent carga
+      ModelSkeleton.tsx       — gafas shimmer (CSS div-based)
+      ModelContent.tsx        — lazy chunk; SVG gafas + badge brand activo
+      model.scss              — ?inline CSS del skeleton (keyframe + shapes)
+      model-content.scss      — ?inline CSS del contenido (gafas reales, hover, badge)
 public/
   index.html                  — GitHub Pages shell (inline theme script + preloads)
                                  no static skeleton — each mode renders its own via React
@@ -163,6 +181,7 @@ public/
 - `BRAND_STORE_IDS` in `api/config.ts`: all set to `'10151'` (only rbn known) — update when others available
 - Labels API endpoint not live yet — defaults always used until implemented
 - Delete `main` branch on both repos after changing default branch in GitHub Settings
-- Configurator pages: `Configurator.tsx` has a placeholder — implement real pages
+- `AppConfigurator.tsx`: re-enable `LabelsProvider` when configurator i18n is needed
 - Brand CSS for configurator: `brands/{brand}/configurator.scss` are empty placeholders
+- `model/ModelContent.tsx`: replace placeholder SVG with real product assets when available
 
