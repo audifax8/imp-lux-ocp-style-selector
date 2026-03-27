@@ -1,6 +1,6 @@
 import type { Labels } from './types'
-import { API_BASE_URL, API_LANGUAGE, BRAND_STORE_IDS } from '../api/config'
-import { activeBrand } from '../brands/detect'
+import { API_BASE_URL, API_LANGUAGE, BRAND_STORE_IDS } from '@/api/config'
+import { activeBrand } from '@/brands/detect'
 
 /**
  * Carga los labels del widget desde la API.

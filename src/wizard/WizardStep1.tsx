@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import step1Styles from './WizardStep1.scss?inline'
 import type { GlassType } from './types'
-import { useLabels } from '../labels/useLabels'
+import { useLabels } from '@/labels/useLabels'
 
 // Inyección de SCSS al cargar el chunk (una sola vez, a nivel de módulo)
 const styleEl = document.createElement('style')

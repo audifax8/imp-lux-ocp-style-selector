@@ -1,5 +1,5 @@
-import type { Brand } from '../brands/types'
-import type { GlassType } from '../wizard/types'
+import type { Brand } from '@/brands/types'
+import type { GlassType } from '@/wizard/types'
 import { API_BASE_URL, API_LANGUAGE, BRAND_STORE_IDS } from './config'
 
 // ── Tipos del response de la API ────────────────────────────────────────────

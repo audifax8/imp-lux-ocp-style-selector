@@ -1,4 +1,4 @@
-import { useLabels } from '../labels/useLabels'
+import { useLabels } from '@/labels/useLabels'
 
 const WizardStep2Skeleton = () => {
   const labels = useLabels()

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config'
+import { resolve } from 'path';
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
@@ -31,4 +32,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
   },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src')
+    }
+  }
 })

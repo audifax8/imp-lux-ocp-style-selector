@@ -1,5 +1,5 @@
-import type { Theme } from '../theme/darkMode'
-import { useLabels } from '../labels/useLabels'
+import type { Theme } from '@/theme/darkMode'
+import { useLabels } from '@/labels/useLabels'
 
 interface Props {
   theme: Theme

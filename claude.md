@@ -2,7 +2,7 @@
 
 ## What it is
 Self-contained React 19 widget (embeddable). Two initialization modes:
-- **configurator** (default) — glasses configurator experience
+- **configurator** (default) — glasses configurator experience with RTR (Real-Time Rendering)
 - **wizard** — picks glasses type → model → opens product page
 
 ## Repos
@@ -28,6 +28,20 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 - Chunks: `chunks/[name]-[hash].js`
 - `base: './'` — relative paths for GitHub Pages subdirectory
 - `cssCodeSplit: false` — all non-`?inline` CSS goes to the single CSS bundle
+- `resolve.alias: { '@': src/ }` — `@/` path alias for all imports
+
+## TypeScript config (`tsconfig.app.json`)
+- `paths: { "@/*": ["./src/*"] }` — mirrors Vite alias so tsc resolves `@/` imports
+- `erasableSyntaxOnly: false` — allows non-erasable enums (needed by `src/declarations/enums.ts`)
+- All cross-folder imports use `@/` — no relative `../` imports across directories
+
+## Module alias convention
+All imports that cross a directory boundary use `@/` instead of relative `../` paths:
+```ts
+import { activeBrand } from '@/brands/detect'     // ✓
+import { activeBrand } from '../../brands/detect'  // ✗
+```
+Same-folder imports (`./`) remain relative.
 
 ## Mode system
 Mode detection singleton: `src/mode/detect.ts`
@@ -126,11 +140,43 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 - `model/strategy/types.ts` — interfaces `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data`
 - `model/strategy/mocks.ts` — `fetchPhase1Mock` (~900ms, datos de modelo) + `fetchPhase2Mock` (~600ms, recomendaciones + sessionId)
 - `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy` usando los mocks
+- `model/strategy/base.ts` — `BaseStrategy` abstract class; provee `runMicrotask/runIdle/runAnimation` via `@/libs/helpers.schedule`
+- `model/strategy/rtr-test.ts` — `RTRTest extends BaseStrategy`; estrategia concreta para RTR: descarga script, carga assets en microtask, inicia el viewer
 
 ### Flujo de inicialización del configurador
 1. Skeleton visible de inmediato (mount)
 2. Fase 1 carga en background (~900ms) — no bloquea el hilo principal → al resolver: gafas + info de modelo visibles
 3. Fase 2 arranca SOLO tras Fase 1 (~600ms) — no bloquea → al resolver: recomendaciones aparecen con animación `mc-fade-in`
+
+## Bootstrap state machine (Memento pattern)
+`src/bootstrap/` — infraestructura de estado para las estrategias de inicialización:
+- `index.ts` — `loadImplementation()`: construye `LoadState` + `Originator` + `Caretaker`, parsea params, guarda el primer memento
+- `state/load-state.ts` — `LoadState`: estado que viaja entre estrategias (params, logger, performance, configureJsons, checkPoint); `clone(updates)` para versiones inmutables
+- `state/originator.ts` — `Originator`: holder del estado actual; guarda/restaura via `Memento`
+- `state/caretaker.ts` — `Caretaker`: almacén de `Memento[]` (historial de estados)
+- `state/memento.ts` — `Memento`: snapshot de un `LoadState`
+
+## Libs
+`src/libs/helpers.ts` — utilidades de scheduling y params:
+- `getInitQueryParams()` — parsea URL params + `window.configureParams` → `MergedParams`
+- `runAsync(fn)` — ejecuta sin bloquear via `queueMicrotask`
+- `runIdle(fn, timeout?)` — via `requestIdleCallback` (fallback: `setTimeout(0)`)
+- `schedule(fn, priority)` — abstracción unificada: `'microtask' | 'idle' | 'animation' | 'timeout'`
+
+## Declarations
+`src/declarations/` — tipos, enums y constantes globales:
+- `enums.ts` — `SkeletonVariant`, `ResolutionType`, `Media`, `Theme`, `RTRBackground`, `FetchPriority`, `ApiType`, `CheckPointType`
+- `types.ts` — `MergedParams`, `ConfigureJsons`, `GraphSettings`, `Preferences`, `ButtonProps`, etc.
+- `constants.ts` — Customer IDs (`RBN_CUSTOMER_ID`, `OAK_CUSTOMER_ID`), API key map, CDN/RTR URLs, skeleton resolution helpers
+- `interfaces.ts` — `ConfigureParams`, `ConfigureInitParams`, `RtrBaseAPI`, `InitRTRPayload`, `RtrAssetsAPI`, `QuickLink`, etc.
+- `cfg-configure-core.d.ts` — module declaration for `@cfg.plat/configure-core`
+
+## Models
+`src/models/` — clases de dominio:
+- `logger.ts` — `Logger`: logging condicional (debug mode); silenciado en prod
+- `performance.ts` — `Performance`: wraps `performance.mark/measure` para medir tiempos con `processStart/processEnd/logMeasure`
+- `rtr/rtr-version.ts` — `RTRVersion`: gestión de versiones del viewer RTR (7.2.2, 4.0.0, 4.1.1); descarga del script, init con callbacks (`onRendered`, `onError`, etc.)
+- `rtr/rtr-assets.ts` — `RTRAssets`: gestión de assets RTR y prefetch via quicklink
 
 ## Dark mode
 `src/theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React.
@@ -161,6 +207,24 @@ src/
   brands/{brand}/configurator.scss — brand CSS for configurator mode
   api/config.ts               — runtime API config (no .env)
   api/models.ts               — fetchModels, getCategoriesByType, getModelsByType
+  bootstrap/
+    index.ts                  — loadImplementation(); builds state + originator + caretaker
+    state/load-state.ts       — LoadState; clone(updates) for immutable state transitions
+    state/originator.ts       — Originator; setState/getState/saveMemento/restore
+    state/caretaker.ts        — Caretaker; stores Memento[]
+    state/memento.ts          — Memento; wraps a LoadState snapshot
+  libs/helpers.ts             — schedule, runAsync, runIdle, getInitQueryParams
+  declarations/
+    enums.ts                  — SkeletonVariant, RTRBackground, CheckPointType, etc.
+    types.ts                  — MergedParams, ConfigureJsons, ButtonProps, etc.
+    constants.ts              — customer IDs, API keys, CDN/RTR URLs
+    interfaces.ts             — ConfigureParams, RtrBaseAPI, InitRTRPayload, etc.
+    cfg-configure-core.d.ts   — module declaration for @cfg.plat/configure-core
+  models/
+    logger.ts                 — Logger (debug-mode conditional logging)
+    performance.ts            — Performance (mark/measure wrapper)
+    rtr/rtr-version.ts        — RTRVersion; script download + init + version management
+    rtr/rtr-assets.ts         — RTRAssets; prefetch management via quicklink
   labels/                     — i18n service (see above)
   theme/darkMode.ts           — theme detection + toggle
   styles/theme.scss           — CSS bundle (vars, dark mode, reset, sr-only, reduced-motion)
@@ -184,7 +248,9 @@ src/
       strategy/
         types.ts              — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
         mocks.ts              — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
-        ConfiguratorInitStrategy.ts — implementación concreta de IInitStrategy
+        ConfiguratorInitStrategy.ts — implementación concreta de IInitStrategy (usa mocks)
+        base.ts               — BaseStrategy abstract; runMicrotask/runIdle/runAnimation
+        rtr-test.ts           — RTRTest extends BaseStrategy; init RTR viewer
 public/
   index.html                  — GitHub Pages shell (inline theme script + preloads)
                                  no static skeleton — each mode renders its own via React
@@ -198,4 +264,6 @@ public/
 - Brand CSS for configurator: `brands/{brand}/configurator.scss` are empty placeholders
 - `model/ModelContent.tsx`: replace placeholder SVG + mock data with real product assets/APIs when available
 - `model/strategy/mocks.ts`: replace mocks with real API calls when endpoints are ready
+- `bootstrap/index.ts`: `loadImplementation()` wired but strategy init is commented out — connect when RTRTest/StrategyContext are ready
+- `declarations/interfaces.ts`: some interfaces reference `@fluid.inc/yr-configure-wrapper/core` (external dep not yet installed)
 

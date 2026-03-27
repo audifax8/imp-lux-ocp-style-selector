@@ -1,4 +1,4 @@
-import type { Brand } from '../brands/types'
+import type { Brand } from '@/brands/types'
 
 // ── Resolución de configuración en runtime ───────────────────────────────────
 // Prioridad para cada valor:
