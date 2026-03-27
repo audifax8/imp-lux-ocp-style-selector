@@ -1,0 +1,136 @@
+// =============================================================================
+// SCSS CRÍTICO DEL CONFIGURADOR — inyectado vía ?inline en bootstrap-configurator
+// Contiene: container, tipografía base, layout del configurador y skeleton inicial.
+// =============================================================================
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// ── Container del widget ──────────────────────────────────────────────────────
+
+#imp-lux-ocp-style-selector {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-inline: 1px solid var(--border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+// ── Tipografía base ───────────────────────────────────────────────────────────
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 3.5rem;
+  letter-spacing: -1.68px;
+  margin: 2rem 0;
+
+  @media (max-width: 1024px) {
+    font-size: 2.25rem;
+    margin: 1.25rem 0;
+  }
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 0.5rem;
+
+  @media (max-width: 1024px) {
+    font-size: 1.25rem;
+  }
+}
+
+p {
+  margin: 0;
+}
+
+// ── Layout del configurador ───────────────────────────────────────────────────
+
+.configurator {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 1rem 1.5rem 3rem;
+  box-sizing: border-box;
+
+  @media (max-width: 1024px) {
+    padding: 1.5rem 1rem 2rem;
+  }
+}
+
+.configurator__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+// ── Skeleton inicial del configurador ─────────────────────────────────────────
+
+@mixin shimmer-bar {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--code-bg) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.configurator-skeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+  flex-grow: 1;
+
+  &__bar {
+    border-radius: 6px;
+    @include shimmer-bar;
+  }
+
+  &__title {
+    height: 3.25rem;
+    width: 55%;
+
+    @media (max-width: 1024px) {
+      height: 2.25rem;
+      width: 70%;
+    }
+  }
+
+  &__subtitle {
+    height: 1.25rem;
+    width: 35%;
+
+    @media (max-width: 1024px) {
+      width: 55%;
+    }
+  }
+
+  &__body {
+    height: 20rem;
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 1rem;
+    animation-delay: 0.15s;
+    @include shimmer-bar;
+  }
+}

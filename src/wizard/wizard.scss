@@ -1,9 +1,66 @@
 // =============================================================================
-// SCSS WIZARD — bundle principal
-// Contiene: layout del wizard, estilos de navegación y skeletons de cada step.
+// SCSS WIZARD — inyectado vía ?inline en bootstrap antes del mount
+// Contiene: container, tipografía, layout del wizard, navegación y skeletons.
 // Los skeletons deben estar aquí porque se renderizan ANTES de que cargue
 // el chunk lazy del step.
 // =============================================================================
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// ── Container del widget ──────────────────────────────────────────────────────
+
+#imp-lux-ocp-style-selector {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-inline: 1px solid var(--border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+// ── Tipografía base ───────────────────────────────────────────────────────────
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 3.5rem;
+  letter-spacing: -1.68px;
+  margin: 2rem 0;
+
+  @media (max-width: 1024px) {
+    font-size: 2.25rem;
+    margin: 1.25rem 0;
+  }
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 0.5rem;
+
+  @media (max-width: 1024px) {
+    font-size: 1.25rem;
+  }
+}
+
+p {
+  margin: 0;
+}
 
 // ── Dark mode switch ─────────────────────────────────────────────────────────
 // Crítico: se renderiza desde el primer frame del wizard.

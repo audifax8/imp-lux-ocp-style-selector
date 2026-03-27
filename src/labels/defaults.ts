@@ -6,6 +6,9 @@ export const DEFAULT_LABELS: Labels = {
   widget: {
     title: 'Style Selector',
   },
+  configurator: {
+    loading: 'Loading configurator',
+  },
   darkMode: {
     label: 'Dark mode',
   },

@@ -5,6 +5,9 @@ export interface Labels {
   widget: {
     title: string              // "Style Selector" — landmark aria-label + sr-only h1
   }
+  configurator: {
+    loading: string            // "Loading configurator" — aria-label del skeleton inicial
+  }
   darkMode: {
     label: string              // "Dark mode" — aria-label del toggle
   }

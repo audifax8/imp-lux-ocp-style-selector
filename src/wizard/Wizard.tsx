@@ -5,7 +5,6 @@ import WizardStep2Skeleton from './WizardStep2Skeleton'
 import DarkModeSwitch from '../components/DarkModeSwitch'
 import { getCurrentTheme, toggleTheme, type Theme } from '../theme/darkMode'
 import { useLabels } from '../labels/useLabels'
-import './wizard.scss'
 
 const WizardStep1 = lazy(() => import('./WizardStep1'))
 const WizardStep2 = lazy(() => import('./WizardStep2'))

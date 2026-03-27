@@ -22,9 +22,10 @@
     </script>
 
     <!--
-      Preloads: navegador descarga CSS y JS en paralelo desde el <head>,
-      antes de que el parser llegue al <link> y <script> del body.
-      El entry JS es muy pequeño (~4 KB); bootstrap + vendor cargan on-demand.
+      Preloads: navegador descarga CSS y JS en paralelo desde el <head>.
+      El CSS del bundle solo contiene theme.scss (vars + reset, ~1 KB).
+      El CSS de cada modo se inyecta vía ?inline desde su bootstrap.
+      El entry JS es muy pequeño (~4 KB); bootstraps cargan on-demand.
     -->
     <link rel="preload" href="imp-lux-ocp-style-selector.css" as="style" />
     <link rel="preload" href="imp-lux-ocp-style-selector.js" as="script" crossorigin />
@@ -33,35 +34,24 @@
   </head>
   <body>
     <!--
-      Skeleton estático: visible de inmediato (solo HTML + CSS, cero JS).
-      React monta aquí cuando el chunk bootstrap carga y reemplaza este markup.
-      Las clases step1-skeleton__card y wizard usan los mismos estilos de
-      critical.scss + wizard.scss que React usa — la transición es seamless.
+      El modo activo (wizard | configurator) se detecta en main.tsx:
+        ?mode=wizard   → carga bootstrap wizard
+        por defecto    → carga bootstrap configurator
+
+      El skeleton de cada modo es renderizado por React inmediatamente después
+      del mount, con los estilos inyectados desde el bootstrap (?inline).
     -->
     <div
       id="imp-lux-ocp-style-selector"
       role="region"
       aria-label="Style Selector"
-    >
-      <div class="wizard">
-        <div class="wizard__toolbar"></div>
-        <div
-          class="step1-skeleton"
-          role="status"
-          aria-live="polite"
-          aria-label="Loading"
-        >
-          <div class="step1-skeleton__card"></div>
-          <div class="step1-skeleton__card"></div>
-          <div class="step1-skeleton__card"></div>
-        </div>
-      </div>
-    </div>
+      aria-busy="true"
+    ></div>
 
     <!--
       type="module" activa ES modules nativos.
-      El entry (~4 KB) hace el setup síncrono (tema, brand) y luego
-      dispara import('./bootstrap') que carga React + App de forma lazy.
+      El entry (~4 KB) hace el setup síncrono (tema, modo) y luego
+      dispara el import del bootstrap correspondiente de forma lazy.
     -->
     <script type="module" src="imp-lux-ocp-style-selector.js"></script>
   </body>

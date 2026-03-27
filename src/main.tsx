@@ -1,17 +1,15 @@
-// SCSS crítico: variables (light + dark), reset, skeleton — igual para todos los brands.
-// Este import genera el .css del bundle principal, NO añade bytes al .js.
-import './styles/critical.scss'
-import { activeBrand } from './brands/detect'
-import { injectBrandStyles } from './brands/loader'
+// SCSS base: variables de tema (light/dark), reset, sr-only — compartido entre modos.
+// No incluye nada específico de wizard ni de configurador.
+import './styles/theme.scss'
 import { getInitialTheme, applyTheme } from './theme/darkMode'
+import { activeMode } from './mode/detect'
 
 // ── Setup síncrono ANTES de cualquier render ──────────────────────────────────
-// Debe ocurrir aquí, en el entry, para evitar FOUC de tema y brand.
+// Aplica el tema antes del mount para evitar FOUC de tema.
+// Las variables CSS ya están disponibles vía theme.scss (cargado como <link>).
 applyTheme(getInitialTheme())
-injectBrandStyles(activeBrand)
 
 // ── Preparar el contenedor del widget ────────────────────────────────────────
-// El cliente puede tener el div ya en su HTML; si no, lo creamos al final del body.
 const MOUNT_ID = 'imp-lux-ocp-style-selector'
 
 let container = document.getElementById(MOUNT_ID)
@@ -25,7 +23,13 @@ if (!container) {
 container.setAttribute('role', 'region')
 container.setAttribute('aria-label', 'Style Selector')
 
-// ── Cargar React + App de forma lazy ─────────────────────────────────────────
-// react-dom (~136 KB) no bloquea el entry. El skeleton estático del HTML
-// (o el que haya en el container) es visible mientras el chunk carga.
-import('./bootstrap').then(({ mount }) => mount(container!))
+// ── Cargar el bootstrap del modo activo de forma lazy ─────────────────────────
+// Vite produce dos árboles de chunks completamente separados:
+//   bootstrap       → wizard (CSS + JS)
+//   bootstrap-configurator → configurador (CSS + JS)
+// El modo inactivo nunca se descarga.
+if (activeMode === 'wizard') {
+  import('./bootstrap').then(({ mount }) => mount(container!))
+} else {
+  import('./bootstrap-configurator').then(({ mount }) => mount(container!))
+}
