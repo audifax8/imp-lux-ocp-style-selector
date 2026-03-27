@@ -31,6 +31,7 @@ export class RTRTest extends BaseStrategy {
   }
 
   override async init(): Promise<void> {
+    console.log(1);
     const state = this.originator.getState();
     const logger = state.getLogger();
     const performance = state.getPerformance();
@@ -41,6 +42,7 @@ export class RTRTest extends BaseStrategy {
       performance?.processEnd('initRTR');
       performance?.logMeasure('initRTR');
     } catch (e) {
+      console.log(e);
       logger?.error('[Error]');
       logger?.object(e);
     }
@@ -105,6 +107,7 @@ export class RTRTest extends BaseStrategy {
         this.runAnimation(async () => {
           const background = this.getBackGround(params);
           const initResult = await this.rtrVersion.init(token, background);
+          console.log({ initResult });
           if (!initResult) {
             throw new Error('[RTR] init failed');
           }
@@ -119,6 +122,7 @@ export class RTRTest extends BaseStrategy {
       });
       return true;
     } catch (e) {
+      console.log(e);
       logger?.error('[RTR] init failed');
       logger?.object(e);
       return false;

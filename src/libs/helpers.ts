@@ -163,7 +163,7 @@ export function getInitQueryParams(): MergedParams {
     skipPreload: parseBoolParam(skipPreload),
     apiKey,
     useProdEndpoint: parseBoolParam(useProdEndpoint),
-    ocHierarchy: ocHierarchy ?? configureParams.ocHierarchy,
+    ocHierarchy: ocHierarchy ?? configureParams?.ocHierarchy,
     rtrVersion: rtrVersion
   };
   const mergedParams = {

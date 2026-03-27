@@ -32,6 +32,8 @@ const Model = () => {
           <ModelContent phase1Data={phase1Data} phase2Data={phase2Data} />
         </Suspense>
       )}
+      <div id="viewer" className="yr-model-rtr" />
+      <div id="container" className="yr-model-rtr" />
     </div>
   )
 }

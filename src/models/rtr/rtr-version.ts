@@ -193,6 +193,7 @@ export class RTRVersion {
             this.logger?.object(e);
           },
           onError: (e: unknown) => {
+            console.log(e);
             this.performance?.processEnd('RenderingRTR');
             this.performance?.logMeasure('RenderingRTR');
             this.logger?.log('[RTR] onError cb');

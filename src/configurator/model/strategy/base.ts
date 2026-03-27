@@ -24,8 +24,8 @@ export abstract class BaseStrategy {
     this.caretaker = caretaker;
     this.originator = originator;
     this.state = originator.getState();
-    const params = this.state.getParams();
-    if (params.yrEnv) {
+    const params = this.state?.getParams();
+    if (params?.yrEnv) {
       //window.caretaker = this.caretaker;
     }
   }
