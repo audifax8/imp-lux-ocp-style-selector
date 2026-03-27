@@ -23,14 +23,22 @@ export const getCurrentTheme = (): Theme => {
   return attr === 'dark' || attr === 'light' ? attr : getInitialTheme()
 }
 
-// Aplica el tema al elemento raíz. Llamar siempre antes de que React monte.
+// Aplica el tema al elemento raíz sin tocar localStorage.
+// Usar en el entry (main.tsx) para evitar un setItem síncrono innecesario
+// en el critical path — el valor ya estaba guardado o viene del sistema.
 export const applyTheme = (theme: Theme): void => {
+  document.documentElement.dataset.theme = theme
+}
+
+// Persiste el tema elegido por el usuario y lo aplica al DOM.
+// Llamar solo desde toggleTheme (acción explícita del usuario).
+export const persistTheme = (theme: Theme): void => {
   document.documentElement.dataset.theme = theme
   localStorage.setItem(STORAGE_KEY, theme)
 }
 
 export const toggleTheme = (current: Theme): Theme => {
   const next: Theme = current === 'dark' ? 'light' : 'dark'
-  applyTheme(next)
+  persistTheme(next)
   return next
 }
