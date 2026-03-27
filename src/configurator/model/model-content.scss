@@ -26,6 +26,38 @@
   }
 }
 
+// ── Info de modelo (fase 1) ───────────────────────────────────────────────────
+
+.model-content__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  animation: mc-fade-in 0.3s ease both;
+}
+
+.model-content__name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.model-content__collection {
+  font-size: 0.8125rem;
+  color: var(--text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.model-content__price {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0;
+}
+
 // ── Etiqueta de brand ─────────────────────────────────────────────────────────
 
 .model-content__brand {
@@ -49,4 +81,39 @@
   border-radius: 50%;
   background: var(--accent);
   flex-shrink: 0;
+}
+
+// ── Recomendaciones (fase 2) ──────────────────────────────────────────────────
+
+.model-content__recommendations {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  animation: mc-fade-in 0.4s ease both;
+}
+
+.model-content__rec-item {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--accent-border);
+  font-size: 0.75rem;
+  color: var(--text);
+  background: var(--accent-bg);
+}
+
+// ── Animación de aparición ────────────────────────────────────────────────────
+
+@keyframes mc-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

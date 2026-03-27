@@ -5,13 +5,19 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import modelContentStyles from './model-content.scss?inline'
 import { activeBrand } from '../../brands/detect'
+import type { InitPhase1Data, InitPhase2Data } from './strategy/types'
 
 const styleEl = document.createElement('style')
 styleEl.dataset.id = 'configurator-model-content'
 styleEl.textContent = modelContentStyles
 document.head.appendChild(styleEl)
 
-const ModelContent = () => (
+interface ModelContentProps {
+  phase1Data: InitPhase1Data
+  phase2Data: InitPhase2Data | null
+}
+
+const ModelContent = ({ phase1Data, phase2Data }: ModelContentProps) => (
   <div className="model-content">
     <svg
       className="model-content__glasses"
@@ -47,10 +53,24 @@ const ModelContent = () => (
       />
     </svg>
 
+    <div className="model-content__info">
+      <p className="model-content__name">{phase1Data.modelName}</p>
+      <p className="model-content__collection">{phase1Data.collection}</p>
+      <p className="model-content__price">{phase1Data.price}</p>
+    </div>
+
     <div className="model-content__brand">
       <span className="model-content__brand-dot" />
       {activeBrand.toUpperCase()}
     </div>
+
+    {phase2Data && (
+      <ul className="model-content__recommendations" aria-label="Recommendations">
+        {phase2Data.recommendations.map(rec => (
+          <li key={rec.id} className="model-content__rec-item">{rec.name}</li>
+        ))}
+      </ul>
+    )}
   </div>
 )
 

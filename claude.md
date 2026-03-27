@@ -116,12 +116,21 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 
 ## Configurator
 - `Configurator.tsx` — main chunk; dark mode toggle + lazy `Model`
-- `ConfiguratorSkeleton.tsx` — skeleton shown via Suspense while Configurator chunk loads
 - `configurator.scss` — ?inline CSS (container, typography, skeleton del configurador)
-- `model/Model.tsx` — lazy chunk; inyecta `model.scss?inline`, muestra `ModelSkeleton` (gafas shimmer) mientras `ModelContent` carga
-- `model/ModelContent.tsx` — lazy chunk; inyecta `model-content.scss?inline`, muestra SVG gafas con colores del brand activo + badge de brand
-- `model/model.scss` — CSS del skeleton de gafas (keyframe + shapes shimmer)
-- `model/model-content.scss` — CSS de las gafas reales (hover, badge) — SOLO carga tras resolver el skeleton
+- `model/Model.tsx` — lazy chunk; inyecta `model.scss?inline`; usa `useInitStrategy` para orquestar Fase 1 → Fase 2; muestra `ModelSkeleton` mientras Fase 1 carga, luego monta `ModelContent`
+- `model/ModelSkeleton.tsx` — gafas shimmer (CSS div-based)
+- `model/ModelContent.tsx` — lazy chunk; inyecta `model-content.scss?inline`; recibe `phase1Data` + `phase2Data` como props; SVG gafas + info de modelo + badge de brand + recomendaciones (fase 2)
+- `model/model.scss` — ?inline CSS del skeleton (keyframe + shapes shimmer)
+- `model/model-content.scss` — ?inline CSS del contenido (gafas, info modelo, badge, recomendaciones, animación `mc-fade-in`)
+- `model/useInitStrategy.ts` — hook que orquesta la cadena Fase 1 → Fase 2 con flag `cancelled` para cleanup en desmontaje
+- `model/strategy/types.ts` — interfaces `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data`
+- `model/strategy/mocks.ts` — `fetchPhase1Mock` (~900ms, datos de modelo) + `fetchPhase2Mock` (~600ms, recomendaciones + sessionId)
+- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy` usando los mocks
+
+### Flujo de inicialización del configurador
+1. Skeleton visible de inmediato (mount)
+2. Fase 1 carga en background (~900ms) — no bloquea el hilo principal → al resolver: gafas + info de modelo visibles
+3. Fase 2 arranca SOLO tras Fase 1 (~600ms) — no bloquea → al resolver: recomendaciones aparecen con animación `mc-fade-in`
 
 ## Dark mode
 `src/theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React.
@@ -164,14 +173,18 @@ src/
     WizardStep2.scss          — on-demand CSS (?inline)
   configurator/
     Configurator.tsx          — main chunk, theme toggle + lazy Model
-    ConfiguratorSkeleton.tsx  — skeleton while Configurator chunk loads
     configurator.scss         — ?inline CSS (container, typography, skeleton)
     model/
-      Model.tsx               — lazy chunk; skeleton de gafas mientras ModelContent carga
+      Model.tsx               — lazy chunk; useInitStrategy hook; skeleton → ModelContent
       ModelSkeleton.tsx       — gafas shimmer (CSS div-based)
-      ModelContent.tsx        — lazy chunk; SVG gafas + badge brand activo
+      ModelContent.tsx        — lazy chunk; props: phase1Data + phase2Data; SVG gafas + info + badge + recomendaciones
       model.scss              — ?inline CSS del skeleton (keyframe + shapes)
-      model-content.scss      — ?inline CSS del contenido (gafas reales, hover, badge)
+      model-content.scss      — ?inline CSS del contenido (gafas, info, badge, recomendaciones, mc-fade-in)
+      useInitStrategy.ts      — hook; Fase 1 → Fase 2 chain; cancelled flag para cleanup
+      strategy/
+        types.ts              — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
+        mocks.ts              — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
+        ConfiguratorInitStrategy.ts — implementación concreta de IInitStrategy
 public/
   index.html                  — GitHub Pages shell (inline theme script + preloads)
                                  no static skeleton — each mode renders its own via React
@@ -183,5 +196,6 @@ public/
 - Delete `main` branch on both repos after changing default branch in GitHub Settings
 - `AppConfigurator.tsx`: re-enable `LabelsProvider` when configurator i18n is needed
 - Brand CSS for configurator: `brands/{brand}/configurator.scss` are empty placeholders
-- `model/ModelContent.tsx`: replace placeholder SVG with real product assets when available
+- `model/ModelContent.tsx`: replace placeholder SVG + mock data with real product assets/APIs when available
+- `model/strategy/mocks.ts`: replace mocks with real API calls when endpoints are ready
 

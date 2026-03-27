@@ -3,8 +3,7 @@
 // Se descarga solo cuando el modo activo es 'configurator'.
 // El SCSS ya fue inyectado en bootstrap-configurator antes del mount.
 // ─────────────────────────────────────────────────────────────────────────────
-import { lazy, Suspense, useState, useEffect } from 'react'
-import ConfiguratorSkeleton from './ConfiguratorSkeleton'
+import { lazy, useState, useEffect } from 'react'
 import DarkModeSwitch from '../components/DarkModeSwitch'
 import { getCurrentTheme, toggleTheme, type Theme } from '../theme/darkMode'
 import { useLabels } from '../labels/useLabels'
@@ -31,9 +30,7 @@ const Configurator = () => {
           onToggle={() => setTheme(prev => toggleTheme(prev))}
         />
       </div>
-      <Suspense fallback={<ConfiguratorSkeleton />}>
-        <Model />
-      </Suspense>
+      <Model />
     </div>
   )
 }

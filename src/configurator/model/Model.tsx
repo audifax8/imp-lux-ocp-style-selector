@@ -5,24 +5,35 @@
 // garantizando que el skeleton de gafas esté estilado desde el primer frame.
 // ─────────────────────────────────────────────────────────────────────────────
 import modelStyles from './model.scss?inline'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import ModelSkeleton from './ModelSkeleton'
+import { useInitStrategy } from './useInitStrategy'
+import { ConfiguratorInitStrategy } from './strategy/ConfiguratorInitStrategy'
 
 const styleEl = document.createElement('style')
 styleEl.dataset.id = 'configurator-model'
 styleEl.textContent = modelStyles
 document.head.appendChild(styleEl)
 
-// ModelContent se carga SOLO cuando el skeleton resuelve.
+// ModelContent se carga SOLO cuando Fase 1 ha resuelto.
 // Su CSS (model-content.scss) se inyecta al cargar este chunk.
 const ModelContent = lazy(() => import('./ModelContent'))
 
-const Model = () => (
-  <div className="model">
-    <Suspense fallback={<ModelSkeleton />}>
-      <ModelContent />
-    </Suspense>
-  </div>
-)
+const Model = () => {
+  const strategy = useMemo(() => new ConfiguratorInitStrategy(), [])
+  const { phase1Data, phase2Data } = useInitStrategy(strategy)
+
+  return (
+    <div className="model">
+      {phase1Data === null ? (
+        <ModelSkeleton />
+      ) : (
+        <Suspense fallback={<ModelSkeleton />}>
+          <ModelContent phase1Data={phase1Data} phase2Data={phase2Data} />
+        </Suspense>
+      )}
+    </div>
+  )
+}
 
 export default Model
