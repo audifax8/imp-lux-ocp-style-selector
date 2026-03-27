@@ -139,9 +139,9 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 - `model/useInitStrategy.ts` — hook que orquesta la cadena Fase 1 → Fase 2 con flag `cancelled` para cleanup en desmontaje
 - `model/strategy/types.ts` — interfaces `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data`
 - `model/strategy/mocks.ts` — `fetchPhase1Mock` (~900ms, datos de modelo) + `fetchPhase2Mock` (~600ms, recomendaciones + sessionId)
-- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy` usando los mocks
+- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy`; en `executePhase1` instancia `Logger`/`Performance` desde params, construye `LoadState`+`Originator`+`Caretaker`, dispara `RTRTest.init()` en paralelo (fire-and-forget) y devuelve `fetchPhase1Mock()`
 - `model/strategy/base.ts` — `BaseStrategy` abstract class; provee `runMicrotask/runIdle/runAnimation` via `@/libs/helpers.schedule`
-- `model/strategy/rtr-test.ts` — `RTRTest extends BaseStrategy`; estrategia concreta para RTR: descarga script, carga assets en microtask, inicia el viewer
+- `model/strategy/rtr-test.ts` — `RTRTest extends BaseStrategy`; descarga script (`downloadScript`), carga assets en microtask (`loadRTRAssets`, prefetch), inicia viewer en `requestAnimationFrame` (`initRTR`); errores de init propagan correctamente via `runAnimation`
 
 ### Flujo de inicialización del configurador
 1. Skeleton visible de inmediato (mount)
@@ -248,9 +248,9 @@ src/
       strategy/
         types.ts              — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
         mocks.ts              — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
-        ConfiguratorInitStrategy.ts — implementación concreta de IInitStrategy (usa mocks)
+        ConfiguratorInitStrategy.ts — executePhase1: Logger+Performance desde params, LoadState+Originator+Caretaker, RTRTest.init() fire-and-forget + fetchPhase1Mock()
         base.ts               — BaseStrategy abstract; runMicrotask/runIdle/runAnimation
-        rtr-test.ts           — RTRTest extends BaseStrategy; init RTR viewer
+        rtr-test.ts           — RTRTest extends BaseStrategy; downloadScript + loadRTRAssets (microtask) + initRTR (rAF); errores propagan via runAnimation
 public/
   index.html                  — GitHub Pages shell (inline theme script + preloads)
                                  no static skeleton — each mode renders its own via React
