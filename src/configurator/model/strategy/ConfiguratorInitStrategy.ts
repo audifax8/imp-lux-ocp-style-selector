@@ -11,6 +11,7 @@ export class ConfiguratorInitStrategy
   implements IInitStrategy<InitPhase1Data, InitPhase2Data>
 {
   async executePhase1(): Promise<InitPhase1Data> {
+    console.log('here 1');
     try {
       const [{ getInitQueryParams }, { RTRTest }, { Caretaker }, { Originator }, { LoadState }] = await Promise.all([
         import('@/libs/helpers'),
@@ -38,7 +39,7 @@ export class ConfiguratorInitStrategy
   }
 
   executePhase2(phase1Result: InitPhase1Data): Promise<InitPhase2Data> {
-    console.log('here');
+    console.log('here 2');
     return fetchPhase2Mock(phase1Result)
   }
 }

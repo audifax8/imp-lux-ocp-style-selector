@@ -17,10 +17,20 @@ export default defineConfig({
         format: 'es',
         // Nombre fijo para el entry principal
         entryFileNames: 'imp-lux-ocp-style-selector.js',
-        // Chunks lazy con hash para cache busting (WizardStep1, WizardStep2, bootstrap…)
-        chunkFileNames: 'chunks/[name]-[hash].js',
+        // Chunks lazy con hash para cache busting (WizardStep1, WizardStep2…)
+        // excepción: bootstrap-configurator y bootstrap-wizard con nombre fijo
+        // para permitir modulepreload y rastreo de peso por modo.
+        chunkFileNames: (chunkInfo) => {
+          if (chunkInfo.name === 'bootstrap-configurator') return 'chunks/bootstrap-configurator.js'
+          if (chunkInfo.name === 'bootstrap') return 'chunks/bootstrap-wizard.js'
+          return 'chunks/[name]-[hash].js'
+        },
         // CSS del bundle principal con nombre fijo; assets estáticos sin hash
         assetFileNames: 'imp-lux-ocp-style-selector.[ext]',
+        // react-dom en su propio chunk para no contaminar chunks de app
+        manualChunks: (id) => {
+          if (id.includes('node_modules/react-dom')) return 'react-dom'
+        },
       },
     },
     // CSS dividido por chunk: cada step lazy obtiene su propio .css que Vite

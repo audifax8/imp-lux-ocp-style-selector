@@ -23,12 +23,25 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 
 ## Build (Vite 8 / Rolldown)
 - Format: `es` (ES modules, real code splitting)
-- Entry: `imp-lux-ocp-style-selector.js` (tiny, ~2.6 KB)
-- CSS bundle: `imp-lux-ocp-style-selector.css` — only `theme.scss` (~1.6 KB, no mode-specific CSS)
-- Chunks: `chunks/[name]-[hash].js`
+- Entry: `imp-lux-ocp-style-selector.js` (tiny, ~2.8 KB)
+- CSS bundle: `imp-lux-ocp-style-selector.css` — only `theme.scss` (~1.2 KB gzip, no mode-specific CSS)
+- Chunks lazy: `chunks/[name]-[hash].js` (con hash para cache busting)
+- **Chunks con nombre fijo** (sin hash, para `modulepreload` y rastreo de peso):
+  - `chunks/bootstrap-configurator.js` — bootstrap del modo configurator
+  - `chunks/bootstrap-wizard.js` — bootstrap del modo wizard
+- **`manualChunks`**: `react-dom` en su propio chunk `chunks/react-dom-[hash].js` — separado para no contaminar chunks de app
 - `base: './'` — relative paths for GitHub Pages subdirectory
 - `cssCodeSplit: false` — all non-`?inline` CSS goes to the single CSS bundle
 - `resolve.alias: { '@': src/ }` — `@/` path alias for all imports
+
+## Bundle sizes (baseline RBN-5144)
+Medido con `npm run size` (`scripts/bundle-size.mjs`, appends a `bundle-sizes.log`):
+- **Configurator total** (shared + configurator chunks): ~211 KB raw / ~69 KB gzip
+- **Wizard total** (shared + wizard chunks): ~210 KB raw / ~67 KB gzip
+- De eso, ~185 KB raw / ~57 KB gzip es `react-dom` (no controlable)
+- Código de app propio: ~26 KB raw / ~12 KB gzip
+
+`npm run build && npm run size -- --label "descripción"` tras cada feature para rastrear crecimiento.
 
 ## TypeScript config (`tsconfig.app.json`)
 - `paths: { "@/*": ["./src/*"] }` — mirrors Vite alias so tsc resolves `@/` imports
