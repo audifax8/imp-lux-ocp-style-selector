@@ -1,10 +1,40 @@
 import { defineConfig } from 'vitest/config'
 import { resolve } from 'path';
 import react from '@vitejs/plugin-react'
+import type { Plugin } from 'vite'
+
+// @cfg.plat/fluid-product-urls/configure.js asigna `.name` directamente a funciones
+// (methods[method].name = method). En strict mode (ESM) Function.name es non-writable,
+// lo que lanza TypeError en runtime.
+//
+// Vite 8 usa Rolldown para build y para el pre-bundling de deps (optimizeDeps).
+// `transform` opera en build; `optimizeDeps.rolldownOptions.plugins` cubre el
+// pre-bundling (cachea en node_modules/.vite/deps/).
+function patchFluidProductUrls(): Plugin {
+  const BROKEN = 'methods[method].name = method;'
+  const FIXED = 'try { Object.defineProperty(methods[method], "name", { value: method, configurable: true, writable: true }); } catch(e) {}'
+
+  const patch = (code: string, id: string) => {
+    if (!id.includes('fluid-product-urls/configure.js')) return
+    return code.replace(BROKEN, FIXED)
+  }
+
+  return {
+    name: 'patch-fluid-product-urls',
+    transform: patch,
+    config: () => ({
+      optimizeDeps: {
+        rolldownOptions: {
+          plugins: [{ name: 'patch-fluid-product-urls-prebundle', transform: patch }]
+        }
+      }
+    })
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), patchFluidProductUrls()],
   // Rutas relativas: imprescindible para GitHub Pages en subdirectorio
   // (https://user.github.io/repo-name/). Sin esto los dynamic imports de chunks
   // apuntan a /chunks/… en lugar de ./chunks/…
@@ -13,28 +43,27 @@ export default defineConfig({
     rollupOptions: {
       input: 'src/main.tsx',
       output: {
-        // ES modules: permite dynamic import → chunks reales por step del wizard
+        // ES modules: permite dynamic import → chunks reales por modo
         format: 'es',
-        // Nombre fijo para el entry principal
         entryFileNames: 'imp-lux-ocp-style-selector.js',
-        // Chunks lazy con hash para cache busting (WizardStep1, WizardStep2…)
-        // excepción: bootstrap-configurator y bootstrap-wizard con nombre fijo
-        // para permitir modulepreload y rastreo de peso por modo.
+        // Nombres fijos para bootstrap-configurator y bootstrap-wizard:
+        // permiten modulepreload y rastreo de peso por modo.
+        // El resto lleva hash para cache busting.
         chunkFileNames: (chunkInfo) => {
           if (chunkInfo.name === 'bootstrap-configurator') return 'chunks/bootstrap-configurator.js'
           if (chunkInfo.name === 'bootstrap') return 'chunks/bootstrap-wizard.js'
           return 'chunks/[name]-[hash].js'
         },
-        // CSS del bundle principal con nombre fijo; assets estáticos sin hash
         assetFileNames: 'imp-lux-ocp-style-selector.[ext]',
-        // react-dom en su propio chunk para no contaminar chunks de app
+        // Deps pesadas en chunks propios — se descargan solo cuando se necesitan
         manualChunks: (id) => {
           if (id.includes('node_modules/react-dom')) return 'react-dom'
+          if (id.includes('node_modules/@cfg.plat/configure-core')) return 'configure-core'
+          if (id.includes('node_modules/@fluid.inc/yr-configure-wrapper')) return 'yr-configure-wrapper'
+          if (id.includes('node_modules/@fluid.inc/cmol-utils')) return 'cmol-utils'
         },
       },
     },
-    // CSS dividido por chunk: cada step lazy obtiene su propio .css que Vite
-    // inyecta automáticamente al cargar el chunk. Los ?inline bypasean esto.
     cssCodeSplit: false,
   },
   test: {
@@ -43,8 +72,20 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
   },
   resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
-    }
+    alias: [
+      // jsonp-node.js es Node.js-only (usa fs + vm).
+      // jsonp-client tiene browser:{"./jsonp-node.js":false} pero Rolldown lo ignora.
+      // Regex necesario porque el require es relativo y Rolldown lo resuelve a ruta
+      // absoluta antes de buscar aliases por string.
+      {
+        find: /.*jsonp-node(\.js)?$/,
+        replacement: resolve(__dirname, 'src/stubs/jsonp-node.js'),
+      },
+      { find: '@', replacement: resolve(__dirname, 'src') },
+    ]
+  },
+  define: {
+    'process.browser': true,
+    'process.env.FLUID_CONFIGURATIONS_VERSION': parseInt('3.13.0')
   }
 })

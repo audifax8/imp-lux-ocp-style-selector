@@ -29,10 +29,19 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 - **Chunks con nombre fijo** (sin hash, para `modulepreload` y rastreo de peso):
   - `chunks/bootstrap-configurator.js` — bootstrap del modo configurator
   - `chunks/bootstrap-wizard.js` — bootstrap del modo wizard
-- **`manualChunks`**: `react-dom` en su propio chunk `chunks/react-dom-[hash].js` — separado para no contaminar chunks de app
+- **`manualChunks`**: deps pesadas en chunks propios (cargadas solo cuando se necesitan):
+  - `react-dom` → `chunks/react-dom-[hash].js`
+  - `@cfg.plat/configure-core` → `chunks/configure-core-[hash].js`
+  - `@fluid.inc/yr-configure-wrapper` → `chunks/yr-configure-wrapper-[hash].js`
+  - `@fluid.inc/cmol-utils` → `chunks/cmol-utils-[hash].js`
 - `base: './'` — relative paths for GitHub Pages subdirectory
 - `cssCodeSplit: false` — all non-`?inline` CSS goes to the single CSS bundle
-- `resolve.alias: { '@': src/ }` — `@/` path alias for all imports
+- `resolve.alias` — `@/` path alias + stub de `jsonp-node.js` (Node-only, ver abajo)
+- `define` — `process.browser: true` + `FLUID_CONFIGURATIONS_VERSION` para `@cfg.plat/configure-core`
+
+## Workarounds de dependencias (vite.config.ts)
+- **`patchFluidProductUrls` plugin** — `@cfg.plat/fluid-product-urls/configure.js` asigna `Function.name` directamente (`methods[method].name = method`), que falla en strict mode ESM. El plugin reemplaza la línea por `Object.defineProperty` con `writable: true`. Aplica en build (`transform` hook) y en dev pre-bundling (`optimizeDeps.rolldownOptions.plugins`).
+- **`src/stubs/jsonp-node.js`** — `jsonp-client` tiene `browser: {"./jsonp-node.js": false}` pero Rolldown lo ignora. El stub reemplaza el módulo Node-only (usa `fs`/`vm`) para eliminar los warnings de build. Alias via regex `/.*jsonp-node(\.js)?$/` (necesario porque el require es relativo y Rolldown resuelve a ruta absoluta antes de buscar aliases).
 
 ## Bundle sizes (baseline RBN-5144)
 Medido con `npm run size` (`scripts/bundle-size.mjs`, appends a `bundle-sizes.log`):

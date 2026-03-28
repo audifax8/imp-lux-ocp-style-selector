@@ -1,0 +1,13 @@
+diff --git a/node_modules/@cfg.plat/fluid-product-urls/configure.js b/node_modules/@cfg.plat/fluid-product-urls/configure.js
+index e0a9348..ba442c4 100644
+--- a/node_modules/@cfg.plat/fluid-product-urls/configure.js
++++ b/node_modules/@cfg.plat/fluid-product-urls/configure.js
+@@ -7,7 +7,7 @@ var urlSettings = require("./configure.json"),
+ for (method in urlTemplates) {
+   if (urlTemplates.hasOwnProperty(method)) {
+     methods[method] = getUrlComposer(urlTemplates[method], urlSettings);
+-    methods[method].name = method;
++    Object.defineProperty(methods[method], "name", { value: method });
+   }
+ }
+ 
