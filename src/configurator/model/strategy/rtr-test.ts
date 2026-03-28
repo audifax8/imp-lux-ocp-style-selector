@@ -51,7 +51,7 @@ export class RTRTest extends BaseStrategy {
     const logger = state.getLogger();
     const performance = state.getPerformance();
     //const objectsFactory = state.getObjectsFactory();
-    this.runMicrotask(async () => {
+    this.runIdle(async () => {
       try {
         performance?.processStart('loadRTRAssets');
         //TODO it needs to be sent by configure params
