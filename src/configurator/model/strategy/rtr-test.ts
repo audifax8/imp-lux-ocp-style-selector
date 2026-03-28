@@ -35,7 +35,7 @@ export class RTRTest extends BaseStrategy {
     const logger = state.getLogger();
     const performance = state.getPerformance();
     try {
-      this.loadRTRAssets();
+      //this.loadRTRAssets();
       performance?.processStart('initRTR');
       await this.initRTR();
       performance?.processEnd('initRTR');
