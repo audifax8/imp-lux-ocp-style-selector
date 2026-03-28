@@ -30,6 +30,16 @@
     <link rel="preload" href="imp-lux-ocp-style-selector.css" as="style" />
     <link rel="preload" href="imp-lux-ocp-style-selector.js" as="script" crossorigin />
 
+    <!--
+      modulepreload para el modo configurator (default).
+      El browser descarga estos chunks desde el <head>, antes de que React
+      arranque, para que executePhase1 los tenga en caché y resuelva sin latencia.
+      Sin preload: los 5 módulos de init se descubrían tarde (Model → useInitStrategy → executePhase1).
+      Con preload: un único chunk (9 KB gz) ya disponible cuando se necesita.
+    -->
+    <link rel="modulepreload" href="chunks/bootstrap-configurator.js" crossorigin />
+    <link rel="modulepreload" href="chunks/configurator-init.js" crossorigin />
+
     <link rel="stylesheet" href="imp-lux-ocp-style-selector.css" />
   </head>
   <body>

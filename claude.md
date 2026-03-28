@@ -29,6 +29,7 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 - **Chunks con nombre fijo** (sin hash, para `modulepreload` y rastreo de peso):
   - `chunks/bootstrap-configurator.js` — bootstrap del modo configurator
   - `chunks/bootstrap-wizard.js` — bootstrap del modo wizard
+  - `chunks/configurator-init.js` — todas las deps de `executePhase1` en un único chunk (9.1 KB / 3.4 KB gzip); preloadeado en `index.html` para que resuelva de caché con latencia cero
 - **`manualChunks`**: deps pesadas en chunks propios (cargadas solo cuando se necesitan):
   - `react-dom` → `chunks/react-dom-[hash].js`
   - `@cfg.plat/configure-core` → `chunks/configure-core-[hash].js`
@@ -161,7 +162,8 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 - `model/useInitStrategy.ts` — hook que orquesta la cadena Fase 1 → Fase 2 con flag `cancelled` para cleanup en desmontaje
 - `model/strategy/types.ts` — interfaces `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data`
 - `model/strategy/mocks.ts` — `fetchPhase1Mock` (~900ms, datos de modelo) + `fetchPhase2Mock` (~600ms, recomendaciones + sessionId)
-- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy`; en `executePhase1` instancia `Logger`/`Performance` desde params, construye `LoadState`+`Originator`+`Caretaker`, dispara `RTRTest.init()` en paralelo (fire-and-forget) y devuelve `fetchPhase1Mock()`
+- `model/strategy/configurator-init.ts` — chunk preloadeable (nombre fijo); re-exporta `getInitQueryParams`, `RTRTest`, `Caretaker`, `Originator`, `LoadState`; consolida las 5 deps de init en un único dynamic import
+- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy`; executePhase1: `import('./configurator-init')` (un solo import, resuelve de caché), Logger+Performance desde params, LoadState+Originator+Caretaker, RTRTest.init() fire-and-forget + fetchPhase1Mock()
 - `model/strategy/base.ts` — `BaseStrategy` abstract class; provee `runMicrotask/runIdle/runAnimation` via `@/libs/helpers.schedule`
 - `model/strategy/rtr-test.ts` — `RTRTest extends BaseStrategy`; descarga script (`downloadScript`), carga assets en microtask (`loadRTRAssets`, prefetch), inicia viewer en `requestAnimationFrame` (`initRTR`); errores de init propagan correctamente via `runAnimation`
 
@@ -270,7 +272,8 @@ src/
       strategy/
         types.ts              — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
         mocks.ts              — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
-        ConfiguratorInitStrategy.ts — executePhase1: Logger+Performance desde params, LoadState+Originator+Caretaker, RTRTest.init() fire-and-forget + fetchPhase1Mock()
+        configurator-init.ts       — chunk preloadeable (nombre fijo); re-exporta deps de executePhase1; absorbe helpers+rtr-test+caretaker+originator+load-state (9.1 KB / 3.4 KB gz)
+        ConfiguratorInitStrategy.ts — executePhase1: import('./configurator-init') (un solo import de caché), RTRTest.init() fire-and-forget + fetchPhase1Mock()
         base.ts               — BaseStrategy abstract; runMicrotask/runIdle/runAnimation
         rtr-test.ts           — RTRTest extends BaseStrategy; downloadScript + loadRTRAssets (microtask) + initRTR (rAF); errores propagan via runAnimation
 public/

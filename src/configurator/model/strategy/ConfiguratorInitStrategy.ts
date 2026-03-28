@@ -15,13 +15,7 @@ export class ConfiguratorInitStrategy
   async executePhase1(): Promise<InitPhase1Data> {
     console.log('here 1');
     try {
-      const [{ getInitQueryParams }, { RTRTest }, { Caretaker }, { Originator }, { LoadState }] = await Promise.all([
-        import('@/libs/helpers'),
-        import('@/configurator/model/strategy/rtr-test'),
-        import('@/bootstrap/state/caretaker'),
-        import('@/bootstrap/state/originator'),
-        import('@/bootstrap/state/load-state'),
-      ]);
+      const { getInitQueryParams, RTRTest, Caretaker, Originator, LoadState } = await import('./configurator-init');
       const params = getInitQueryParams();
       const { showPerformance, showLogs } = params;
       const state = new LoadState();
