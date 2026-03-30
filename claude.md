@@ -1,9 +1,10 @@
 # imp-lux-ocp-style-selector — Project Context
 
 ## What it is
-Self-contained React 19 widget (embeddable). Two initialization modes:
+Self-contained React 19 widget (embeddable). Three initialization modes:
 - **configurator** (default) — glasses configurator experience with RTR (Real-Time Rendering)
 - **wizard** — picks glasses type → model → opens product page
+- **index** — product index listing
 
 ## Repos
 - `origin` → `git@github.com:audifax8/imp-lux-ocp-style-selector.git`
@@ -29,6 +30,7 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 - **Chunks con nombre fijo** (sin hash, para `modulepreload` y rastreo de peso):
   - `chunks/bootstrap-configurator.js` — bootstrap del modo configurator
   - `chunks/bootstrap-wizard.js` — bootstrap del modo wizard
+  - `chunks/bootstrap-index.js` — bootstrap del modo index
   - `chunks/configurator-init.js` — todas las deps de `executePhase1` en un único chunk (9.1 KB / 3.4 KB gzip); preloadeado en `index.html` para que resuelva de caché con latencia cero
 - **`manualChunks`**: deps pesadas en chunks propios (cargadas solo cuando se necesitan):
   - `react-dom` → `chunks/react-dom-[hash].js`
@@ -74,7 +76,7 @@ Detection priority:
 2. `?mode=` URL param
 3. `'configurator'` (default)
 
-**Isolation rule:** wizard chunks never load in configurator mode and vice versa.
+**Isolation rule:** each mode's chunks never load in the other modes.
 All mode-specific CSS (including brand CSS) is `?inline` — injected by the bootstrap before React mounts.
 
 ## Entry flow
@@ -84,6 +86,7 @@ All mode-specific CSS (including brand CSS) is `?inline` — injected by the boo
 3. Sets `role=region` + `aria-label` on container
 4. Branches lazy import:
    - `import('./bootstrap')` → wizard
+   - `import('./bootstrap-index')` → index
    - `import('./bootstrap-configurator')` → configurator (default)
 
 **Wizard bootstrap** (`bootstrap.tsx`):
@@ -96,6 +99,11 @@ All mode-specific CSS (including brand CSS) is `?inline` — injected by the boo
 - Injects active brand CSS via `brands/loader-configurator`
 - `createRoot` + `<AppConfigurator />` (Configurator — LabelsProvider currently disabled)
 
+**Index bootstrap** (`bootstrap-index.tsx`):
+- Injects `index/index.scss?inline` (container + typography + skeleton + index styles)
+- Injects active brand CSS via `brands/loader-index`
+- `createRoot` + `<AppIndex />` (LabelsProvider + Index)
+
 ## Brand system
 Brands: `rbn` (default), `oak`, `sgh`, `bliz`, `cdm`
 
@@ -107,10 +115,12 @@ Detection priority:
 Each brand has separate CSS per mode, loaded via `?inline`:
 - `src/brands/{brand}/wizard.scss` — brand overrides for wizard
 - `src/brands/{brand}/configurator.scss` — brand overrides for configurator
+- `src/brands/{brand}/index.scss` — brand overrides for index (placeholders)
 
 Loaders:
 - `brands/loader-wizard.ts` — imports all `{brand}/wizard.scss?inline`
 - `brands/loader-configurator.ts` — imports all `{brand}/configurator.scss?inline`
+- `brands/loader-index.ts` — imports all `{brand}/index.scss?inline`
 
 ## CSS architecture
 ```
@@ -119,6 +129,7 @@ imp-lux-ocp-style-selector.css        ← theme.scss only (CSS vars, dark mode, 
 
 bootstrap.tsx (wizard)                ← wizard/wizard.scss?inline + brands/loader-wizard
 bootstrap-configurator.tsx            ← configurator/configurator.scss?inline + brands/loader-configurator
+bootstrap-index.tsx                   ← index/index.scss?inline + brands/loader-index
 WizardStep1.tsx                       ← WizardStep1.scss?inline (on-demand, when step loads)
 WizardStep2.tsx                       ← WizardStep2.scss?inline (on-demand, when step loads)
 configurator/model/Model.tsx          ← model/model.scss?inline (skeleton de gafas)
@@ -219,16 +230,20 @@ Both wizard and configurator include a `DarkModeSwitch` component.
 ```
 src/
   main.tsx                    — tiny entry, sync setup + mode branch
-  mode/detect.ts              — mode singleton (wizard | configurator)
+  mode/detect.ts              — mode singleton (wizard | configurator | index)
   bootstrap.tsx               — wizard bootstrap (CSS inject + brand + React mount)
   bootstrap-configurator.tsx  — configurator bootstrap (CSS inject + brand + React mount)
+  bootstrap-index.tsx         — index bootstrap (CSS inject + brand + React mount)
   App.tsx                     — LabelsProvider + Wizard (wizard mode)
   AppConfigurator.tsx         — Configurator (configurator mode; LabelsProvider disabled temporalmente)
+  AppIndex.tsx                — LabelsProvider + Index (index mode)
   brands/detect.ts            — brand singleton
   brands/loader-wizard.ts     — injects wizard brand CSS (?inline)
   brands/loader-configurator.ts — injects configurator brand CSS (?inline)
+  brands/loader-index.ts      — injects index brand CSS (?inline)
   brands/{brand}/wizard.scss  — brand CSS for wizard mode
   brands/{brand}/configurator.scss — brand CSS for configurator mode
+  brands/{brand}/index.scss   — brand CSS for index mode (placeholders)
   api/config.ts               — runtime API config (no .env)
   api/models.ts               — fetchModels, getCategoriesByType, getModelsByType
   bootstrap/
@@ -259,6 +274,11 @@ src/
     WizardStep2.tsx           — lazy chunk
     WizardStep1.scss          — on-demand CSS (?inline)
     WizardStep2.scss          — on-demand CSS (?inline)
+  index/
+    Index.tsx                 — main chunk; theme toggle + lazy IndexContent
+    IndexContent.tsx          — lazy chunk; placeholder — reemplazar con API real
+    IndexSkeleton.tsx         — grid shimmer (CSS div-based)
+    index.scss                — ?inline CSS (container, typography, toolbar, skeleton grid)
   configurator/
     Configurator.tsx          — main chunk, theme toggle + lazy Model
     configurator.scss         — ?inline CSS (container, typography, skeleton)
@@ -287,6 +307,8 @@ public/
 - Delete `main` branch on both repos after changing default branch in GitHub Settings
 - `AppConfigurator.tsx`: re-enable `LabelsProvider` when configurator i18n is needed
 - Brand CSS for configurator: `brands/{brand}/configurator.scss` are empty placeholders
+- Brand CSS for index: `brands/{brand}/index.scss` are empty placeholders
+- `index/IndexContent.tsx`: replace placeholder with real product index API when available
 - `model/ModelContent.tsx`: replace placeholder SVG + mock data with real product assets/APIs when available
 - `model/strategy/mocks.ts`: replace mocks with real API calls when endpoints are ready
 - `bootstrap/index.ts`: `loadImplementation()` wired but strategy init is commented out — connect when RTRTest/StrategyContext are ready

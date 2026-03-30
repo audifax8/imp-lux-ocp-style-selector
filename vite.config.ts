@@ -51,6 +51,7 @@ export default defineConfig({
         // El resto lleva hash para cache busting.
         chunkFileNames: (chunkInfo) => {
           if (chunkInfo.name === 'bootstrap-configurator') return 'chunks/bootstrap-configurator.js'
+          if (chunkInfo.name === 'bootstrap-index') return 'chunks/bootstrap-index.js'
           if (chunkInfo.name === 'bootstrap') return 'chunks/bootstrap-wizard.js'
           if (chunkInfo.name === 'configurator-init') return 'chunks/configurator-init.js'
           return 'chunks/[name]-[hash].js'

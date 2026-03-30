@@ -30,6 +30,8 @@ container.setAttribute('aria-label', 'Style Selector')
 // El modo inactivo nunca se descarga.
 if (activeMode === 'wizard') {
   import('./bootstrap').then(({ mount }) => mount(container!))
+} else if (activeMode === 'index') {
+  import('./bootstrap-index').then(({ mount }) => mount(container!))
 } else {
   import('./bootstrap-configurator').then(({ mount }) => mount(container!))
 }
