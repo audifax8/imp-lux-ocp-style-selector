@@ -1,7 +1,7 @@
 import { BaseStrategy } from './base';
-import type { Caretaker } from '@/bootstrap/state/caretaker';
-import type { LoadState } from '@/bootstrap/state/load-state';
-import type { Originator } from '@/bootstrap/state/originator';
+import type { Caretaker } from '@/configurator/bootstrap/state/caretaker';
+import type { LoadingState } from '@/configurator/bootstrap/state/loading-state';
+import type { Originator } from '@/configurator/bootstrap/state/originator';
 
 import { RTRVersion } from '@/models/rtr/rtr-version';
 import type { RTRAssets } from '@/models/rtr/rtr-assets';
@@ -9,12 +9,12 @@ import type { RTRAssets } from '@/models/rtr/rtr-assets';
 import { RTRBackground } from '@/declarations/enums';
 import type { MergedParams } from '@/declarations/types';
 
-export class RTRTest extends BaseStrategy {
+export class RTRSkeleton extends BaseStrategy {
   protected rtrAssets: RTRAssets = undefined!;
   private version: string = undefined!;
   private rtrVersion: RTRVersion = undefined!;
 
-  constructor(caretaker: Caretaker, originator: Originator, state: LoadState) {
+  constructor(caretaker: Caretaker, originator: Originator, state: LoadingState) {
     super(caretaker, originator);
     this.version = this.getRTRVersion();
     this.rtrVersion = new RTRVersion(this.version, state.getLogger(), state.getPerformance());
@@ -107,12 +107,6 @@ export class RTRTest extends BaseStrategy {
         if (!initResult) {
           throw new Error('[RTR] init failed');
         }
-        /*this.updateUIState({ token, showSkeleton: false });
-        this.updateAPIState({
-          rtrApiReady: true,
-          rtrOn: true,
-          rtrDisabled: false
-        });*/
       });
       return true;
     } catch (e) {

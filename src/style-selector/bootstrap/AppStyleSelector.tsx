@@ -1,7 +1,7 @@
 //import { LabelsProvider } from './labels/LabelsProvider'
-import Wizard from './wizard/Wizard'
+import Wizard from '../Wizard'
 
-const App = () => (
+const AppStyleSelector = () => (
   <Wizard />
 )
 
@@ -11,4 +11,4 @@ const App = () => (
   </LabelsProvider>
 )*/
 
-export default App
+export default AppStyleSelector

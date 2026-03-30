@@ -1,6 +1,6 @@
-import type { Caretaker } from '@/bootstrap/state/caretaker';
-import type { LoadState } from '@/bootstrap/state/load-state';
-import type { Originator } from '@/bootstrap/state/originator';
+import type { Caretaker } from '@/configurator/bootstrap/state/caretaker';
+import type { LoadingState } from '@/configurator/bootstrap/state/loading-state';
+import type { Originator } from '@/configurator/bootstrap/state/originator';
 
 //import { updateUIStore } from '@/state/actions/ui';
 //import { updateAPIStore } from '@/state/actions/apis';
@@ -18,7 +18,7 @@ import { schedule } from '@/libs/helpers';
 export abstract class BaseStrategy {
   protected caretaker: Caretaker = undefined!;
   protected originator: Originator = undefined!;
-  protected state: LoadState = undefined!;
+  protected state: LoadingState = undefined!;
 
   constructor(caretaker: Caretaker, originator: Originator) {
     this.caretaker = caretaker;

@@ -4,8 +4,8 @@
 // El SCSS ya fue inyectado en bootstrap-index antes del mount.
 // ─────────────────────────────────────────────────────────────────────────────
 import { lazy, Suspense, useState, useEffect } from 'react'
-import DarkModeSwitch from '@/components/DarkModeSwitch'
-import { getCurrentTheme, toggleTheme, type Theme } from '@/theme/darkMode'
+import DarkModeSwitch from '@/shared/components/DarkModeSwitch'
+import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
 import { useLabels } from '@/labels/useLabels'
 
 const MOUNT_ID = 'imp-lux-ocp-style-selector'

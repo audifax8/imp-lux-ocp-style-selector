@@ -1,5 +1,4 @@
 /* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import {
   API_KEYS_MAP,
   DEFAULT_LOCALE,
@@ -10,7 +9,7 @@ import {
 } from '@/declarations/constants';
 import type { MergedParams } from '@/declarations/types';
 import type { ConfigureParams, QuickLink, RxcBaseAPI } from '@/declarations/interfaces';
-import type { Caretaker } from '@/bootstrap/state/caretaker';
+import type { Caretaker } from '@/configurator/bootstrap/state/caretaker';
 
 declare global {
   interface Window {

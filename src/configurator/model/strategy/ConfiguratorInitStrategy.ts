@@ -15,10 +15,10 @@ export class ConfiguratorInitStrategy
   async executePhase1(): Promise<InitPhase1Data> {
     console.log('here 1');
     try {
-      const { getInitQueryParams, RTRTest, Caretaker, Originator, LoadState } = await import('./configurator-init');
+      const { getInitQueryParams, RTRSkeleton, Caretaker, Originator, LoadingState } = await import('./configurator-init');
       const params = getInitQueryParams();
       const { showPerformance, showLogs } = params;
-      const state = new LoadState();
+      const state = new LoadingState();
       state.setParams(params);
       state.setLogger(new Logger(showLogs ?? false));
       state.setPerformance(new Performance(showPerformance ?? false));
@@ -26,7 +26,7 @@ export class ConfiguratorInitStrategy
       const caretaker = new Caretaker();
       originator.setState(state);
       caretaker.addMemento(originator.saveMemento());
-      const rtTest = new RTRTest(caretaker, originator, state);
+      const rtTest = new RTRSkeleton(caretaker, originator, state);
       rtTest.init();
     } catch (e) {
       console.log(e);

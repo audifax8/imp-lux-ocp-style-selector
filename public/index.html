@@ -5,6 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Style Selector</title>
 
+    <link rel="preconnect" href="https://cdn-prod.fluidconfigure.com" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://prod.fluidconfigure.com" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://vmmv.luxottica.com" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://rxc.luxottica.com" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://cp.luxottica.com" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://rtr-viewer.luxottica.com" crossorigin="anonymous" />
+
+    <link
+      rel="preload"
+      as="script"
+      href="https://rtr-viewer.luxottica.com/lib/v/7.2.2/main.js"
+      crossorigin="anonymous"
+      fetchpriority="high" />
+
+    <link
+      rel="preload"
+      as="script"
+      href="https://cp.luxottica.com/public/v1/prefetch/0RB2140CP50?qa=false"
+      crossorigin="anonymous"
+      fetchpriority="high" />
+
+    <link
+      rel="preload"
+      as="script"
+      href="https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/rbn/assets/js/quicklink.umd.js"
+      crossorigin="anonymous"
+      fetchpriority="high"
+    />
+
+    <link
+      rel="preload"
+      as="fetch"
+      crossorigin="anonymous"
+      href="https://cdn-prod.fluidconfigure.com/static/configs/3.13.0/prod/dev/1581/product/22972/graph-settings-en_US.json"
+      fetchpriority="high"
+    />
+
+    <script>
+      // example data sent by the customer
+      window.configureParams = {
+        ocId: '1ff9e4f3-293e-425d-b17e-4a5cc5578d0b',
+        //endpoint: '//www.ray-ban.com/wcs/resources/store/10151/remix',
+        endpoint: '//one-configurator-services-mockup.luxdeepblue.com',
+        subscriptionKey: 'c17dfca82cc14819a4e2b600667c0123',
+        vendorId: '0RB2140CP',
+        region: 'US',
+        headerDivId: '#rb-pcp-promo-stripe-wrapper',
+        vmExperience: true,
+        ocHierarchy: 'B2C.RB.NA.US',
+        locale: 'en_US',
+        currency: 'USD',
+        numberFormat: 'USD',
+        showSurpriseMe: false,
+        //endpoint: '/wcs/resources/store/10151/remix',
+        promoMessage: '',
+        changeStyleMessage: '',
+        enableTooltip: 'true',
+        loadingMessage: '',
+        skipOnMissingUpc: true,
+        vmBipa: {
+          options: {
+            channel: 'ecommerce',
+            brand: 'RB',
+            storeId: 10151,
+            locale: 'en-US',
+            key: '537c852b-b2c7-4021-89ad-26a5502ce8f4'
+          },
+          privacy: {
+            bipaActive: true,
+            privacyPolicy: 'https://www.ray-ban.com/usa/c/privacy-policy',
+            termsAndConditions: 'https://www.ray-ban.com/usa/c/terms-of-sale',
+            region: 'US',
+            source: 'B2C_RBCOM',
+            bipaPrefill: {
+              firstName: '',
+              lastName: '',
+              email: ''
+            }
+          },
+          privacyCallbacks: {}
+        }
+      };
+    </script>
+
     <!--
       Inline theme detection: aplica data-theme ANTES de que el CSS se pinte
       para evitar cualquier flash de tema incorrecto. Lee localStorage igual

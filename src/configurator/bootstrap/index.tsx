@@ -1,8 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import configuratorStyles from './configurator/configurator.scss?inline'
-import { injectBrandStyles } from './brands/loader-configurator'
-import { activeBrand } from './brands/detect'
+import configuratorStyles from '@/configurator/configurator.scss?inline'
+import { injectBrandStyles } from '@/white-label/loader-configurator'
+import { activeBrand } from '@/white-label/detect'
 import AppConfigurator from './AppConfigurator'
 
 const styleEl = document.createElement('style')

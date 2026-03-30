@@ -3,8 +3,8 @@
 ## What it is
 Self-contained React 19 widget (embeddable). Three initialization modes:
 - **configurator** (default) — glasses configurator experience with RTR (Real-Time Rendering)
-- **wizard** — picks glasses type → model → opens product page
-- **index** — product index listing
+- **style-selector** (wizard) — picks glasses type → model → opens product page
+- **products-index** (index) — product index listing
 
 ## Repos
 - `origin` → `git@github.com:audifax8/imp-lux-ocp-style-selector.git`
@@ -29,8 +29,8 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 - Chunks lazy: `chunks/[name]-[hash].js` (con hash para cache busting)
 - **Chunks con nombre fijo** (sin hash, para `modulepreload` y rastreo de peso):
   - `chunks/bootstrap-configurator.js` — bootstrap del modo configurator
-  - `chunks/bootstrap-wizard.js` — bootstrap del modo wizard
-  - `chunks/bootstrap-index.js` — bootstrap del modo index
+  - `chunks/bootstrap-wizard.js` — bootstrap del modo style-selector
+  - `chunks/bootstrap-index.js` — bootstrap del modo products-index
   - `chunks/configurator-init.js` — todas las deps de `executePhase1` en un único chunk (9.1 KB / 3.4 KB gzip); preloadeado en `index.html` para que resuelva de caché con latencia cero
 - **`manualChunks`**: deps pesadas en chunks propios (cargadas solo cuando se necesitan):
   - `react-dom` → `chunks/react-dom-[hash].js`
@@ -49,7 +49,7 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 ## Bundle sizes (baseline RBN-5144)
 Medido con `npm run size` (`scripts/bundle-size.mjs`, appends a `bundle-sizes.log`):
 - **Configurator total** (shared + configurator chunks): ~211 KB raw / ~69 KB gzip
-- **Wizard total** (shared + wizard chunks): ~210 KB raw / ~67 KB gzip
+- **Style-selector total** (shared + style-selector chunks): ~210 KB raw / ~67 KB gzip
 - De eso, ~185 KB raw / ~57 KB gzip es `react-dom` (no controlable)
 - Código de app propio: ~26 KB raw / ~12 KB gzip
 
@@ -63,21 +63,23 @@ Medido con `npm run size` (`scripts/bundle-size.mjs`, appends a `bundle-sizes.lo
 ## Module alias convention
 All imports that cross a directory boundary use `@/` instead of relative `../` paths:
 ```ts
-import { activeBrand } from '@/brands/detect'     // ✓
-import { activeBrand } from '../../brands/detect'  // ✗
+import { activeBrand } from '@/white-label/detect'     // ✓
+import { activeBrand } from '../../white-label/detect'  // ✗
 ```
 Same-folder imports (`./`) remain relative.
 
 ## Mode system
-Mode detection singleton: `src/mode/detect.ts`
+Mode detection singleton: `src/shared/mode/detect.ts`
 
 Detection priority:
 1. `window.__IMP_LUX_MODE__`
 2. `?mode=` URL param
 3. `'configurator'` (default)
 
+Valid modes: `'wizard'` | `'configurator'` | `'index'`
+
 **Isolation rule:** each mode's chunks never load in the other modes.
-All mode-specific CSS (including brand CSS) is `?inline` — injected by the bootstrap before React mounts.
+All mode-specific CSS (including white-label CSS) is `?inline` — injected by the bootstrap before React mounts.
 
 ## Entry flow
 `main.tsx` (sync setup only, no React):
@@ -85,26 +87,26 @@ All mode-specific CSS (including brand CSS) is `?inline` — injected by the boo
 2. Detects active mode
 3. Sets `role=region` + `aria-label` on container
 4. Branches lazy import:
-   - `import('./bootstrap')` → wizard
-   - `import('./bootstrap-index')` → index
-   - `import('./bootstrap-configurator')` → configurator (default)
+   - `import('@/style-selector/bootstrap')` → wizard
+   - `import('@/products-index/bootstrap')` → index
+   - `import('@/configurator/bootstrap')` → configurator (default)
 
-**Wizard bootstrap** (`bootstrap.tsx`):
-- Injects `wizard/wizard.scss?inline` (container + typography + skeleton + wizard styles)
-- Injects active brand CSS via `brands/loader-wizard`
-- `createRoot` + `<App />` (LabelsProvider + Wizard)
+**Style-selector bootstrap** (`style-selector/bootstrap/index.tsx`):
+- Injects `style-selector/wizard.scss?inline` (container + typography + skeleton + wizard styles)
+- Injects active white-label CSS via `white-label/loader-wizard`
+- `createRoot` + `<AppStyleSelector />` (LabelsProvider + Wizard)
 
-**Configurator bootstrap** (`bootstrap-configurator.tsx`):
+**Configurator bootstrap** (`configurator/bootstrap/index.tsx`):
 - Injects `configurator/configurator.scss?inline` (container + typography + skeleton + configurator styles)
-- Injects active brand CSS via `brands/loader-configurator`
+- Injects active white-label CSS via `white-label/loader-configurator`
 - `createRoot` + `<AppConfigurator />` (Configurator — LabelsProvider currently disabled)
 
-**Index bootstrap** (`bootstrap-index.tsx`):
-- Injects `index/index.scss?inline` (container + typography + skeleton + index styles)
-- Injects active brand CSS via `brands/loader-index`
+**Products-index bootstrap** (`products-index/bootstrap/index.tsx`):
+- Injects `products-index/index.scss?inline` (container + typography + skeleton + index styles)
+- Injects active white-label CSS via `white-label/loader-index`
 - `createRoot` + `<AppIndex />` (LabelsProvider + Index)
 
-## Brand system
+## White-label system
 Brands: `rbn` (default), `oak`, `sgh`, `bliz`, `cdm`
 
 Detection priority:
@@ -113,31 +115,33 @@ Detection priority:
 3. `'rbn'`
 
 Each brand has separate CSS per mode, loaded via `?inline`:
-- `src/brands/{brand}/wizard.scss` — brand overrides for wizard
-- `src/brands/{brand}/configurator.scss` — brand overrides for configurator
-- `src/brands/{brand}/index.scss` — brand overrides for index (placeholders)
+- `src/white-label/{brand}/wizard.scss` — brand overrides for style-selector
+- `src/white-label/{brand}/configurator.scss` — brand overrides for configurator (placeholders)
+- `src/white-label/{brand}/index.scss` — brand overrides for products-index (placeholders)
 
-Loaders:
-- `brands/loader-wizard.ts` — imports all `{brand}/wizard.scss?inline`
-- `brands/loader-configurator.ts` — imports all `{brand}/configurator.scss?inline`
-- `brands/loader-index.ts` — imports all `{brand}/index.scss?inline`
+Loaders (`src/white-label/`):
+- `loader-wizard.ts` — imports all `{brand}/wizard.scss?inline`
+- `loader-configurator.ts` — imports all `{brand}/configurator.scss?inline`
+- `loader-index.ts` — imports all `{brand}/index.scss?inline`
+- `detect.ts` — brand singleton
+- `types.ts` — `Brand` type + `BRANDS` const
 
 ## CSS architecture
 ```
-imp-lux-ocp-style-selector.css        ← theme.scss only (CSS vars, dark mode, reset, sr-only)
-                                          loaded via <link>, always — no mode-specific content
+imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (CSS vars, dark mode, reset, sr-only)
+                                                loaded via <link>, always — no mode-specific content
 
-bootstrap.tsx (wizard)                ← wizard/wizard.scss?inline + brands/loader-wizard
-bootstrap-configurator.tsx            ← configurator/configurator.scss?inline + brands/loader-configurator
-bootstrap-index.tsx                   ← index/index.scss?inline + brands/loader-index
-WizardStep1.tsx                       ← WizardStep1.scss?inline (on-demand, when step loads)
-WizardStep2.tsx                       ← WizardStep2.scss?inline (on-demand, when step loads)
-configurator/model/Model.tsx          ← model/model.scss?inline (skeleton de gafas)
-configurator/model/ModelContent.tsx   ← model/model-content.scss?inline (gafas reales, SOLO tras resolver skeleton)
+style-selector/bootstrap/index.tsx           ← style-selector/wizard.scss?inline + white-label/loader-wizard
+configurator/bootstrap/index.tsx             ← configurator/configurator.scss?inline + white-label/loader-configurator
+products-index/bootstrap/index.tsx           ← products-index/index.scss?inline + white-label/loader-index
+style-selector/WizardStep1.tsx               ← WizardStep1.scss?inline (on-demand, when step loads)
+style-selector/WizardStep2.tsx               ← WizardStep2.scss?inline (on-demand, when step loads)
+configurator/model/Model.tsx                 ← model/model.scss?inline (skeleton de gafas)
+configurator/model/ModelContent.tsx          ← model/model-content.scss?inline (gafas reales, SOLO tras resolver skeleton)
 ```
 
 ## API config (no .env — runtime only)
-`src/api/config.ts` — priority for each value:
+`src/style-selector/api/config.ts` — priority for each value:
 1. `window.__IMP_LUX_API_URL__` / `window.__IMP_LUX_API_LANG__`
 2. `?apiUrl=` / `?lang=` URL params
 3. Hardcoded defaults (`https://www.ray-ban.com` / `en`)
@@ -155,12 +159,19 @@ Models endpoint: `GET {API_BASE_URL}/wcs/resources/store/{storeId}/remix/models?
 Used in every component. While API loads or on error, `DEFAULT_LABELS` are shown silently.
 Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 
-## Wizard (2-step)
-- `Wizard.tsx` — step orchestrator + theme toggle (no CSS import — injected by bootstrap)
+## Style-selector (2-step wizard)
+- `Wizard.tsx` — step orchestrator + theme toggle
 - `WizardStep1` — lazy chunk; glass type selection (sunglasses / eyeglasses / kids-sunglasses)
 - `WizardStep2` — lazy chunk; fetches models, shows category filters + model grid
+- `wizard.scss` — ?inline CSS (container, typography, nav, toggle, skeletons)
 
 Step SCSS loaded via `?inline` and injected at module level when chunk loads.
+
+## Products-index
+- `Index.tsx` — main chunk; theme toggle + lazy `IndexContent`
+- `IndexContent.tsx` — lazy chunk; product index placeholder (reemplazar con API real)
+- `IndexSkeleton.tsx` — grid shimmer (CSS div-based)
+- `index.scss` — ?inline CSS (container, typography, toolbar, skeleton grid)
 
 ## Configurator
 - `Configurator.tsx` — main chunk; dark mode toggle + lazy `Model`
@@ -173,10 +184,10 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 - `model/useInitStrategy.ts` — hook que orquesta la cadena Fase 1 → Fase 2 con flag `cancelled` para cleanup en desmontaje
 - `model/strategy/types.ts` — interfaces `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data`
 - `model/strategy/mocks.ts` — `fetchPhase1Mock` (~900ms, datos de modelo) + `fetchPhase2Mock` (~600ms, recomendaciones + sessionId)
-- `model/strategy/configurator-init.ts` — chunk preloadeable (nombre fijo); re-exporta `getInitQueryParams`, `RTRTest`, `Caretaker`, `Originator`, `LoadState`; consolida las 5 deps de init en un único dynamic import
-- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy`; executePhase1: `import('./configurator-init')` (un solo import, resuelve de caché), Logger+Performance desde params, LoadState+Originator+Caretaker, RTRTest.init() fire-and-forget + fetchPhase1Mock()
+- `model/strategy/configurator-init.ts` — chunk preloadeable (nombre fijo); re-exporta `getInitQueryParams`, `RTRSkeleton`, `Caretaker`, `Originator`, `LoadingState`; consolida las deps de init en un único dynamic import
+- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy`; executePhase1: `import('./configurator-init')` (un solo import, resuelve de caché), Logger+Performance desde params, LoadingState+Originator+Caretaker, RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
 - `model/strategy/base.ts` — `BaseStrategy` abstract class; provee `runMicrotask/runIdle/runAnimation` via `@/libs/helpers.schedule`
-- `model/strategy/rtr-test.ts` — `RTRTest extends BaseStrategy`; descarga script (`downloadScript`), carga assets en microtask (`loadRTRAssets`, prefetch), inicia viewer en `requestAnimationFrame` (`initRTR`); errores de init propagan correctamente via `runAnimation`
+- `model/strategy/rtr-skeleton.ts` — `RTRSkeleton extends BaseStrategy`; descarga script (`downloadScript`), carga assets en idle (`loadRTRAssets`), inicia viewer en `requestAnimationFrame` (`initRTR`); errores propagan via `runAnimation`
 
 ### Flujo de inicialización del configurador
 1. Skeleton visible de inmediato (mount)
@@ -184,12 +195,11 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 3. Fase 2 arranca SOLO tras Fase 1 (~600ms) — no bloquea → al resolver: recomendaciones aparecen con animación `mc-fade-in`
 
 ## Bootstrap state machine (Memento pattern)
-`src/bootstrap/` — infraestructura de estado para las estrategias de inicialización:
-- `index.ts` — `loadImplementation()`: construye `LoadState` + `Originator` + `Caretaker`, parsea params, guarda el primer memento
-- `state/load-state.ts` — `LoadState`: estado que viaja entre estrategias (params, logger, performance, configureJsons, checkPoint); `clone(updates)` para versiones inmutables
-- `state/originator.ts` — `Originator`: holder del estado actual; guarda/restaura via `Memento`
-- `state/caretaker.ts` — `Caretaker`: almacén de `Memento[]` (historial de estados)
-- `state/memento.ts` — `Memento`: snapshot de un `LoadState`
+`src/configurator/bootstrap/state/` — infraestructura de estado para las estrategias de inicialización:
+- `loading-state.ts` — `LoadingState`: estado que viaja entre estrategias (params, logger, performance, configureJsons, checkPoint); `clone(updates)` para versiones inmutables
+- `originator.ts` — `Originator`: holder del estado actual; guarda/restaura via `Memento`
+- `caretaker.ts` — `Caretaker`: almacén de `Memento[]` (historial de estados)
+- `memento.ts` — `Memento`: snapshot de un `LoadingState`
 
 ## Libs
 `src/libs/helpers.ts` — utilidades de scheduling y params:
@@ -213,10 +223,12 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 - `rtr/rtr-version.ts` — `RTRVersion`: gestión de versiones del viewer RTR (7.2.2, 4.0.0, 4.1.1); descarga del script, init con callbacks (`onRendered`, `onError`, etc.)
 - `rtr/rtr-assets.ts` — `RTRAssets`: gestión de assets RTR y prefetch via quicklink
 
-## Dark mode
-`src/theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React.
-`html[data-theme="light|dark"]` — set by JS; CSS also has `@media prefers-color-scheme` fallback.
-Both wizard and configurator include a `DarkModeSwitch` component.
+## Shared
+`src/shared/` — código compartido entre todos los modos:
+- `mode/detect.ts` — mode singleton (`wizard | configurator | index`)
+- `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
+- `styles/theme.scss` — CSS bundle (vars, dark mode, reset, sr-only, reduced-motion)
+- `components/DarkModeSwitch.tsx` — toggle component; usado en todos los modos
 
 ## WCAG AAA
 - Root font: `112.5%` (respects browser font-size preference)
@@ -229,88 +241,98 @@ Both wizard and configurator include a `DarkModeSwitch` component.
 ## Key files
 ```
 src/
-  main.tsx                    — tiny entry, sync setup + mode branch
-  mode/detect.ts              — mode singleton (wizard | configurator | index)
-  bootstrap.tsx               — wizard bootstrap (CSS inject + brand + React mount)
-  bootstrap-configurator.tsx  — configurator bootstrap (CSS inject + brand + React mount)
-  bootstrap-index.tsx         — index bootstrap (CSS inject + brand + React mount)
-  App.tsx                     — LabelsProvider + Wizard (wizard mode)
-  AppConfigurator.tsx         — Configurator (configurator mode; LabelsProvider disabled temporalmente)
-  AppIndex.tsx                — LabelsProvider + Index (index mode)
-  brands/detect.ts            — brand singleton
-  brands/loader-wizard.ts     — injects wizard brand CSS (?inline)
-  brands/loader-configurator.ts — injects configurator brand CSS (?inline)
-  brands/loader-index.ts      — injects index brand CSS (?inline)
-  brands/{brand}/wizard.scss  — brand CSS for wizard mode
-  brands/{brand}/configurator.scss — brand CSS for configurator mode
-  brands/{brand}/index.scss   — brand CSS for index mode (placeholders)
-  api/config.ts               — runtime API config (no .env)
-  api/models.ts               — fetchModels, getCategoriesByType, getModelsByType
-  bootstrap/
-    index.ts                  — loadImplementation(); builds state + originator + caretaker
-    state/load-state.ts       — LoadState; clone(updates) for immutable state transitions
-    state/originator.ts       — Originator; setState/getState/saveMemento/restore
-    state/caretaker.ts        — Caretaker; stores Memento[]
-    state/memento.ts          — Memento; wraps a LoadState snapshot
-  libs/helpers.ts             — schedule, runAsync, runIdle, getInitQueryParams
-  declarations/
-    enums.ts                  — SkeletonVariant, RTRBackground, CheckPointType, etc.
-    types.ts                  — MergedParams, ConfigureJsons, ButtonProps, etc.
-    constants.ts              — customer IDs, API keys, CDN/RTR URLs
-    interfaces.ts             — ConfigureParams, RtrBaseAPI, InitRTRPayload, etc.
-    cfg-configure-core.d.ts   — module declaration for @cfg.plat/configure-core
-  models/
-    logger.ts                 — Logger (debug-mode conditional logging)
-    performance.ts            — Performance (mark/measure wrapper)
-    rtr/rtr-version.ts        — RTRVersion; script download + init + version management
-    rtr/rtr-assets.ts         — RTRAssets; prefetch management via quicklink
-  labels/                     — i18n service (see above)
-  theme/darkMode.ts           — theme detection + toggle
-  styles/theme.scss           — CSS bundle (vars, dark mode, reset, sr-only, reduced-motion)
-  wizard/
-    Wizard.tsx                — step orchestrator, theme toggle
-    wizard.scss               — ?inline CSS (container, typography, nav, toggle, skeletons)
-    WizardStep1.tsx           — lazy chunk
-    WizardStep2.tsx           — lazy chunk
-    WizardStep1.scss          — on-demand CSS (?inline)
-    WizardStep2.scss          — on-demand CSS (?inline)
-  index/
-    Index.tsx                 — main chunk; theme toggle + lazy IndexContent
-    IndexContent.tsx          — lazy chunk; placeholder — reemplazar con API real
-    IndexSkeleton.tsx         — grid shimmer (CSS div-based)
-    index.scss                — ?inline CSS (container, typography, toolbar, skeleton grid)
+  main.tsx                         — tiny entry, sync setup + mode branch
+  shared/
+    mode/detect.ts                 — mode singleton (wizard | configurator | index)
+    theme/darkMode.ts              — theme detection + toggle
+    styles/theme.scss              — CSS bundle (vars, dark mode, reset, sr-only)
+    components/DarkModeSwitch.tsx  — shared dark mode toggle component
+  white-label/
+    detect.ts                      — brand singleton
+    types.ts                       — Brand type + BRANDS const
+    loader-wizard.ts               — injects style-selector brand CSS (?inline)
+    loader-configurator.ts         — injects configurator brand CSS (?inline)
+    loader-index.ts                — injects products-index brand CSS (?inline)
+    {brand}/wizard.scss            — brand CSS for style-selector mode
+    {brand}/configurator.scss      — brand CSS for configurator mode (placeholders)
+    {brand}/index.scss             — brand CSS for products-index mode (placeholders)
+  style-selector/
+    bootstrap/
+      index.tsx                    — style-selector bootstrap (CSS inject + brand + React mount)
+      AppStyleSelector.tsx         — LabelsProvider + Wizard
+    api/
+      config.ts                    — runtime API config (no .env)
+      models.ts                    — fetchModels, getCategoriesByType, getModelsByType
+    types.ts                       — GlassType, etc.
+    Wizard.tsx                     — step orchestrator, theme toggle
+    wizard.scss                    — ?inline CSS (container, typography, nav, toggle, skeletons)
+    WizardStep1.tsx                — lazy chunk
+    WizardStep2.tsx                — lazy chunk
+    WizardStep1.scss               — on-demand CSS (?inline)
+    WizardStep2.scss               — on-demand CSS (?inline)
+    WizardStep1Skeleton.tsx        — skeleton step 1
+    WizardStep2Skeleton.tsx        — skeleton step 2
+  products-index/
+    bootstrap/
+      index.tsx                    — products-index bootstrap (CSS inject + brand + React mount)
+      AppIndex.tsx                 — LabelsProvider + Index
+    Index.tsx                      — main chunk; theme toggle + lazy IndexContent
+    IndexContent.tsx               — lazy chunk; placeholder — reemplazar con API real
+    IndexSkeleton.tsx              — grid shimmer (CSS div-based)
+    index.scss                     — ?inline CSS (container, typography, toolbar, skeleton grid)
   configurator/
-    Configurator.tsx          — main chunk, theme toggle + lazy Model
-    configurator.scss         — ?inline CSS (container, typography, skeleton)
+    bootstrap/
+      index.tsx                    — configurator bootstrap (CSS inject + brand + React mount)
+      AppConfigurator.tsx          — Configurator (LabelsProvider currently disabled)
+      state/
+        loading-state.ts           — LoadingState; clone(updates) for immutable state transitions
+        originator.ts              — Originator; setState/getState/saveMemento/restore
+        caretaker.ts               — Caretaker; stores Memento[]
+        memento.ts                 — Memento; wraps a LoadingState snapshot
+    Configurator.tsx               — main chunk, theme toggle + lazy Model
+    configurator.scss              — ?inline CSS (container, typography, skeleton)
     model/
-      Model.tsx               — lazy chunk; useInitStrategy hook; skeleton → ModelContent
-      ModelSkeleton.tsx       — gafas shimmer (CSS div-based)
-      ModelContent.tsx        — lazy chunk; props: phase1Data + phase2Data; SVG gafas + info + badge + recomendaciones
-      model.scss              — ?inline CSS del skeleton (keyframe + shapes)
-      model-content.scss      — ?inline CSS del contenido (gafas, info, badge, recomendaciones, mc-fade-in)
-      useInitStrategy.ts      — hook; Fase 1 → Fase 2 chain; cancelled flag para cleanup
+      Model.tsx                    — lazy chunk; useInitStrategy hook; skeleton → ModelContent
+      ModelSkeleton.tsx            — gafas shimmer (CSS div-based)
+      ModelContent.tsx             — lazy chunk; props: phase1Data + phase2Data; SVG gafas + info + badge + recomendaciones
+      model.scss                   — ?inline CSS del skeleton (keyframe + shapes)
+      model-content.scss           — ?inline CSS del contenido (gafas, info, badge, recomendaciones, mc-fade-in)
+      useInitStrategy.ts           — hook; Fase 1 → Fase 2 chain; cancelled flag para cleanup
       strategy/
-        types.ts              — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
-        mocks.ts              — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
-        configurator-init.ts       — chunk preloadeable (nombre fijo); re-exporta deps de executePhase1; absorbe helpers+rtr-test+caretaker+originator+load-state (9.1 KB / 3.4 KB gz)
-        ConfiguratorInitStrategy.ts — executePhase1: import('./configurator-init') (un solo import de caché), RTRTest.init() fire-and-forget + fetchPhase1Mock()
-        base.ts               — BaseStrategy abstract; runMicrotask/runIdle/runAnimation
-        rtr-test.ts           — RTRTest extends BaseStrategy; downloadScript + loadRTRAssets (microtask) + initRTR (rAF); errores propagan via runAnimation
+        types.ts                   — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
+        mocks.ts                   — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
+        configurator-init.ts       — chunk preloadeable (nombre fijo); re-exporta deps de executePhase1 (9.1 KB / 3.4 KB gz)
+        ConfiguratorInitStrategy.ts — executePhase1: import('./configurator-init') (un solo import de caché), RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
+        base.ts                    — BaseStrategy abstract; runMicrotask/runIdle/runAnimation
+        rtr-skeleton.ts            — RTRSkeleton extends BaseStrategy; downloadScript + loadRTRAssets (idle) + initRTR (rAF)
+  libs/helpers.ts                  — schedule, runAsync, runIdle, getInitQueryParams
+  labels/                          — i18n service (see above)
+  declarations/
+    enums.ts                       — SkeletonVariant, RTRBackground, CheckPointType, etc.
+    types.ts                       — MergedParams, ConfigureJsons, ButtonProps, etc.
+    constants.ts                   — customer IDs, API keys, CDN/RTR URLs
+    interfaces.ts                  — ConfigureParams, RtrBaseAPI, InitRTRPayload, etc.
+    cfg-configure-core.d.ts        — module declaration for @cfg.plat/configure-core
+  models/
+    logger.ts                      — Logger (debug-mode conditional logging)
+    performance.ts                 — Performance (mark/measure wrapper)
+    rtr/rtr-version.ts             — RTRVersion; script download + init + version management
+    rtr/rtr-assets.ts              — RTRAssets; prefetch management via quicklink
+  stubs/
+    jsonp-node.js                  — stub Node-only path de jsonp-client (elimina warnings de build)
 public/
-  index.html                  — GitHub Pages shell (inline theme script + preloads)
-                                 no static skeleton — each mode renders its own via React
+  index.html                       — GitHub Pages shell (inline theme script + preloads)
+                                     no static skeleton — each mode renders its own via React
 ```
 
 ## Pending
-- `BRAND_STORE_IDS` in `api/config.ts`: all set to `'10151'` (only rbn known) — update when others available
+- `BRAND_STORE_IDS` in `style-selector/api/config.ts`: all set to `'10151'` (only rbn known) — update when others available
 - Labels API endpoint not live yet — defaults always used until implemented
 - Delete `main` branch on both repos after changing default branch in GitHub Settings
-- `AppConfigurator.tsx`: re-enable `LabelsProvider` when configurator i18n is needed
-- Brand CSS for configurator: `brands/{brand}/configurator.scss` are empty placeholders
-- Brand CSS for index: `brands/{brand}/index.scss` are empty placeholders
-- `index/IndexContent.tsx`: replace placeholder with real product index API when available
-- `model/ModelContent.tsx`: replace placeholder SVG + mock data with real product assets/APIs when available
-- `model/strategy/mocks.ts`: replace mocks with real API calls when endpoints are ready
-- `bootstrap/index.ts`: `loadImplementation()` wired but strategy init is commented out — connect when RTRTest/StrategyContext are ready
+- `configurator/bootstrap/AppConfigurator.tsx`: re-enable `LabelsProvider` when configurator i18n is needed
+- White-label CSS for configurator: `white-label/{brand}/configurator.scss` are empty placeholders
+- White-label CSS for products-index: `white-label/{brand}/index.scss` are empty placeholders
+- `products-index/IndexContent.tsx`: replace placeholder with real product index API when available
+- `configurator/model/ModelContent.tsx`: replace placeholder SVG + mock data with real product assets/APIs when available
+- `configurator/model/strategy/mocks.ts`: replace mocks with real API calls when endpoints are ready
 - `declarations/interfaces.ts`: some interfaces reference `@fluid.inc/yr-configure-wrapper/core` (external dep not yet installed)
-

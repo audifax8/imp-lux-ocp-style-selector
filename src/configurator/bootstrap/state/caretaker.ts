@@ -1,4 +1,4 @@
-import type { Memento } from '@/bootstrap/state/memento';
+import type { Memento } from '@/configurator/bootstrap/state/memento';
 
 export class Caretaker {
   private mementos: Memento[] = [];

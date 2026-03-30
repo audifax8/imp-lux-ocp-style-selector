@@ -1,5 +1,5 @@
 //import { LabelsProvider } from './labels/LabelsProvider'
-import Index from './index/Index'
+import Index from '../Index'
 
 const AppIndex = () => (
   <Index />

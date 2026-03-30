@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { useState, useEffect } from 'react'
 import step2Styles from './WizardStep2.scss?inline'
-import { activeBrand } from '@/brands/detect'
+import { activeBrand } from '@/white-label/detect'
 import {
   fetchModels,
   getCategoriesByType,
@@ -13,7 +13,7 @@ import {
   type ApiModel,
   type ApiModelsResponse,
   type ModelCategory,
-} from '@/api/models'
+} from '@/style-selector/api/models'
 import type { GlassType } from './types'
 import { useLabels } from '@/labels/useLabels'
 import { interpolate } from '@/labels/types'

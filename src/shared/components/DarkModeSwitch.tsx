@@ -1,4 +1,4 @@
-import type { Theme } from '@/theme/darkMode'
+import type { Theme } from '@/shared/theme/darkMode'
 import { useLabels } from '@/labels/useLabels'
 
 interface Props {

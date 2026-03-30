@@ -4,7 +4,7 @@
 // El SCSS se inyecta a nivel de módulo antes de que React monte el componente.
 // ─────────────────────────────────────────────────────────────────────────────
 import modelContentStyles from './model-content.scss?inline'
-import { activeBrand } from '@/brands/detect'
+import { activeBrand } from '@/white-label/detect'
 import type { InitPhase1Data, InitPhase2Data } from '@/configurator/model/strategy/types'
 
 const styleEl = document.createElement('style')

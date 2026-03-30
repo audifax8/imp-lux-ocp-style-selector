@@ -1,8 +1,8 @@
 // SCSS base: variables de tema (light/dark), reset, sr-only — compartido entre modos.
 // No incluye nada específico de wizard ni de configurador.
-import './styles/theme.scss'
-import { getInitialTheme, applyTheme } from './theme/darkMode'
-import { activeMode } from './mode/detect'
+import '@/shared/styles/theme.scss'
+import { getInitialTheme, applyTheme } from '@/shared/theme/darkMode'
+import { activeMode } from '@/shared/mode/detect'
 
 // ── Setup síncrono ANTES de cualquier render ──────────────────────────────────
 // Aplica el tema antes del mount para evitar FOUC de tema.
@@ -29,9 +29,9 @@ container.setAttribute('aria-label', 'Style Selector')
 //   bootstrap-configurator → configurador (CSS + JS)
 // El modo inactivo nunca se descarga.
 if (activeMode === 'wizard') {
-  import('./bootstrap').then(({ mount }) => mount(container!))
+  import('@/style-selector/bootstrap').then(({ mount }) => mount(container!))
 } else if (activeMode === 'index') {
-  import('./bootstrap-index').then(({ mount }) => mount(container!))
+  import('@/products-index/bootstrap').then(({ mount }) => mount(container!))
 } else {
-  import('./bootstrap-configurator').then(({ mount }) => mount(container!))
+  import('@/configurator/bootstrap').then(({ mount }) => mount(container!))
 }

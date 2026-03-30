@@ -13,7 +13,7 @@
 // =============================================================================
 
 export { getInitQueryParams } from '@/libs/helpers'
-export { RTRTest } from '@/configurator/model/strategy/rtr-test'
-export { Caretaker } from '@/bootstrap/state/caretaker'
-export { Originator } from '@/bootstrap/state/originator'
-export { LoadState } from '@/bootstrap/state/load-state'
+export { RTRSkeleton } from '@/configurator/model/strategy/rtr-skeleton'
+export { Caretaker } from '@/configurator/bootstrap/state/caretaker'
+export { Originator } from '@/configurator/bootstrap/state/originator'
+export { LoadingState } from '@/configurator/bootstrap/state/loading-state'

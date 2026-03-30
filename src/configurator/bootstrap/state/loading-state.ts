@@ -14,7 +14,7 @@ import type { VmApiProxy } from '@/models/vm/vm-proxy';*/
 
 import type { CheckPointType } from '@/declarations/enums';
 
-export type LoadStateProps = {
+export type LoadingStateProps = {
   //core: ConfigureCore;
   //luxApi: LuxAPI;
   params: MergedParams;
@@ -31,7 +31,7 @@ export type LoadStateProps = {
   rtrWrapper: RtrWrapper;*/
 };
 
-export class LoadState {
+export class LoadingState {
   /*private core: ConfigureCore = undefined!;
   private luxApi: LuxAPI = undefined!;*/
   private params: MergedParams = undefined!;
@@ -155,8 +155,8 @@ export class LoadState {
     return this.objectsFactory;
   }*/
 
-  public clone(updates: Partial<LoadStateProps>): LoadState {
-    const newInstance = new LoadState();
+  public clone(updates: Partial<LoadingStateProps>): LoadingState {
+    const newInstance = new LoadingState();
 
     //newInstance.setCore(updates.core ?? this.core);
     //newInstance.setLuxApi(updates.luxApi ?? this.luxApi);

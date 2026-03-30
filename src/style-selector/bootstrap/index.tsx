@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import wizardStyles from './wizard/wizard.scss?inline'
-import { injectBrandStyles } from './brands/loader-wizard'
-import { activeBrand } from './brands/detect'
-import App from './App'
+import wizardStyles from '@/style-selector/wizard.scss?inline'
+import { injectBrandStyles } from '@/white-label/loader-wizard'
+import { activeBrand } from '@/white-label/detect'
+import App from './AppStyleSelector'
 
 const styleEl = document.createElement('style')
 styleEl.dataset.mode = 'wizard'

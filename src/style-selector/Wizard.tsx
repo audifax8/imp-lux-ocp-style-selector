@@ -2,8 +2,8 @@ import { lazy, Suspense, useState, useEffect } from 'react'
 import type { GlassType } from './types'
 import WizardStep1Skeleton from './WizardStep1Skeleton'
 import WizardStep2Skeleton from './WizardStep2Skeleton'
-import DarkModeSwitch from '@/components/DarkModeSwitch'
-import { getCurrentTheme, toggleTheme, type Theme } from '@/theme/darkMode'
+import DarkModeSwitch from '@/shared/components/DarkModeSwitch'
+import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
 import { useLabels } from '@/labels/useLabels'
 
 const WizardStep1 = lazy(() => import('./WizardStep1'))

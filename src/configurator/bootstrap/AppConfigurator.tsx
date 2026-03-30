@@ -1,5 +1,5 @@
 //import { LabelsProvider } from './labels/LabelsProvider'
-import Configurator from './configurator/Configurator'
+import Configurator from '../Configurator'
 
 const AppConfigurator = () => (
   <Configurator />
