@@ -49,12 +49,10 @@ export class RTRVersion {
   ];
 
   protected version: ApiVersion = undefined!;
-  protected RTR_ASSETS_URL = 'https://cp.luxottica.com/public/v1/prefetch/_vendorId_?qa=_rtrQa_';
   protected logger?: Logger = undefined!;
   protected performance?: Performance = undefined!;
   protected rendered: boolean = false;
   protected api: RtrBaseAPI = undefined!;
-  protected lastTokenRendered!: string;
 
   constructor(urlVersion: string, logger?: Logger, performance?: Performance) {
     this.logger = logger;
@@ -77,11 +75,6 @@ export class RTRVersion {
 
   public getInitObject() {
     return this.getVersion()?.windowObjectName;
-  }
-
-  public getAssetsURL(rtrVendorId: string): string {
-    const assetsURL = this.RTR_ASSETS_URL.replace('_vendorId_', rtrVendorId).replace('_rtrQa_', 'false');
-    return assetsURL;
   }
 
   public setAPI() {
@@ -213,7 +206,6 @@ export class RTRVersion {
             //TODO until callback is defined
             if (!this.rendered) {
               this.rendered = true;
-              this.lastTokenRendered = token;
               this.performance?.processEnd('RenderingRTR');
               this.performance?.logMeasure('RenderingRTR');
               resolve(true);

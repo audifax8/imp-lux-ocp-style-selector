@@ -8,19 +8,20 @@ import type { Originator } from '@/configurator/bootstrap/state/originator';
 //import type { APIsState } from '@/store/APIsStore';
 //import { useUIStore, type UIState } from '@/store/UIStore';
 
-import { schedule } from '@/libs/helpers';
+import { AsyncTask } from '@/models/async-task';
 //import { registerDependency } from '@/context/dependencies-apis';
 //import { completeLayoutPromise, completeMenuPromise } from '@/lazy-imports';
 
 //import type { Dependencies } from '@/declarations/interfaces';
 //import { Theme } from '@/declarations/enums';
 
-export abstract class BaseStrategy {
+export abstract class BaseStrategy extends AsyncTask {
   protected caretaker: Caretaker = undefined!;
   protected originator: Originator = undefined!;
   protected state: LoadingState = undefined!;
 
   constructor(caretaker: Caretaker, originator: Originator) {
+    super();
     this.caretaker = caretaker;
     this.originator = originator;
     this.state = originator.getState();
@@ -58,18 +59,6 @@ export abstract class BaseStrategy {
   /*protected registerDependency<K extends keyof Dependencies>(key: K, value: Dependencies[K]) {
     return registerDependency(key, value);
   }*/
-
-  protected runMicrotask<T>(fn: () => T | Promise<T>): Promise<T> {
-    return schedule(fn, 'microtask');
-  }
-
-  protected runIdle<T>(fn: () => T | Promise<T>): Promise<T> {
-    return schedule(fn, 'idle');
-  }
-
-  protected runAnimation<T>(fn: () => T | Promise<T>): Promise<T> {
-    return schedule(fn, 'animation');
-  }
 
   public destroy() {
     this.caretaker = undefined!;

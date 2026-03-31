@@ -12,8 +12,11 @@
 // de caché con latencia cero.
 // =============================================================================
 
-export { getInitQueryParams } from '@/libs/helpers'
-export { RTRSkeleton } from '@/configurator/model/strategy/rtr-skeleton'
+export { getInitQueryParams, schedule } from '@/libs/helpers'
+export { AsyncTask } from '@/models/async-task'
+export { RTRAssets } from '@/models/rtr/rtr-assets'
+export { RTRVersion } from '@/models/rtr/rtr-version'
 export { Caretaker } from '@/configurator/bootstrap/state/caretaker'
 export { Originator } from '@/configurator/bootstrap/state/originator'
+export { RTRSkeleton } from '@/configurator/model/strategy/rtr-skeleton'
 export { LoadingState } from '@/configurator/bootstrap/state/loading-state'

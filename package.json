@@ -17,7 +17,8 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "preview": "vite preview",
-    "size": "node scripts/bundle-size.mjs"
+    "size": "node scripts/bundle-size.mjs",
+    "audit": "node scripts/audit.mjs"
   },
   "dependencies": {
     "react": "^19.2.4",

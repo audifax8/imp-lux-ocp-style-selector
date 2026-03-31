@@ -32,6 +32,11 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
   - `chunks/bootstrap-wizard.js` — bootstrap del modo style-selector
   - `chunks/bootstrap-index.js` — bootstrap del modo products-index
   - `chunks/configurator-init.js` — todas las deps de `executePhase1` en un único chunk (9.1 KB / 3.4 KB gzip); preloadeado en `index.html` para que resuelva de caché con latencia cero
+- **Nombres fijos via `facadeModuleId`** — los tres bootstraps son `index.tsx` tras el refactor de directorios, así que Rolldown no puede inferir su nombre por archivo. `chunkFileNames` usa `chunkInfo.facadeModuleId` (ruta completa) para asignar el nombre correcto:
+  - `id.includes('configurator/bootstrap')` → `bootstrap-configurator.js`
+  - `id.includes('products-index/bootstrap')` → `bootstrap-index.js`
+  - `id.includes('style-selector/bootstrap')` → `bootstrap-wizard.js`
+  - `chunkInfo.name === 'configurator-init'` → `configurator-init.js` (no es entry, usa name)
 - **`manualChunks`**: deps pesadas en chunks propios (cargadas solo cuando se necesitan):
   - `react-dom` → `chunks/react-dom-[hash].js`
   - `@cfg.plat/configure-core` → `chunks/configure-core-[hash].js`
@@ -54,6 +59,30 @@ Medido con `npm run size` (`scripts/bundle-size.mjs`, appends a `bundle-sizes.lo
 - Código de app propio: ~26 KB raw / ~12 KB gzip
 
 `npm run build && npm run size -- --label "descripción"` tras cada feature para rastrear crecimiento.
+
+## Post-build auditor (`scripts/audit.mjs`)
+`npm run audit` — corre DESPUÉS de un build. Sale con código 1 si hay fallos.
+
+Tres secciones:
+
+**1. CHUNKS — presencia**
+Verifica que existan los 6 archivos críticos: entry JS, CSS bundle, `bootstrap-configurator`, `bootstrap-wizard`, `bootstrap-index`, `configurator-init`.
+Además cruza los `modulepreload` hrefs de `public/index.html` contra `dist/` — si renombras un chunk, avisa.
+
+**2. SIZES — umbrales** (raw KB, sin comprimir)
+| Chunk | WARN | FAIL |
+|---|---|---|
+| entry JS | > 10 KB | > 20 KB |
+| bootstrap-* | > 35 KB | > 70 KB |
+| configurator-init | > 15 KB | > 30 KB |
+
+**3. BLOCKING — análisis estático de src/**
+| Patrón | Severidad |
+|---|---|
+| `new Promise((resolve)` sin `reject` — Promise colgada | FAIL |
+| `try/catch` alrededor de `.then()`/`import()` — no captura rechazos async | WARN |
+| `await fetch()` directo en strategies — puede bloquear LCP | WARN |
+| Synchronous XHR — `.open(..., false)` | FAIL |
 
 ## TypeScript config (`tsconfig.app.json`)
 - `paths: { "@/*": ["./src/*"] }` — mirrors Vite alias so tsc resolves `@/` imports
@@ -321,8 +350,17 @@ src/
   stubs/
     jsonp-node.js                  — stub Node-only path de jsonp-client (elimina warnings de build)
 public/
-  index.html                       — GitHub Pages shell (inline theme script + preloads)
-                                     no static skeleton — each mode renders its own via React
+  index.html                       — GitHub Pages shell — este es el que Vite copia a dist/
+                                     contiene: inline theme script, preconnects a dominios RTR/CDN,
+                                     preloads de scripts externos (RTR viewer, quicklink, prefetch),
+                                     modulepreload de bootstrap-configurator + configurator-init,
+                                     window.configureParams de ejemplo, y <link> CSS bundle
+                                     IMPORTANTE: el index.html raíz (/) es solo para dev server —
+                                     todo lo que debe aparecer en dist/ debe estar en public/index.html
+scripts/
+  bundle-size.mjs                  — snapshot de tamaños por modo, appends a bundle-sizes.log
+  audit.mjs                        — post-build auditor: presencia de chunks, umbrales de tamaño,
+                                     análisis estático de bloqueos de main thread
 ```
 
 ## Pending

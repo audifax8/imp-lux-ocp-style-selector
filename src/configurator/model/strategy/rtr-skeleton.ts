@@ -4,7 +4,7 @@ import type { LoadingState } from '@/configurator/bootstrap/state/loading-state'
 import type { Originator } from '@/configurator/bootstrap/state/originator';
 
 import { RTRVersion } from '@/models/rtr/rtr-version';
-import type { RTRAssets } from '@/models/rtr/rtr-assets';
+import { RTRAssets } from '@/models/rtr/rtr-assets';
 
 import { RTRBackground } from '@/declarations/enums';
 import type { MergedParams } from '@/declarations/types';
@@ -35,7 +35,6 @@ export class RTRSkeleton extends BaseStrategy {
     const logger = state.getLogger();
     const performance = state.getPerformance();
     try {
-      //this.loadRTRAssets();
       performance?.processStart('initRTR');
       await this.initRTR();
       performance?.processEnd('initRTR');
@@ -44,40 +43,6 @@ export class RTRSkeleton extends BaseStrategy {
       logger?.error('[Error]');
       logger?.object(e);
     }
-  }
-
-  async loadRTRAssets(): Promise<undefined> {
-    const state = this.originator.getState();
-    const logger = state.getLogger();
-    const performance = state.getPerformance();
-    //const objectsFactory = state.getObjectsFactory();
-    this.runIdle(async () => {
-      try {
-        performance?.processStart('loadRTRAssets');
-        //TODO it needs to be sent by configure params
-        const vendorIdSize = '0RB2140CP50';
-        const rtrAssetsURL = this.rtrVersion.getAssetsURL(vendorIdSize);
-        const response = await fetch(rtrAssetsURL);
-        console.log({ response });
-        //const assets = await response.json();
-
-        //const rtrAssets = await objectsFactory?.buildRTRAssets();
-        //rtrAssets?.setRTRAssets(assets);
-        //rtrAssets?.setQuickLink(window.quicklink);
-        //rtrAssets?.prefetchListStartup();
-
-        //this.rtrAssets = rtrAssets;
-        //this.registerDependency('rtrAssets', rtrAssets);
-        performance?.processEnd('loadRTRAssets');
-        performance?.logMeasure('loadRTRAssets');
-        return true;
-      } catch (e) {
-        performance?.processEnd('loadRTRAssets');
-        logger?.error('');
-        logger?.object(e);
-        return false;
-      }
-    });
   }
 
   public getBackGround(params: MergedParams): RTRBackground {
@@ -99,7 +64,12 @@ export class RTRSkeleton extends BaseStrategy {
       const DEFAULT_TOKEN =
         'TKN~0RB2140CP~2RB2140J61_901...AA~2AJ3031111_901...AA~NULL~1RB0050L020_GRIDFK~NULL~RBCP..50';
       const token = DEFAULT_TOKEN;
-      await this.rtrVersion.downloadScript();
+      //await this.rtrVersion.downloadScript();
+      this.rtrAssets = new RTRAssets(this.originator);
+      await Promise.all([
+        this.rtrVersion.downloadScript(),
+        this.rtrAssets.downloadRTRAssets()
+      ]);
       this.rtrVersion.setAPI();
       await this.runAnimation(async () => {
         const background = this.getBackGround(params);
