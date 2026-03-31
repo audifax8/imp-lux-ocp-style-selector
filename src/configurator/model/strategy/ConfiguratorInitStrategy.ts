@@ -34,16 +34,26 @@ export class ConfiguratorInitStrategy
     return fetchPhase1Mock()
   }
 
-  executePhase2(phase1Result: InitPhase1Data): Promise<InitPhase2Data> {
-    console.log('here 2');
-    import('@cfg.plat/configure-core')
-      .then((createCore) => {
-        console.log({ createCore });
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-
+  async executePhase2(phase1Result: InitPhase1Data): Promise<InitPhase2Data> {
+    try {
+      console.log('here');
+      const { getInitQueryParams, Caretaker, Originator, LoadingState } = await import('./configurator-init');
+      const params = getInitQueryParams();
+      const { showPerformance, showLogs } = params;
+      const state = new LoadingState();
+      state.setParams(params);
+      state.setLogger(new Logger(showLogs ?? false));
+      state.setPerformance(new Performance(showPerformance ?? false));
+      const originator = new Originator();
+      const caretaker = new Caretaker();
+      originator.setState(state);
+      caretaker.addMemento(originator.saveMemento());
+      const { Core } = await import('./core');
+      const core = new Core(caretaker, originator);
+      core.init();
+    } catch (e) {
+      console.log(e);
+    }
     return fetchPhase2Mock(phase1Result)
   }
 }

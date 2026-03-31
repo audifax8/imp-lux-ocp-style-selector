@@ -45,11 +45,12 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
 - `base: './'` — relative paths for GitHub Pages subdirectory
 - `cssCodeSplit: false` — all non-`?inline` CSS goes to the single CSS bundle
 - `resolve.alias` — `@/` path alias + stub de `jsonp-node.js` (Node-only, ver abajo)
-- `define` — `process.browser: true` + `FLUID_CONFIGURATIONS_VERSION` para `@cfg.plat/configure-core`
+- `define` — `process.browser: true` + `FLUID_CONFIGURATIONS_VERSION` para `@cfg.plat/configure-core` + `global: 'globalThis'` (ver workarounds)
 
 ## Workarounds de dependencias (vite.config.ts)
 - **`patchFluidProductUrls` plugin** — `@cfg.plat/fluid-product-urls/configure.js` asigna `Function.name` directamente (`methods[method].name = method`), que falla en strict mode ESM. El plugin reemplaza la línea por `Object.defineProperty` con `writable: true`. Aplica en build (`transform` hook) y en dev pre-bundling (`optimizeDeps.rolldownOptions.plugins`).
 - **`src/stubs/jsonp-node.js`** — `jsonp-client` tiene `browser: {"./jsonp-node.js": false}` pero Rolldown lo ignora. El stub reemplaza el módulo Node-only (usa `fs`/`vm`) para eliminar los warnings de build. Alias via regex `/.*jsonp-node(\.js)?$/` (necesario porque el require es relativo y Rolldown resuelve a ruta absoluta antes de buscar aliases).
+- **`global: 'globalThis'` en `define`** — `@cfg.plat/configure-core` y sus deps transitivas (`@cfg.plat/configuration-loader`, `@cfg.plat/configuration-engine`, etc.) son librerías Node.js que referencian `global` (no existe en browser). Vite lo reemplaza estáticamente por `globalThis` en build y dev.
 
 ## Bundle sizes (baseline RBN-5144)
 Medido con `npm run size` (`scripts/bundle-size.mjs`, appends a `bundle-sizes.log`):

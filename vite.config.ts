@@ -89,6 +89,10 @@ export default defineConfig({
   },
   define: {
     'process.browser': true,
-    'process.env.FLUID_CONFIGURATIONS_VERSION': parseInt('3.13.0')
+    'process.env.FLUID_CONFIGURATIONS_VERSION': parseInt('3.13.0'),
+    // @cfg.plat/configure-core y sus deps (@cfg.plat/configuration-loader,
+    // @cfg.plat/configuration-engine, etc.) son librerías Node.js que referencian
+    // `global` (no existe en browser). `globalThis` es el equivalente universal.
+    global: 'globalThis'
   }
 })
