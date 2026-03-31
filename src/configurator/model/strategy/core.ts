@@ -9,6 +9,7 @@ import { AsyncTask } from '@/models/async-task';
 import type { Caretaker } from '@/configurator/bootstrap/state/caretaker';
 import type { Originator } from '@/configurator/bootstrap/state/originator';
 import { CheckPointType } from '@/declarations/enums';
+import type { Overrides } from '@/models/overrides';
 //import { ApisFactory } from '@/factory/apis-factory';
 
 /*import type { LuxAPI } from '@/models/lux';
@@ -156,6 +157,19 @@ export class Core extends AsyncTask implements InitBaseMethods {
       this.caretaker.addMemento(this.originator.saveMemento());
       const core = await this.createCore('CreatingConfigure');
       console.log({ core });
+      if (params.skipOla) {
+        return;
+      }
+      const product = core.getProduct();
+      const vendorId = product.vendorId;
+      const { Overrides } = await import('@/models/overrides');
+      const overrides = new Overrides(params, logger, performance);
+      const components = await overrides.getLuxComponents(vendorId);
+      const attributes = product?.attributes;
+      overrides.getProductOverrides(components, attributes);
+      console.log({ overrides });
+      const coreWithOla = await this.createCore('ApplyOverrides', overrides);
+      console.log({ coreWithOla });
     } catch (e) {
       logger?.object(e);
     }
@@ -244,7 +258,7 @@ export class Core extends AsyncTask implements InitBaseMethods {
     //this.timeOuts.forEach((tOut) => clearTimeout(tOut));
   }
 
-  createCore(measureName: string, overrides?: unknown): Promise<ConfigureCore> {
+  createCore(measureName: string, overrides?: Overrides): Promise<ConfigureCore> {
     console.log(overrides);
     return new Promise((resolve, reject) => {
       const state = this.originator.getState();
@@ -268,7 +282,7 @@ export class Core extends AsyncTask implements InitBaseMethods {
               locale,
               productOverrides: {
                 debug: false,
-                //values: overrides?.mappedAttributes
+                values: overrides?.mappedAttributes
               }
             },
             (error: Error, configureCore: ConfigureCore) => {

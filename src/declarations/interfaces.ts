@@ -1,3 +1,5 @@
+import type { AttributeValue } from '@fluid.inc/yr-configure-wrapper/core';
+
 import type { FetchPriority, ResolutionType, SkeletonVariant } from '@/declarations/enums';
 import type { KeyString } from '@/declarations/types';
 
@@ -297,11 +299,8 @@ export interface Components {
   vatIncluded: boolean;
   grids: Grid[];
 }
-
-// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export interface Override {
   [key: string]: {
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
     valueUsages?: {
       [key: string]: {
         active: boolean;
@@ -312,4 +311,39 @@ export interface Override {
 
 export interface QuickLink {
   prefetch(URL: string[], test: boolean, test1: boolean): Promise<unknown>;
+}
+
+export interface MapAttributeValue extends AttributeValue {
+  url?: string;
+  valueUsageVendorId?: string;
+  colorCodeURL?: string;
+}
+
+export interface ConfigurableAttribute {
+  id: number;
+  alias: string;
+  vendorId?: string;
+  usageVendorId?: string;
+  name: string;
+  attributeValues?: MapAttributeValue[];
+  values?: MapAttributeValue[];
+  subAttributes?: ConfigurableAttribute[];
+}
+
+export interface OverrideDictionary {
+  [key: string]: AttributeValue[];
+}
+
+interface HeadlessFacet {
+  name: string;
+  values: string[];
+}
+export interface HeadlessProduct {
+  product: {
+    name: string;
+    id: number;
+    vendorId: string;
+    attributes: ConfigurableAttribute[];
+    facets: HeadlessFacet[];
+  };
 }
