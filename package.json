@@ -25,7 +25,8 @@
     "react-dom": "^19.2.4",
     "@cfg.plat/configure-core": "^6.2.2",
     "@fluid.inc/cmol-utils": "^0.0.11",
-    "@fluid.inc/yr-configure-wrapper": "1.2.1"
+    "@fluid.inc/yr-configure-wrapper": "1.2.1",
+    "@fluid.inc/imp-tools-lux": "3.18.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

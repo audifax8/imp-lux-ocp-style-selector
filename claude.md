@@ -42,6 +42,7 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
   - `@cfg.plat/configure-core` → `chunks/configure-core-[hash].js`
   - `@fluid.inc/yr-configure-wrapper` → `chunks/yr-configure-wrapper-[hash].js`
   - `@fluid.inc/cmol-utils` → `chunks/cmol-utils-[hash].js`
+  - `@fluid.inc/imp-tools-lux` → `chunks/imp-tools-lux-[hash].js`
 - `base: './'` — relative paths for GitHub Pages subdirectory
 - `cssCodeSplit: false` — all non-`?inline` CSS goes to the single CSS bundle
 - `resolve.alias` — `@/` path alias + stub de `jsonp-node.js` (Node-only, ver abajo)

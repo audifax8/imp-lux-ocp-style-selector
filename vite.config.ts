@@ -64,6 +64,7 @@ export default defineConfig({
           if (id.includes('node_modules/@cfg.plat/configure-core')) return 'configure-core'
           if (id.includes('node_modules/@fluid.inc/yr-configure-wrapper')) return 'yr-configure-wrapper'
           if (id.includes('node_modules/@fluid.inc/cmol-utils')) return 'cmol-utils'
+          if (id.includes('node_modules/@fluid.inc/imp-tools-lux')) return 'imp-tools-lux'
         },
       },
     },

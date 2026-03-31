@@ -168,9 +168,27 @@ export class Core extends AsyncTask implements InitBaseMethods {
       const attributes = product?.attributes;
       overrides.getProductOverrides(components, attributes);
       console.log({ overrides });
+
+
+      /*const { updateBySequenceCheck, getProductOverridesSize, RAYBAN_CODE, getProductOverrides,
+        injectOverridesForBestSeller, getFrameCategoryOverrides, getFrameOverrides
+      } = await import('@fluid.inc/imp-tools-lux');*/
+      const { RAYBAN_CODE, getFrameOverrides } = await import('@fluid.inc/imp-tools-lux');
+      console.log({ getFrameOverrides, RAYBAN_CODE });
+
+      /*const options = { configure, params, components, appCode: RAYBAN_CODE };
+      let finalProductOverrides = getProductOverrides(options);
+      finalProductOverrides = getProductOverridesSize(configure, finalProductOverrides, params);
+      finalProductOverrides = updateBySequenceCheck(configure, finalProductOverrides, params);
+      finalProductOverrides = getFrameCategoryOverrides(configure, finalProductOverrides, params);
+      finalProductOverrides = getFrameOverrides(configure, finalProductOverrides, params);
+      finalProductOverrides = injectOverridesForBestSeller(configure, finalProductOverrides, params);
+      console.log({ finalProductOverrides });*/
+
       const coreWithOla = await this.createCore('ApplyOverrides', overrides);
       console.log({ coreWithOla });
     } catch (e) {
+      console.log(e);
       logger?.object(e);
     }
     performance?.processEnd('initCore');

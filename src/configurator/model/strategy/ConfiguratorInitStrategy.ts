@@ -13,7 +13,7 @@ export class ConfiguratorInitStrategy
   implements IInitStrategy<InitPhase1Data, InitPhase2Data>
 {
   async executePhase1(): Promise<InitPhase1Data> {
-    console.log('here 1');
+    console.log('here');
     try {
       const { getInitQueryParams, RTRSkeleton, Caretaker, Originator, LoadingState } = await import('./configurator-init');
       const params = getInitQueryParams();
@@ -27,7 +27,7 @@ export class ConfiguratorInitStrategy
       originator.setState(state);
       caretaker.addMemento(originator.saveMemento());
       const rtTest = new RTRSkeleton(caretaker, originator, state);
-      rtTest.init();
+      await rtTest.init();
     } catch (e) {
       console.log(e);
     }
@@ -36,7 +36,7 @@ export class ConfiguratorInitStrategy
 
   async executePhase2(phase1Result: InitPhase1Data): Promise<InitPhase2Data> {
     try {
-      console.log('here');
+      console.log('here 1');
       const { getInitQueryParams, Caretaker, Originator, LoadingState } = await import('./configurator-init');
       const params = getInitQueryParams();
       const { showPerformance, showLogs } = params;
