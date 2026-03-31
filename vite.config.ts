@@ -50,9 +50,10 @@ export default defineConfig({
         // permiten modulepreload y rastreo de peso por modo.
         // El resto lleva hash para cache busting.
         chunkFileNames: (chunkInfo) => {
-          if (chunkInfo.name === 'bootstrap-configurator') return 'chunks/bootstrap-configurator.js'
-          if (chunkInfo.name === 'bootstrap-index') return 'chunks/bootstrap-index.js'
-          if (chunkInfo.name === 'bootstrap') return 'chunks/bootstrap-wizard.js'
+          const id = chunkInfo.facadeModuleId ?? ''
+          if (id.includes('configurator/bootstrap')) return 'chunks/bootstrap-configurator.js'
+          if (id.includes('products-index/bootstrap')) return 'chunks/bootstrap-index.js'
+          if (id.includes('style-selector/bootstrap')) return 'chunks/bootstrap-wizard.js'
           if (chunkInfo.name === 'configurator-init') return 'chunks/configurator-init.js'
           return 'chunks/[name]-[hash].js'
         },
