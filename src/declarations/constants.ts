@@ -5,7 +5,7 @@ export const MEGA_WAYFARER_ID = 26101;
 export const RBN_CUSTOMER_ID = 1581;
 export const OAK_CUSTOMER_ID = 1479;
 export const WAYFARER_ID = 22972;
-export const WAYFARER_VENDOR_ID = '0RB3025CP';
+export const WAYFARER_VENDOR_ID = '0RB2140CP';
 export const RADAR_EV_VENDOR_ID = '0OO9208CP';
 export const DEFAULT_LOCALE = 'en_US';
 
