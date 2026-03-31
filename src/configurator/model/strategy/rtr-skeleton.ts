@@ -21,16 +21,10 @@ export class RTRSkeleton extends BaseStrategy {
   }
 
   private getRTRVersion(): string {
-    const params = this.originator.getState().getParams();
-    const { rtrVersion } = params;
-    if (rtrVersion) {
-      return rtrVersion;
-    }
-    const DEFAULT_RTR_VERSION = '7.2.2';
-    return DEFAULT_RTR_VERSION;
+    return this.rtrVersion?.getVersion()?.version;
   }
 
-  override async init(): Promise<void> {
+  override async init(): Promise<boolean> {
     const state = this.originator.getState();
     const logger = state.getLogger();
     const performance = state.getPerformance();
@@ -39,9 +33,13 @@ export class RTRSkeleton extends BaseStrategy {
       await this.initRTR();
       performance?.processEnd('initRTR');
       performance?.logMeasure('initRTR');
+      return true;
     } catch (e) {
       logger?.error('[Error]');
       logger?.object(e);
+      performance?.processEnd('initRTR');
+      performance?.logMeasure('initRTR');
+      return false;
     }
   }
 
@@ -64,7 +62,6 @@ export class RTRSkeleton extends BaseStrategy {
       const DEFAULT_TOKEN =
         'TKN~0RB2140CP~2RB2140J61_901...AA~2AJ3031111_901...AA~NULL~1RB0050L020_GRIDFK~NULL~RBCP..50';
       const token = DEFAULT_TOKEN;
-      //await this.rtrVersion.downloadScript();
       this.rtrAssets = new RTRAssets(this.originator);
       await Promise.all([
         this.rtrVersion.downloadScript(),
@@ -73,7 +70,7 @@ export class RTRSkeleton extends BaseStrategy {
       this.rtrVersion.setAPI();
       await this.runAnimation(async () => {
         const background = this.getBackGround(params);
-        const initResult = await this.rtrVersion.init(token, background);
+        const initResult = await this.rtrVersion.init(token, background);;
         if (!initResult) {
           throw new Error('[RTR] init failed');
         }

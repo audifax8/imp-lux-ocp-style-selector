@@ -31,7 +31,7 @@ export abstract class BaseStrategy extends AsyncTask {
     }
   }
 
-  abstract init(): Promise<void>;
+  abstract init(): Promise<boolean>;
 
   /*protected updateAPIState(newApiState: APIsState) {
     //return updateAPIStore(newApiState);
