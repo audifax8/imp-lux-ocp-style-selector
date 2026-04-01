@@ -4,8 +4,9 @@ import type { InitRTRPayload } from '@/declarations/interfaces';
 import type { RtrBaseAPI } from '@/declarations/interfaces';
 
 import type { RTRBackground } from '@/declarations/enums';
+import type { MergedParams } from '@/declarations/types';
 
-type ApiVersion = '7.2.2' | '4.0.0' | '4.1.1';
+type ApiVersion = '8.2.0' | '7.2.2' | '4.0.0' | '4.1.1';
 
 interface RTRVersionsMap {
   url: string;
@@ -45,6 +46,12 @@ export class RTRVersion {
       version: '4.1.1',
       windowObjectName: 'rtrViewerMV',
       extraName: 'viewer'
+    },
+    {
+      url: 'https://rtr-viewer.luxottica.com/lib/v/8.2.0/main.js',
+      version: '8.2.0',
+      windowObjectName: 'rtrViewer',
+      extraName: 'RtrViewer'
     }
   ];
 
@@ -54,19 +61,16 @@ export class RTRVersion {
   protected rendered: boolean = false;
   protected api: RtrBaseAPI = undefined!;
 
-  constructor(urlVersion: string, logger?: Logger, performance?: Performance) {
+  constructor(params: MergedParams, logger?: Logger, performance?: Performance) {
     this.logger = logger;
     this.performance = performance;
-    this.version = this.sanitizeVersion(urlVersion);
+    const rtrVersion = params?.rtrVersion || this.DEFAULT_VERSION.version;
+    this.version = this.sanitizeVersion(rtrVersion);
     this.logger?.log('[RTR] using v:' + this.version);
   }
 
   public sanitizeVersion(urlVersion: string) {
-    const v = this.versionsMap.find((v) => v.version === urlVersion);
-    if (v) {
-      return v.version;
-    }
-    return this.DEFAULT_VERSION.version;
+    return this.versionsMap.find((v) => v.version === urlVersion)?.version ?? this.DEFAULT_VERSION.version;
   }
 
   public getVersion() {

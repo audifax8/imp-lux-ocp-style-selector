@@ -11,17 +11,12 @@ import type { MergedParams } from '@/declarations/types';
 
 export class RTRSkeleton extends BaseStrategy {
   protected rtrAssets: RTRAssets = undefined!;
-  private version: string = undefined!;
   private rtrVersion: RTRVersion = undefined!;
 
   constructor(caretaker: Caretaker, originator: Originator, state: LoadingState) {
     super(caretaker, originator);
-    this.version = this.getRTRVersion();
-    this.rtrVersion = new RTRVersion(this.version, state.getLogger(), state.getPerformance());
-  }
-
-  private getRTRVersion(): string {
-    return this.rtrVersion?.getVersion()?.version;
+    const params = this.originator?.getState()?.getParams();
+    this.rtrVersion = new RTRVersion(params, state.getLogger(), state.getPerformance());
   }
 
   override async init(): Promise<boolean> {
