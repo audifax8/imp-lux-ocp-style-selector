@@ -54,6 +54,7 @@ export default defineConfig({
           if (id.includes('configurator/bootstrap')) return 'chunks/bootstrap-configurator.js'
           if (id.includes('products-index/bootstrap')) return 'chunks/bootstrap-index.js'
           if (id.includes('style-selector/bootstrap')) return 'chunks/bootstrap-wizard.js'
+          if (id.includes('demo/bootstrap')) return 'chunks/bootstrap-demo.js'
           if (chunkInfo.name === 'configurator-init') return 'chunks/configurator-init.js'
           return 'chunks/[name]-[hash].js'
         },

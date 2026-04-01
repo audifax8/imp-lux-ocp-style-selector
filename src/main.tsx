@@ -32,6 +32,8 @@ if (activeMode === 'wizard') {
   import('@/style-selector/bootstrap').then(({ mount }) => mount(container!))
 } else if (activeMode === 'index') {
   import('@/products-index/bootstrap').then(({ mount }) => mount(container!))
+} else if (activeMode === 'demo') {
+  import('@/demo/bootstrap').then(({ mount }) => mount(container!))
 } else {
   import('@/configurator/bootstrap').then(({ mount }) => mount(container!))
 }

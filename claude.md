@@ -5,6 +5,7 @@ Self-contained React 19 widget (embeddable). Three initialization modes:
 - **configurator** (default) — glasses configurator experience with RTR (Real-Time Rendering)
 - **style-selector** (wizard) — picks glasses type → model → opens product page
 - **products-index** (index) — product index listing
+- **demo** — sandbox para probar layouts desktop/mobile con brand CSS activo; sin skeleton; acceso al estilo base compartido
 
 ## Repos
 - `origin` → `git@github.com:audifax8/imp-lux-ocp-style-selector.git`
@@ -31,11 +32,13 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
   - `chunks/bootstrap-configurator.js` — bootstrap del modo configurator
   - `chunks/bootstrap-wizard.js` — bootstrap del modo style-selector
   - `chunks/bootstrap-index.js` — bootstrap del modo products-index
+  - `chunks/bootstrap-demo.js` — bootstrap del modo demo
   - `chunks/configurator-init.js` — todas las deps de `executePhase1` en un único chunk (9.1 KB / 3.4 KB gzip); preloadeado en `index.html` para que resuelva de caché con latencia cero
 - **Nombres fijos via `facadeModuleId`** — los tres bootstraps son `index.tsx` tras el refactor de directorios, así que Rolldown no puede inferir su nombre por archivo. `chunkFileNames` usa `chunkInfo.facadeModuleId` (ruta completa) para asignar el nombre correcto:
   - `id.includes('configurator/bootstrap')` → `bootstrap-configurator.js`
   - `id.includes('products-index/bootstrap')` → `bootstrap-index.js`
   - `id.includes('style-selector/bootstrap')` → `bootstrap-wizard.js`
+  - `id.includes('demo/bootstrap')` → `bootstrap-demo.js`
   - `chunkInfo.name === 'configurator-init'` → `configurator-init.js` (no es entry, usa name)
 - **`manualChunks`**: deps pesadas en chunks propios (cargadas solo cuando se necesitan):
   - `react-dom` → `chunks/react-dom-[hash].js`
@@ -107,7 +110,7 @@ Detection priority:
 2. `?mode=` URL param
 3. `'configurator'` (default)
 
-Valid modes: `'wizard'` | `'configurator'` | `'index'`
+Valid modes: `'wizard'` | `'configurator'` | `'index'` | `'demo'`
 
 **Isolation rule:** each mode's chunks never load in the other modes.
 All mode-specific CSS (including white-label CSS) is `?inline` — injected by the bootstrap before React mounts.
@@ -287,6 +290,7 @@ src/
     loader-wizard.ts               — injects style-selector brand CSS (?inline)
     loader-configurator.ts         — injects configurator brand CSS (?inline)
     loader-index.ts                — injects products-index brand CSS (?inline)
+    loader-demo.ts                 — injects demo brand CSS (?inline, reutiliza wizard.scss de cada brand)
     {brand}/wizard.scss            — brand CSS for style-selector mode
     {brand}/configurator.scss      — brand CSS for configurator mode (placeholders)
     {brand}/index.scss             — brand CSS for products-index mode (placeholders)
