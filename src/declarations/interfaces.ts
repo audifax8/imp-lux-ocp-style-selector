@@ -56,7 +56,7 @@ export interface ConfigureInitParams {
   showThemeSwitch?: boolean;
   darkMode?: boolean;
   showHeader?: boolean;
-  skeleton?: boolean;
+  skeletonLoader?: boolean;
   skipLuxApi?: boolean;
   apiKey: string;
   //skipHeadless?: boolean;

@@ -19,16 +19,36 @@ document.head.appendChild(styleEl)
 // Su CSS (model-content.scss) se inyecta al cargar este chunk.
 const ModelContent = lazy(() => import('./ModelContent'))
 
+// SharedSkeleton: chunk alternativo, se descarga SOLO cuando se renderiza.
+// ?skeletonLoader=true → activo; ausente/false → ModelSkeleton por defecto (sin coste de red).
+const _raw = new URLSearchParams(window.location.search).get('skeletonLoader')
+const skeletonEnabled = _raw !== null && (_raw === '' || _raw === 'true')
+
+// Preload inmediato: si el param está activo, disparamos el import ahora para que el
+// chunk esté en caché cuando React lo necesite — evita el flash de ModelSkeleton.
+// IMPORTANTE: SharedSkeleton se usa sin <Suspense> propio (ver skeleton variable abajo).
+// Esto funciona SOLO porque el preload garantiza que lazy() resuelve síncronamente.
+// Si eliminas sharedSkeletonImport, añade un <Suspense> wrapper alrededor de <SharedSkeleton />.
+const sharedSkeletonImport = skeletonEnabled
+  ? import('@/shared/components/SharedSkeleton')
+  : null
+const SharedSkeleton = lazy(() => sharedSkeletonImport!)
+
 const Model = () => {
   const strategy = useMemo(() => new ConfiguratorInitStrategy(), [])
   const { phase1Data, phase2Data } = useInitStrategy(strategy)
 
+  // Cuando skeletonEnabled: SharedSkeleton con fallback al original mientras su chunk carga.
+  // Cuando !skeletonEnabled: ModelSkeleton directamente, SharedSkeleton nunca se descarga.
+  const skeleton = skeletonEnabled
+    ? <SharedSkeleton /> : <ModelSkeleton />
+
   return (
     <div className="model">
       {phase1Data === null ? (
-        <ModelSkeleton />
+        skeleton
       ) : (
-        <Suspense fallback={<ModelSkeleton />}>
+        <Suspense fallback={skeleton}>
           <ModelContent phase1Data={phase1Data} phase2Data={phase2Data} />
         </Suspense>
       )}

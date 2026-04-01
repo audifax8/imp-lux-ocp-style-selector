@@ -260,6 +260,7 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 - `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
 - `styles/theme.scss` — CSS bundle (vars, dark mode, reset, sr-only, reduced-motion)
 - `components/DarkModeSwitch.tsx` — toggle component; usado en todos los modos
+- `components/SharedSkeleton.tsx` — skeleton alternativo compartido entre configurator y style-selector; activado con `?skeletonLoader=true`; chunk lazy propio con preload inmediato a nivel de módulo cuando el param está activo (`sharedSkeletonImport = import(...)` antes de que React monte); esto garantiza que `lazy()` resuelve síncronamente y `<SharedSkeleton />` puede usarse sin `<Suspense>` wrapper propio; cuando el param no está presente el chunk no se descarga y los skeletons originales se usan sin coste de red
 
 ## WCAG AAA
 - Root font: `112.5%` (respects browser font-size preference)
@@ -278,6 +279,8 @@ src/
     theme/darkMode.ts              — theme detection + toggle
     styles/theme.scss              — CSS bundle (vars, dark mode, reset, sr-only)
     components/DarkModeSwitch.tsx  — shared dark mode toggle component
+    components/SharedSkeleton.tsx  — shared skeleton (lazy chunk); active via ?skeleton=true
+    components/SharedSkeleton.scss — ?inline CSS for SharedSkeleton
   white-label/
     detect.ts                      — brand singleton
     types.ts                       — Brand type + BRANDS const

@@ -1,0 +1,40 @@
+// =============================================================================
+// SCSS SHARED SKELETON — inyectado inline cuando el chunk SharedSkeleton carga
+// Reutiliza los CSS vars del proyecto (--border, --code-bg) para que el shimmer
+// respete el tema light/dark automáticamente.
+// =============================================================================
+
+@keyframes shared-skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@mixin shared-shimmer($delay: 0s) {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--code-bg) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shared-skeleton-shimmer 1.4s ease-in-out infinite $delay;
+}
+
+.shared-skeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 3rem 2rem;
+  width: 100%;
+
+  &__bar {
+    height: 0.875rem;
+    width: 100%;
+    border-radius: 4px;
+    @include shared-shimmer;
+
+    &--med   { width: 72%; animation-delay: 0.1s; }
+    &--short { width: 48%; animation-delay: 0.2s; }
+  }
+}
