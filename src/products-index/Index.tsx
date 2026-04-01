@@ -4,7 +4,7 @@
 // El SCSS ya fue inyectado en bootstrap-index antes del mount.
 // ─────────────────────────────────────────────────────────────────────────────
 import { lazy, Suspense, useState, useEffect } from 'react'
-import DarkModeSwitch from '@/shared/components/DarkModeSwitch'
+import DarkModeSwitch from '@/shared/components/dark-mode-switch'
 import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
 import { useLabels } from '@/labels/useLabels'
 

@@ -26,7 +26,7 @@ const SharedSkeleton = lazy(() => sharedSkeletonImport!)
 
 const MOUNT_ID = 'imp-lux-ocp-style-selector'
 
-const Wizard = () => {
+const StyleSelector = () => {
   const [selectedType, setSelectedType] = useState<GlassType | null>(null)
   const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   const labels = useLabels()
@@ -69,4 +69,4 @@ const Wizard = () => {
   )
 }
 
-export default Wizard
+export default StyleSelector

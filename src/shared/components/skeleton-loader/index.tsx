@@ -4,7 +4,7 @@
 // Se activa con ?skeletonLoader=true. Solo se descarga cuando se renderiza.
 // CSS inyectado a nivel de módulo (patrón del proyecto).
 // =============================================================================
-import skeletonStyles from './SharedSkeleton.scss?inline'
+import skeletonStyles from './index.scss?inline'
 
 const styleEl = document.createElement('style')
 styleEl.dataset.id = 'shared-skeleton'

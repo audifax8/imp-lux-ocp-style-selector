@@ -1,8 +1,9 @@
 //import { LabelsProvider } from './labels/LabelsProvider'
-import Wizard from '../Wizard'
+//import Wizard from '../Wizard'
+import StyleSelector from "../StyleSelector"
 
 const AppStyleSelector = () => (
-  <Wizard />
+  <StyleSelector />
 )
 
 /*const App = () => (

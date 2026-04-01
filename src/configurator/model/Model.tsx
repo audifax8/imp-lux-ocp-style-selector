@@ -30,7 +30,7 @@ const skeletonEnabled = _raw !== null && (_raw === '' || _raw === 'true')
 // Esto funciona SOLO porque el preload garantiza que lazy() resuelve síncronamente.
 // Si eliminas sharedSkeletonImport, añade un <Suspense> wrapper alrededor de <SharedSkeleton />.
 const sharedSkeletonImport = skeletonEnabled
-  ? import('@/shared/components/SharedSkeleton')
+  ? import('@/shared/components/skeleton-loader')
   : null
 const SharedSkeleton = lazy(() => sharedSkeletonImport!)
 
