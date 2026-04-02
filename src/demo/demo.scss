@@ -17,10 +17,10 @@ $breakpoint: 600px;
 .demo-scene {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(180deg, #c8c8c8 0%, #b8b8b8 60%, #ccc9c2 80%, #d8d5ce 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(180deg, var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00)) 87.07%, var(--color-generic-neutral-dark-background, #818181) 100%), url(<path-to-image>) lightgray -49.465px -9px / 126.381% 100.956% no-repeat;
 }
 
 // ── Overlay (centered content block) ─────────────────────────────────────────
@@ -48,27 +48,12 @@ $breakpoint: 600px;
 .demo-title {
   color: var(--color-generic-neutral-ultra-dark-text, #000);
   text-align: center;
-
-  /* Texts/Text 2xl Bold */
   font-family: var(--typography-body-2xl-family, Inter);
   font-size: var(--typography-body-2xl-size, 24px);
   font-style: normal;
   font-weight: 700;
   line-height: var(--typography-body-2xl-line-height, 30px); /* 125% */
   letter-spacing: var(--typography-body-2xl-letter-spacing, 0);
-
-  @media (min-width: $breakpoint) {
-    color: var(--color-generic-neutral-ultra-dark-text, #000);
-    text-align: center;
-
-    /* Texts/Text 2xl Bold */
-    font-family: var(--typography-body-2xl-family, Inter);
-    font-size: var(--typography-body-2xl-size, 24px);
-    font-style: normal;
-    font-weight: 700;
-    line-height: var(--typography-body-2xl-line-height, 30px); /* 125% */
-    letter-spacing: var(--typography-body-2xl-letter-spacing, 0);
-  }
 }
 
 // ── Progress bar ──────────────────────────────────────────────────────────────
@@ -77,11 +62,7 @@ $breakpoint: 600px;
   margin-top: var(--spacing-2xl, 40px);;
   width: 232px;
   background: rgba(255, 255, 255, 0.5);
-  border-radius: 9999px;
   overflow: hidden;
-  padding: var(--spacing-none, 0);
-  gap: var(--spacing-none, 0);
-  border: 3px solid var(--color-stepper-light-active-border, #FFF);
   display: flex;
   height: 8px;
   padding: var(--spacing-none, 0);
