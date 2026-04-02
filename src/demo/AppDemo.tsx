@@ -1,29 +1,30 @@
 // Componente raíz del modo demo.
-// Layouts:
-//   Desktop — header con logo + stepper + menú, 3 cards centradas con max-width
-//   Mobile  — header logo + menú, sub-nav con atrás/título/cerrar, cards a ancho completo
+// Layout: pantalla de carga RTR a viewport completo.
+//   Fondo: gradiente gris neutro (simula entorno de estudio)
+//   Contenido: brand + título + barra de progreso centrados, ligeramente por encima del centro
 
-import { Card } from "@/style-selector/components/card"
-import { Button } from "@/style-selector/components/category-button"
-import { Header } from "@/style-selector/components/header"
-import { SubNav } from "@/style-selector/components/sub-nav"
+import { getSVGURL } from "@/shared/assets"
+import { Logo } from "@/style-selector/components/logo"
 
 const AppDemo = () => (
-  <div className="demo ligh">
-    <Header />
-    <Header skeleton={true} />
-
-    {/* Sub-nav — solo visible en mobile */}
-    <SubNav />
-    <SubNav skeleton={true} />
-    <Button label={'test'} />
-    <Button label={'test'} skeleton={true} />
-    <Button label={'test'} selected={true} />
-
-    <main className="demo-content">
-      <Card title="Test" skeleton={true} />
-      <Card title="Test" skeleton={false} />
-    </main>
+  <div className="demo" role="main">
+    <div className="demo-scene">
+      {/* role="status" + aria-live="polite": announces loading state to AT on mount */}
+      <div className="demo-overlay" role="status" aria-live="polite">
+        <Logo className={'demo-brand'} url={getSVGURL('EssilorLuxotticaBlack', 'wl')} />
+        <p className="demo-title">Starting your Remix experience</p>
+        <div
+          className="demo-progress"
+          role="progressbar"
+          aria-label="Loading"
+          aria-valuenow={50}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <div className="demo-progress__fill" />
+        </div>
+      </div>
+    </div>
   </div>
 )
 
