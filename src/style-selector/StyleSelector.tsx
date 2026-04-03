@@ -1,13 +1,13 @@
-import { lazy, Suspense, useState, useEffect } from 'react'
-import type { GlassType } from './types'
+import { lazy, Suspense, useEffect } from 'react'
+/*import type { GlassType } from './types'
 import WizardStep1Skeleton from './WizardStep1Skeleton'
 import WizardStep2Skeleton from './WizardStep2Skeleton'
 import DarkModeSwitch from '@/shared/components/dark-mode-switch'
-import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
+import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'*/
 import { useLabels } from '@/labels/useLabels'
 
-const WizardStep1 = lazy(() => import('./WizardStep1'))
-const WizardStep2 = lazy(() => import('./WizardStep2'))
+//const WizardStep1 = lazy(() => import('./WizardStep1'))
+//const WizardStep2 = lazy(() => import('./WizardStep2'))
 
 // SharedSkeleton: chunk alternativo, se descarga SOLO cuando se renderiza.
 // ?skeletonLoader=true → activo; ausente/false → skeletons originales (sin coste de red).
@@ -21,14 +21,14 @@ const skeletonEnabled = _raw !== null && (_raw === '' || _raw === 'true')
 // Si eliminas sharedSkeletonImport, añade un <Suspense> wrapper alrededor de <SharedSkeleton />.
 const sharedSkeletonImport = skeletonEnabled
   ? import('@/shared/components/skeleton-loader')
-  : null
+  : import('./WizardStep2Skeleton')
 const SharedSkeleton = lazy(() => sharedSkeletonImport!)
 
 const MOUNT_ID = 'imp-lux-ocp-style-selector'
 
 const StyleSelector = () => {
-  const [selectedType, setSelectedType] = useState<GlassType | null>(null)
-  const [theme, setTheme] = useState<Theme>(getCurrentTheme)
+  //const [selectedType, setSelectedType] = useState<GlassType | null>(null)
+  //const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   const labels = useLabels()
 
   // Sincroniza el aria-label del container con el label cargado desde la API.
@@ -40,7 +40,14 @@ const StyleSelector = () => {
   }, [labels.widget.title])
 
   return (
-    <div className="wizard">
+    <Suspense fallback={<SharedSkeleton />}>
+      <SharedSkeleton />
+    </Suspense>
+  )
+}
+
+/*
+<div className="wizard">
       <h1 className="sr-only">{labels.widget.title}</h1>
       <div className="wizard__toolbar">
         <DarkModeSwitch
@@ -66,7 +73,6 @@ const StyleSelector = () => {
         </Suspense>
       )}
     </div>
-  )
-}
+    */
 
 export default StyleSelector

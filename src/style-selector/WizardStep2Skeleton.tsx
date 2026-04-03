@@ -1,15 +1,19 @@
-import { useLabels } from '@/labels/useLabels'
+import { Card } from "@/style-selector/components/card"
+import { Header } from "@/style-selector/components/header"
+import { SubNav } from "@/style-selector/components/sub-nav"
 
 const WizardStep2Skeleton = () => {
-  const labels = useLabels()
   return (
-    <div role="status" aria-live="polite" aria-label={labels.step2.loading}>
-      <div className="step2-skeleton__header" />
-      <div className="step2-skeleton__grid">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="step2-skeleton__card" />
-        ))}
-      </div>
+    <div className="style-selector-skeleton">
+      <Header skeleton={true} />
+      <Header skeleton={false} />
+      <SubNav skeleton={true} />
+      <SubNav skeleton={false} />
+      <main className="style-selector-skeleton__elements">
+        <Card title="Test" skeleton={true} />
+        <Card title="Test" skeleton={true} />
+        <Card title="Test" skeleton={true} />
+      </main>
     </div>
   )
 }

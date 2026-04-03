@@ -1,40 +1,91 @@
 // =============================================================================
-// SCSS SHARED SKELETON — inyectado inline cuando el chunk SharedSkeleton carga
-// Reutiliza los CSS vars del proyecto (--border, --code-bg) para que el shimmer
-// respete el tema light/dark automáticamente.
+// SCSS DEMO — inyectado inline desde el bootstrap
+// Layout: pantalla de carga RTR a viewport completo.
+//   Fondo: gradiente gris neutro (simula entorno de estudio con suelo reflectante)
+//   Contenido: brand + título + barra de progreso centrados, ligeramente por encima del centro
 // =============================================================================
 
-@keyframes shared-skeleton-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
+$breakpoint: 600px;
+
+.demo {
+  min-height: 100vh;
+  font-family: var(--sans);
 }
 
-@mixin shared-shimmer($delay: 0s) {
-  background: linear-gradient(
-    90deg,
-    var(--border) 25%,
-    var(--code-bg) 50%,
-    var(--border) 75%
-  );
-  background-size: 200% 100%;
-  animation: shared-skeleton-shimmer 1.4s ease-in-out infinite $delay;
+// ── Scene (full-viewport gradient background) ─────────────────────────────────
+
+.demo-scene {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(
+      180deg,
+      var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00))
+      87.07%,
+      var(--color-generic-neutral-dark-background, #818181) 100%),
+      url(<path-to-image>)
+      lightgray -49.465px -9px / 126.381% 100.956% no-repeat;
 }
 
-.shared-skeleton {
+// ── Overlay (centered content block) ─────────────────────────────────────────
+
+.demo-overlay {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
-  padding: 3rem 2rem;
-  width: 100%;
+  text-align: center;
+}
 
-  &__bar {
-    height: 0.875rem;
-    width: 100%;
-    border-radius: 4px;
-    @include shared-shimmer;
+// ── Brand label ───────────────────────────────────────────────────────────────
 
-    &--med   { width: 72%; animation-delay: 0.1s; }
-    &--short { width: 48%; animation-delay: 0.2s; }
-  }
+.demo-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  aspect-ratio: 2/1;
+}
+
+// ── Title ─────────────────────────────────────────────────────────────────────
+
+.demo-title {
+  color: var(--color-generic-neutral-ultra-dark-text, #000);
+  text-align: center;
+  font-family: var(--typography-body-2xl-family, Inter);
+  font-size: var(--typography-body-2xl-size, 24px);
+  font-style: normal;
+  font-weight: 700;
+  line-height: var(--typography-body-2xl-line-height, 30px); /* 125% */
+  letter-spacing: var(--typography-body-2xl-letter-spacing, 0);
+}
+
+// ── Progress bar ──────────────────────────────────────────────────────────────
+
+.demo-progress {
+  margin-top: var(--spacing-2xl, 40px);;
+  width: 232px;
+  background: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  display: flex;
+  height: 8px;
+  padding: var(--spacing-none, 0);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-none, 0);
+  border-radius: var(--radius-default, 6px);
+  border: 1px solid var(--color-stepper-light-active-border, #FFF);
+}
+
+.demo-progress__fill {
+  display: flex;
+  padding: var(--spacing-2xs, 4px) var(--spacing-none, 0);
+  align-items: center;
+  gap: var(--spacing-none, 0);
+  flex: 1 0 0;
+  width: 20%;
+  background: var(--color-stepper-light-checked-background, #FFF);
 }

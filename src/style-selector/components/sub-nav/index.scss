@@ -5,9 +5,10 @@ $breakpoint: 600px;
   display: none;
 
   @media (max-width: $breakpoint) {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    width: 100%;
     align-items: center;
-    grid-row: 2 / span 1;
-    grid-column: 1 / span 12;
     justify-self: center;
     display: flex;
     padding: var(--spacing-sm, 12px);
@@ -24,7 +25,7 @@ $breakpoint: 600px;
   justify-content: center;
   align-items: center;
   gap: var(--spacing-xs, 8px);
-  border-radius: var(--radius-round, 999px);
+  //border-radius: var(--radius-round, 999px);
   //background-color: transparent;
 }
 
@@ -33,6 +34,7 @@ $breakpoint: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4px;
 }
 
 .demo-subnav__title {
@@ -48,6 +50,7 @@ $breakpoint: 600px;
   letter-spacing: var(--typography-body-lg-letter-spacing, 0);
 
   &.yr-skeleton {
+    display: block;
     height: 27px;
     width: 83px;
   }
@@ -66,6 +69,7 @@ $breakpoint: 600px;
   letter-spacing: var(--typography-body-xs-letter-spacing, 0);
 
   &.yr-skeleton {
+    display: block;
     height: 16px;
     width: 20px;
   }

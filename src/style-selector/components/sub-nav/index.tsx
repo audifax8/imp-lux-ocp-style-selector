@@ -3,6 +3,8 @@ import { Skeleton } from '@/shared/components/skeleton';
 import { SkeletonVariant } from '@/declarations/enums';
 
 import './index.scss';
+import { getSVGURL } from '@/shared/assets';
+import { Logo } from '../logo';
 
 
 interface SubNavProps {
@@ -18,16 +20,20 @@ export const SubNav: React.FC<SubNavProps> = ({
   return (
     <div className="demo-subnav">
       {!skeleton ?
-        <button className="demo-subnav__back" aria-label="Back">&#8249;</button> :
-        <Skeleton className='demo-subnav__back' variant={SkeletonVariant.text} />
+        <Logo className={'yr-button__icon'} url={getSVGURL('ArrowLeftBlack', 'wl')} height={16} width={16} /> :
+        <Skeleton className='demo-subnav__back' variant={SkeletonVariant.rectangular} />
       }
       <div className="demo-subnav__center">
-        {!skeleton ? <span className="demo-subnav__title">Page title</span> : <Skeleton className='demo-subnav__title' variant={SkeletonVariant.text} />}
-        {!skeleton ? <span className="demo-subnav__count">X/X</span> : <Skeleton className='demo-subnav__count' variant={SkeletonVariant.text} />}
+        <div className="demo-subnav__title">
+          {!skeleton ? <span className="demo-subnav__title">Page title</span> : <Skeleton className='demo-subnav__title' variant={SkeletonVariant.text} />}
+        </div>
+        <div className="demo-subnav__count">
+          {!skeleton ? <span className="demo-subnav__count">X/X</span> : <Skeleton className='demo-subnav__count' variant={SkeletonVariant.text} />}
+        </div>
       </div>
       {!skeleton ?
-        <button className="demo-subnav__close" aria-label="Close">&#x2715;</button> :
-        <Skeleton className='demo-subnav__close' variant={SkeletonVariant.text} />
+        <Logo className={'yr-button__icon'} url={getSVGURL('CloseBlack', 'wl')} height={16} width={16} /> :
+        <Skeleton className='demo-subnav__close' variant={SkeletonVariant.rectangular} />
       }
     </div>
   );
