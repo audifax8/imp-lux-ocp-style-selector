@@ -30,6 +30,6 @@ export async function completeStyleSelectorPromise() {
     import('@/state/menu-loader')
   ]);
   loadMenu.loadMenuState();*/
-  const styleSelectorModule = await import('@/style-selector/WizardStep1');
+  const styleSelectorModule = await import('@/style-selector/style');
   styleSelector.resolve({ default: styleSelectorModule.default as React.ComponentType<unknown> });
 }

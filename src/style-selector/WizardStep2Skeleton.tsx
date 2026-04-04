@@ -6,9 +6,7 @@ const WizardStep2Skeleton = () => {
   return (
     <div className="style-selector-skeleton">
       <Header skeleton={true} />
-      <Header skeleton={false} />
       <SubNav skeleton={true} />
-      <SubNav skeleton={false} />
       <main className="style-selector-skeleton__elements">
         <Card title="Test" skeleton={true} />
         <Card title="Test" skeleton={true} />
