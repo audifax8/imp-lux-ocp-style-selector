@@ -1,15 +1,10 @@
-//import { LabelsProvider } from './labels/LabelsProvider'
-//import Wizard from '../Wizard'
+import { DataProvider } from "../providers/data"
 import StyleSelector from "../StyleSelector"
 
 const AppStyleSelector = () => (
-  <StyleSelector />
+  <DataProvider>
+    <StyleSelector />  
+  </DataProvider>
 )
-
-/*const App = () => (
-  <LabelsProvider>
-    <Wizard />
-  </LabelsProvider>
-)*/
 
 export default AppStyleSelector

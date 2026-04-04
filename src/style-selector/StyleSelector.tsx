@@ -1,9 +1,6 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense } from 'react'
 
-import { completeStyleSelectorPromise, StyleSelectorComponent } from '@/style-selector/lazy-imports'
-import { fetchModels, type ApiModelsResponse } from '@/style-selector/api/models'
-
-import { activeBrand } from '@/white-label/detect'
+import { StyleSelectorComponent } from '@/style-selector/lazy-imports'
 
 // SharedSkeleton: chunk alternativo, se descarga SOLO cuando se renderiza.
 // ?skeletonLoader=true → activo; ausente/false → skeletons originales (sin coste de red).
@@ -16,18 +13,6 @@ const sharedSkeletonImport = skeletonEnabled
 const SharedSkeleton = lazy(() => sharedSkeletonImport!)
 
 const StyleSelector = () => {
-  const [, setData] = useState<ApiModelsResponse | null>(null)
-
-  useEffect(() => {
-    fetchModels(activeBrand)
-      .then((data) => {
-        setData(data);
-        completeStyleSelectorPromise();
-      })
-      .catch((err: unknown) => {
-        console.log(err)
-      })
-  }, [])
   return (
     <Suspense fallback={<SharedSkeleton />}>
       <StyleSelectorComponent />
