@@ -14,11 +14,14 @@ $breakpoint: 600px;
   }
 }
 
-.demo-header__lux-logo {
+.demo-header__logo-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin-left: 20px;
+  width: 140.4px;
+  height: 15.251px;
+  aspect-ratio: 140.40/15.25;
 }
 
 .demo-header__logo {
@@ -31,6 +34,7 @@ $breakpoint: 600px;
   &.yr-skeleton {
     height: 17px;
     width: 141px;
+    color: transparent;
   }
 }
 

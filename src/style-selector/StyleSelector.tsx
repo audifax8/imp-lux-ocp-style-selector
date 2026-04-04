@@ -1,10 +1,21 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 /*import type { GlassType } from './types'
 import WizardStep1Skeleton from './WizardStep1Skeleton'
 import WizardStep2Skeleton from './WizardStep2Skeleton'
 import DarkModeSwitch from '@/shared/components/dark-mode-switch'
 import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'*/
 import { useLabels } from '@/labels/useLabels'
+import { completeStyleSelectorPromise, StyleSelectorComponent } from '@/style-selector/lazy-imports'
+import { activeBrand } from '@/white-label/detect'
+
+import {
+  fetchModels,
+  //getCategoriesByType,
+  //getModelsByType,
+  //type ApiModel,
+  type ApiModelsResponse,
+  //type ModelCategory,
+} from '@/style-selector/api/models'
 
 //const WizardStep1 = lazy(() => import('./WizardStep1'))
 //const WizardStep2 = lazy(() => import('./WizardStep2'))
@@ -30,6 +41,8 @@ const StyleSelector = () => {
   //const [selectedType, setSelectedType] = useState<GlassType | null>(null)
   //const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   const labels = useLabels()
+  const [, setData] = useState<ApiModelsResponse | null>(null)
+  const [, setError] = useState<string | null>(null)
 
   // Sincroniza el aria-label del container con el label cargado desde la API.
   // main.tsx pone el valor por defecto antes del mount; aquí lo actualizamos
@@ -39,9 +52,20 @@ const StyleSelector = () => {
     if (container) container.setAttribute('aria-label', labels.widget.title)
   }, [labels.widget.title])
 
+  useEffect(() => {
+    fetchModels(activeBrand)
+      .then((data) => {
+        setData(data);
+        //completeStyleSelectorPromise();
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : 'Error loading models')
+      })
+  }, [])
+
   return (
     <Suspense fallback={<SharedSkeleton />}>
-      <SharedSkeleton />
+      <StyleSelectorComponent />
     </Suspense>
   )
 }
