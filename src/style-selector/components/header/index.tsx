@@ -35,22 +35,33 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const STEPS = ['1. Type', '2. Prescription', '3. Model', '4. Inspiration']
   return (
-    <header className="demo-header">
-      <div className='demo-logo-container' aria-label="Menu" role="button" tabIndex={0}>
-        <Logo className={'yr-button__icon'} url={getSVGURL('EssilorLuxotticaBlack', 'wl')} />
-        <Skeleton className='card__title yr-skeleton' variant={SkeletonVariant.text} />
+    <header className="header">
+      <div className="header-logo" aria-label="Menu" role="button" tabIndex={0}>
+        {!skeleton ? 
+          <Logo className={'header-logo__icon'} url={getSVGURL('EssilorLuxotticaBlack', 'wl')} /> :
+          <Skeleton className='header-logo__icon yr-skeleton' variant={SkeletonVariant.text} />
+        }
       </div>
       
-      <nav className="demo-header__nav" aria-label="Steps">
-        <ul className="demo-header__nav-items"
+      <nav className="header-nav" aria-label="Steps">
+        <ul className="header-nav-items"
           role="menubar"
           aria-label="Mythical University">
             {STEPS.map(
-              (step, i) => (<li role="none" key={i}><a role="menuitem" className='demo-header__nav-item'>{step}</a></li>))}
+              (step, i) =>
+                (<li
+                  role="none"
+                  className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''}`}
+                  key={i}><a role="menuitem">
+                    {step}</a>
+                </li>))}
         </ul>
       </nav>
-      <div className={`demo-header__menu ${skeleton ? 'yr-skeleton' : ''}`} aria-label="Menu" role="button" tabIndex={0}>
-        <Logo className={'yr-button__icon'} url={getSVGURL('Menu', 'wl')} height={20} width={20} />
+      <div className="header-menu" aria-label="Menu" role="button" tabIndex={0}>
+        {!skeleton ? 
+          <Logo className={'header-menu__icon'} url={getSVGURL('Menu', 'wl')} height={20} width={20} /> :
+          <Skeleton className='header-menu__icon yr-skeleton' variant={SkeletonVariant.text} />
+        }
       </div>
     </header>
   );

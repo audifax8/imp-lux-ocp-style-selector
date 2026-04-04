@@ -2,10 +2,9 @@
 $breakpoint: 600px;
 // ── Header ────────────────────────────────────────────────────────────────────
 
-.demo-header {
+.header {
   display: flex;
   align-items: center;
-  // Oculto en mobile
   @media (max-width: $breakpoint) {
     justify-content: space-between;
     height: 52px;
@@ -14,7 +13,7 @@ $breakpoint: 600px;
   }
 }
 
-.demo-header__logo-container {
+.header-logo {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -22,25 +21,15 @@ $breakpoint: 600px;
   width: 140.4px;
   height: 15.251px;
   aspect-ratio: 140.40/15.25;
-}
 
-.demo-header__logo {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-
-  &.yr-skeleton {
-    height: 17px;
-    width: 141px;
-    color: transparent;
+  & .yr-skeleton {
+    display: block;
+    height: inherit;
+    width: inherit;
   }
 }
 
-.demo-header__nav {
-  display: flex;
-  width: 100%;
+.header-nav {
   display: flex;
   width: 100%;
   align-items: center;
@@ -51,51 +40,28 @@ $breakpoint: 600px;
   @media (max-width: $breakpoint) {
     display: none;
   }
-}
 
-.demo-header__nav-items {
-  display: flex;
-  list-style: none;      /* Removes bullets */
-  margin: 0;             /* Removes top/bottom spacing */
-  padding: 0;
-}
-
-.demo-header__nav-item {
-  white-space: nowrap;
-  display: flex;
-  padding: var(--spacing-none, 0) var(--spacing-2xl, 40px) var(--spacing-base, 16px) var(--spacing-2xl, 40px);
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  gap: var(--spacing-none, 0);
-  flex: 1 0 0;
-
-  color: var(--color-stepper-brand-default-title, #767676);
-  text-align: center;
-  /* Headings/Heading 5 */
-  font-family: var(--typography-h5-family, Inter);
-  font-size: var(--typography-h5-size, 14px);
-  font-style: normal;
-  font-weight: 700;
-  line-height: var(--typography-h5-line-height, 16px); /* 114.286% */
-  letter-spacing: var(--typography-h5-letter-spacing, 0);
-
-  &--active {
-    color: var(--color-stepper-brand-checked-title, #0354A6);
-    border-bottom: var(--stroke-heavy, 4px) solid var(--color-stepper-brand-checked-border, #0354A6);
+  &-items {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
+}
+
+.header-nav-item {
+  white-space: nowrap;
+  padding: var(--spacing-none, 0) var(--spacing-2xl, 40px) var(--spacing-base, 16px) var(--spacing-2xl, 40px);
 
   &.yr-skeleton {
-    height: 32px;
-    width: 127px;
-    color: transparent;
-    border-bottom: unset;
+    margin: 8px;
   }
 }
 
-.demo-header__menu {
+.header-menu {
   display: flex;
   height: 80px;
+  width: 40px;
   align-items: center;
   justify-content: center;
   margin-right: 20px;
@@ -104,8 +70,9 @@ $breakpoint: 600px;
     height: 52px;
   }
 
-  &.yr-skeleton {
-    height: 23px;
-    width: 28px;
+  & .yr-skeleton {
+    display: block;
+    height: 20px;
+    width: 20px;
   }
 }
