@@ -23,14 +23,58 @@ export interface ApiModelsResponse {
   eyeglasses?: ApiCategory[]
 }
 
+export type Model = {
+  modelCode: string;
+  vendorId: string;
+  pageUrl: string;
+  promoBadge: string;
+  label: string;
+  thumbnailUrl: string;
+};
+
+export type CategoryGroup = {
+  category: string;
+  models: Model[];
+};
+
+export type InputData = Record<string, CategoryGroup[]>;
+
+export type Output = {
+  types?: string[];
+  categories?: Category[];
+};
+
+export type Category = {
+  type: string;
+  category: string;
+  models: Model[];
+};
+
+export function mapData(data: InputData): Output {
+  const types = Object.keys(data);
+
+  const categories = types.flatMap((type) =>
+    data[type].map((group) => ({
+      type,
+      category: group.category,
+      models: group.models,
+    }))
+  );
+
+  return {
+    types,
+    categories,
+  };
+}
+
 // ── Fetch ───────────────────────────────────────────────────────────────────
 
-export const fetchModels = async (brand: Brand): Promise<ApiModelsResponse> => {
+export const fetchModels = async (brand: Brand): Promise<InputData> => {
   const storeId = BRAND_STORE_IDS[brand]
   const url = `${API_BASE_URL}/wcs/resources/store/${storeId}/remix/models?language=${API_LANGUAGE}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
-  return res.json() as Promise<ApiModelsResponse>
+  return res.json() as Promise<InputData>
 }
 
 // ── Tipos de salida ──────────────────────────────────────────────────────────

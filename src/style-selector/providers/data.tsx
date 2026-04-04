@@ -1,18 +1,19 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
-import { fetchModels, type ApiModelsResponse } from '@/style-selector/api/models';
+import { fetchModels, mapData, type Output } from '@/style-selector/api/models';
 import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
 import { activeBrand } from '@/white-label/detect'
 import { DataContext } from '@/style-selector/providers/context';
 
+
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const [data, setData] = useState<ApiModelsResponse>({});
-  const value = useMemo(() => (data), [data]);
+  const [data, setData] = useState<Output>({});
 
   useEffect(() => {
     fetchModels(activeBrand)
       .then((data) => {
-        setData(data);
+        const mapped = mapData(data);
+        setData(mapped);
         completeStyleSelectorPromise();
       })
       .catch((err: unknown) => {
@@ -21,7 +22,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   return (
-    <DataContext.Provider value={value}>
+    <DataContext.Provider value={data}>
       {children}
     </DataContext.Provider>
   );

@@ -1,6 +1,6 @@
 $breakpoint: 600px;
 
-.style-selector-skeleton {
+.style-selector {
   min-height: 100vh;
   background:
     linear-gradient(
@@ -19,6 +19,18 @@ $breakpoint: 600px;
     justify-content: center;
     align-items: center;
     gap: 16px;
+
+    @media (max-width: $breakpoint) {
+      margin: 0 16px;
+    }
+  }
+
+  &__models {
+    margin: 0 256px;
+    display: flex;
+    gap: 16px;
+    flex-flow: wrap;
+    justify-content: center;
 
     @media (max-width: $breakpoint) {
       margin: 0 16px;

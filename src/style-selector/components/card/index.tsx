@@ -13,7 +13,7 @@ interface CardProps {
   imageSrc?: string;
   imageAlt?: string;
   skeleton?: boolean;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -48,7 +48,7 @@ export const Card: React.FC<CardProps> = ({
             src={imageSrc}
             alt={imageAlt}
             className='card__image'
-            loading='lazy'
+            loading='eager'
           /> :
           <Skeleton
             className={'card__image'}
