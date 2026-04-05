@@ -44,3 +44,12 @@ export const BRAND_STORE_IDS: Record<Brand, string> = {
   bliz: '10151', // TODO
   cdm:  '10151', // TODO
 }
+
+// Actualiza los valores cuando se conozcan los IDs reales de cada brand.
+export const BRAND_URLS: Record<Brand, string> = {
+  rbn:  'https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=',
+  oak:  'https://www.oakley.com/en-us/oneConfigurator/models?language=',
+  sgh:  'https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=',
+  bliz: 'https://www.bliz.com/wcs/shop/colorama/models?language=',
+  cdm:  'https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=',
+}

@@ -1,6 +1,6 @@
 import type { Brand } from '@/white-label/types'
 import type { GlassType } from '@/style-selector/types'
-import { API_BASE_URL, API_LANGUAGE, BRAND_STORE_IDS } from '@/style-selector/api/config'
+import { API_LANGUAGE, BRAND_URLS } from '@/style-selector/api/config'
 
 // ── Tipos del response de la API ────────────────────────────────────────────
 
@@ -96,30 +96,13 @@ export function mapData(data: InputData): Output {
   };
 }
 
-/*
-export function mapData(data: InputData): Output {
-  const types = Object.keys(data);
-
-  const categories = types.flatMap((type) =>
-    data[type].map((group) => ({
-      type,
-      category: group.category,
-      models: group.models,
-    }))
-  );
-
-  return {
-    types,
-    categories,
-  };
-}
-*/
-
 // ── Fetch ───────────────────────────────────────────────────────────────────
 
 export const fetchModels = async (brand: Brand): Promise<InputData> => {
-  const storeId = BRAND_STORE_IDS[brand]
-  const url = `${API_BASE_URL}/wcs/resources/store/${storeId}/remix/models?language=${API_LANGUAGE}`
+  console.log({ brand });
+  const brand_url = BRAND_URLS[brand]
+  //https://www.oakley.com/en-us/oneConfigurator/models?language=en
+  const url = `${brand_url + API_LANGUAGE}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
   return res.json() as Promise<InputData>

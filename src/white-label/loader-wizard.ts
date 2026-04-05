@@ -18,6 +18,7 @@ const brandStyles: Record<Brand, string> = {
 }
 
 export const injectBrandStyles = (brand: Brand): void => {
+  console.log(brand);
   if (document.querySelector(`style[data-brand="${brand}"]`)) return
 
   const style = document.createElement('style')
