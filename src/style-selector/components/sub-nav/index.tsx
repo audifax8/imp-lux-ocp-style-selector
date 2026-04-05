@@ -10,8 +10,8 @@ import './index.scss';
 interface SubNavProps {
   skeleton?: boolean;
   steps: Step[];
-  selectedStep: number;
-  onClick: (e: React.MouseEvent, stepId: number) => void;
+  selectedStep: Step;
+  onClick: (step: Step) => void;
 }
 
 export const SubNav: React.FC<SubNavProps> = ({
@@ -25,41 +25,44 @@ export const SubNav: React.FC<SubNavProps> = ({
 
   return (
     <div className="demo-subnav">
-      {!skeleton ?
-        <Component
-          className='header-nav-items'
-          onClick={(e) => onClick(e, 0)}
-          {...(isClickable && {
-            type: 'button',
-            'aria-label': '',
-          })}
-        >
-          <Logo className={'yr-button__icon'} url={getSVGURL('ArrowLeftBlack', 'wl')} height={16} width={16} />
-        </Component>
-         :
-        <Skeleton className='demo-subnav__back' variant={SkeletonVariant.rectangular} />
-      }
+      <div className='demo-subnav__back'>
+        {skeleton && <Skeleton className='demo-subnav__back' variant={SkeletonVariant.rectangular} />}
+        {!skeleton && selectedStep.id ?
+          <Component
+            className='header-nav-items'
+            onClick={() => onClick(steps[0])}
+            {...(isClickable && {
+              type: 'button',
+              'aria-label': '',
+            })}
+          >
+            <Logo className={'yr-button__icon'} url={getSVGURL('ArrowLeftBlack', 'wl')} height={16} width={16} />
+          </Component> : <></>
+        }
+      </div>
       <div className="demo-subnav__center">
         <div className="demo-subnav__title">
-          {!skeleton ? <span className="demo-subnav__title">Page title</span> : <Skeleton className='demo-subnav__title' variant={SkeletonVariant.text} />}
+          {!skeleton ? <span className="demo-subnav__title">{selectedStep?.name}</span> : <Skeleton className='demo-subnav__title' variant={SkeletonVariant.text} />}
         </div>
         <div className="demo-subnav__count">
-          {!skeleton ? <span className="demo-subnav__count">{(selectedStep + 1 ) + '/' + (steps.length)}</span> : <Skeleton className='demo-subnav__count' variant={SkeletonVariant.text} />}
+          {!skeleton ? <span className="demo-subnav__count">{(selectedStep.id + 1 ) + '/' + (steps.length)}</span> : <Skeleton className='demo-subnav__count' variant={SkeletonVariant.text} />}
         </div>
       </div>
-      {!skeleton ?
-        <Component
-          className='header-nav-items'
-          onClick={(e) => onClick(e, 0)}
-          {...(isClickable && {
-            type: 'button',
-            'aria-label': '',
-          })}
-        >
-          <Logo className={'yr-button__icon'} url={getSVGURL('CloseBlack', 'wl')} height={16} width={16} />
-        </Component> :
-        <Skeleton className='demo-subnav__close' variant={SkeletonVariant.rectangular} />
-      }
+      <div className='demo-subnav__close'>
+        {skeleton && <Skeleton className='demo-subnav__close' variant={SkeletonVariant.rectangular} />}
+        {!skeleton && selectedStep.id ?
+          <Component
+            className='header-nav-items'
+            onClick={() => onClick(steps[0])}
+            {...(isClickable && {
+              type: 'button',
+              'aria-label': '',
+            })}
+          >
+            <Logo className={'yr-button__icon'} url={getSVGURL('CloseBlack', 'wl')} height={16} width={16} />
+          </Component> : <></>
+        }
+      </div>
     </div>
   );
 };

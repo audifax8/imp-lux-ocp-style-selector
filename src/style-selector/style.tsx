@@ -30,9 +30,9 @@ const Style = () => {
     }
   ]
   const [steps] = useState<Step[]>(STEPS);
-  const [selectedStep, setSelectedStep] = useState<number>(0);
+  const [selectedStep, setSelectedStep] = useState<Step>(steps[0]);
 
-  const onClick = (e: React.MouseEvent, type: string) => {
+  const onClick = (type: string) => {
     setSelectedType(type);
     const filtered = categories?.filter(category => category.type === type);
     setSubCategories(filtered);
@@ -40,13 +40,13 @@ const Style = () => {
       setSelectedCategory(filtered[0]);
       setFilteredModels(filtered[0].models);
       //TODO
-      setSelectedStep(1);
+      setSelectedStep(steps[1]);
     }
   };
 
-  const onHeaderClick = (e: React.MouseEvent, stepId: number) => {
-    if (stepId === 0) {
-      setSelectedStep(0);
+  const onHeaderClick = (step: Step) => {
+    if (step?.id === 0) {
+      setSelectedStep(steps[0]);
       setSelectedCategory(undefined);
     }
   };
@@ -68,7 +68,7 @@ const Style = () => {
             title={type}
             imageSrc={getSVGURLByType(type, activeBrand, 'img')}
             imageAlt={type}
-            onClick={(e: React.MouseEvent) => onClick(e, type)}
+            onClick={() => onClick(type)}
           />)}
       </main>)}
       {selectedCategory && (<main className='style-selector__models'>

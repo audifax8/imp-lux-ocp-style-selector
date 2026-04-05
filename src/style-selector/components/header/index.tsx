@@ -4,14 +4,14 @@ import { Logo } from '../logo';
 import { getSVGURL } from '@/shared/assets';
 import { SkeletonVariant } from '@/declarations/enums';
 import { Skeleton } from '@/shared/components/skeleton';
+import type { Step } from '@/style-selector/api/models';
 
 import './index.scss';
-import type { Step } from '@/style-selector/api/models';
 interface HeaderProps {
   steps?: Step[];
-  selectedStep?: number;
+  selectedStep?: Step;
   skeleton?: boolean;
-  onClick: (e: React.MouseEvent, stepId: number) => void;
+  onClick: (step: Step) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -42,11 +42,11 @@ export const Header: React.FC<HeaderProps> = ({
             (step, i) =>
               (<li
                 role="none"
-                className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''} ${step.id === selectedStep ? 'header-nav-item__selected' : ''}`}
+                className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''} ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''}`}
                 key={i}>
                   <Component
                     className='header-nav-items'
-                    onClick={(e) => onClick(e, step.id)}
+                    onClick={() => onClick(step)}
                     {...(isClickable && {
                       type: 'button',
                       'aria-label': '',
