@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import wizardStyles from '@/style-selector/wizard.scss?inline'
+import wizardStyles from '@/style-selector/index.scss?inline'
 
 import { injectBrandStyles } from '@/white-label/loader-wizard'
 import { activeBrand } from '@/white-label/detect'
