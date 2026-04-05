@@ -1,0 +1,28 @@
+$breakpoint: 600px;
+/*
+@media (max-width: $breakpoint) {}
+*/
+
+
+.category-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.category-filter-nav {
+  display: flex;
+  overflow-y: auto;
+
+  &-item {
+    margin: 16px;
+
+    &__selected {
+      border-radius: 8px;
+      border: 1px solid #000;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px);
+    }
+  }
+}

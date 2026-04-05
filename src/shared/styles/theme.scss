@@ -194,3 +194,15 @@ table {
     background-position: 200% 0;
   }
 }
+
+button {
+  border: none;
+  /* OR */
+  border-width: 0;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

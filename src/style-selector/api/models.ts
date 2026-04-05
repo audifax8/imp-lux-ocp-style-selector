@@ -18,6 +18,11 @@ interface ApiCategory {
   category: string
 }
 
+export interface Step {
+  id: number;
+  name: string;
+}
+
 export interface ApiModelsResponse {
   sunglasses?: ApiCategory[]
   eyeglasses?: ApiCategory[]
@@ -53,6 +58,48 @@ export type Category = {
 export function mapData(data: InputData): Output {
   const types = Object.keys(data);
 
+  const categories = types.flatMap((type) => {
+    const groups = data[type];
+
+    // 🔹 ALL sin duplicados (usando modelCode como clave única)
+    const uniqueMap = new Map<string, Model>();
+
+    groups.forEach((group) => {
+      group.models.forEach((model) => {
+        if (!uniqueMap.has(model.modelCode)) {
+          uniqueMap.set(model.modelCode, model);
+        }
+      });
+    });
+
+    const allModels = Array.from(uniqueMap.values());
+
+    const allCategory = {
+      type,
+      category: "ALL",
+      models: allModels,
+    };
+
+    // 🔹 categorías normales
+    const normalCategories = groups.map((group) => ({
+      type,
+      category: group.category,
+      models: group.models,
+    }));
+
+    return [allCategory, ...normalCategories];
+  });
+
+  return {
+    types,
+    categories,
+  };
+}
+
+/*
+export function mapData(data: InputData): Output {
+  const types = Object.keys(data);
+
   const categories = types.flatMap((type) =>
     data[type].map((group) => ({
       type,
@@ -66,6 +113,7 @@ export function mapData(data: InputData): Output {
     categories,
   };
 }
+*/
 
 // ── Fetch ───────────────────────────────────────────────────────────────────
 

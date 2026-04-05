@@ -1,39 +1,28 @@
 import React from 'react';
-//import { Skeleton } from '@/shared/components/skeleton';
-//import { SkeletonVariant } from '@/declarations/enums';
 
-import './index.scss';
 import { Logo } from '../logo';
 import { getSVGURL } from '@/shared/assets';
 import { SkeletonVariant } from '@/declarations/enums';
 import { Skeleton } from '@/shared/components/skeleton';
 
-
+import './index.scss';
+import type { Step } from '@/style-selector/api/models';
 interface HeaderProps {
+  steps?: Step[];
+  selectedStep?: number;
   skeleton?: boolean;
-  onClick?: () => void;
+  onClick: (e: React.MouseEvent, stepId: number) => void;
 }
 
-/*
-      {STEPS.map(
-          (step, i) =>
-            !skeleton ? (
-              <span
-                key={step}
-                className={`demo-header__step${i === 0 ? ' demo-header__step--active' : ''}`}
-              >
-                {step}
-              </span>
-              ) : (<Skeleton key={step} className='demo-header__step' variant={SkeletonVariant.text} />)
-          )
-        }
-        */
-
 export const Header: React.FC<HeaderProps> = ({
+  steps,
+  selectedStep,
   skeleton,
-  //onClick,
+  onClick
 }) => {
-  const STEPS = ['1. Type', '2. Prescription', '3. Model', '4. Inspiration']
+  const isClickable = typeof onClick === 'function';
+  const Component = isClickable ? 'button' : 'div';
+  
   return (
     <header className="header">
       <div className="header-logo" aria-label="Menu" role="button" tabIndex={0}>
@@ -44,17 +33,29 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
       
       <nav className="header-nav" aria-label="Steps">
-        <ul className="header-nav-items"
+        <ul
+          className="header-nav-items"
           role="menubar"
-          aria-label="Mythical University">
-            {STEPS.map(
-              (step, i) =>
-                (<li
-                  role="none"
-                  className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''}`}
-                  key={i}><a role="menuitem">
-                    {step}</a>
-                </li>))}
+          aria-label=""
+        >
+          {steps?.map(
+            (step, i) =>
+              (<li
+                role="none"
+                className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''} ${step.id === selectedStep ? 'header-nav-item__selected' : ''}`}
+                key={i}>
+                  <Component
+                    className='header-nav-items'
+                    onClick={(e) => onClick(e, step.id)}
+                    {...(isClickable && {
+                      type: 'button',
+                      'aria-label': '',
+                    })}
+                  >
+                    <a role="menuitem">{step?.name}</a>
+                  </Component>
+              </li>)
+            )}
         </ul>
       </nav>
       <div className="header-menu" aria-label="Menu" role="button" tabIndex={0}>

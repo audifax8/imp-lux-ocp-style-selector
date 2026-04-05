@@ -3,20 +3,16 @@ import { Skeleton } from '@/shared/components/skeleton';
 import { getSVGURL } from '@/shared/assets';
 import { SkeletonVariant } from '@/declarations/enums';
 
-import './index.scss';
 import { Logo } from '../logo';
 
-//impl example
-//<Card title="Test" skeleton={true} />
-//<Card title="Test" skeleton={false} />
-
+import './index.scss';
 
 interface ButtonProps {
   className?: string;
   label?: string;
   skeleton?: boolean;
   selected?: boolean;
-  onClick?: () => void;
+  onClick: (e: React.MouseEvent) => void;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -24,11 +20,10 @@ export const Button: React.FC<ButtonProps> = ({
   label,
   skeleton,
   selected,
-  //onClick,
+  onClick,
 }) => {
-  //const isClickable = typeof onClick === 'function';
   return (
-    <button className={`${className} yr-button ${selected ? 'yr-button__selected' : ''}`} type="button" aria-label={label}>
+    <button className={`${className} yr-button ${selected ? 'yr-button__selected' : ''}`} type="button" aria-label={label} onClick={onClick}>
       {!skeleton ?
         <Logo className={'yr-button__icon'} width={24} height={24} url={getSVGURL('Category', 'wl')} /> :
         <Skeleton className='yr-button__icon yr-skeleton' variant={SkeletonVariant.text} />
