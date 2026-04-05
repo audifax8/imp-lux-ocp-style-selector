@@ -29,6 +29,14 @@ $breakpoint: 600px;
   }
 }
 
+.header-logo__icon {
+  height: 100%;
+  background-image: url("https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/EssilorLuxotticaBlack.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .header-nav {
   display: flex;
   width: 100%;

@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="header">
       <div className="header-logo" aria-label="Menu" role="button" tabIndex={0}>
         {!skeleton ? 
-          <Logo className={'header-logo__icon'} url={getSVGURL('EssilorLuxotticaBlack', 'wl')} /> :
+          <div className={'header-logo__icon'}> </div> :
           <Skeleton className='header-logo__icon yr-skeleton' variant={SkeletonVariant.text} />
         }
       </div>

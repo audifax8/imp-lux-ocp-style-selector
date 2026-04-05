@@ -20,3 +20,11 @@
   --accent-bg: rgba(255, 107, 116, 0.15);
   --accent-border: rgba(255, 107, 116, 0.45);
 }
+
+.header-logo {
+  height: 73px !important;
+  &__icon {
+    background-image: url("https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/rbn/assets/svg/RemixLogoBlack.svg") !important;
+    height: 73px !important;
+  }
+}
