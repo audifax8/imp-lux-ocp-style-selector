@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Logo } from '../logo';
+import { Logo } from '@/style-selector/components/logo';
 import { getSVGURL } from '@/shared/assets';
 import { SkeletonVariant } from '@/declarations/enums';
 import { Skeleton } from '@/shared/components/skeleton';
@@ -11,7 +11,7 @@ interface HeaderProps {
   steps?: Step[];
   selectedStep?: Step;
   skeleton?: boolean;
-  onClick: (step: Step) => void;
+  onClick?: (step: Step) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
                 key={i}>
                   <Component
                     className='header-nav-items'
-                    onClick={() => onClick(step)}
+                    onClick={() => onClick?.(step)}
                     {...(isClickable && {
                       type: 'button',
                       'aria-label': '',

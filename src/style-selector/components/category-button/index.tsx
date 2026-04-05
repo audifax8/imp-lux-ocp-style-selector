@@ -2,8 +2,7 @@ import React from 'react';
 import { Skeleton } from '@/shared/components/skeleton';
 import { getSVGURL } from '@/shared/assets';
 import { SkeletonVariant } from '@/declarations/enums';
-
-import { Logo } from '../logo';
+import { Logo } from '@/style-selector/components/logo';
 
 import './index.scss';
 
@@ -12,7 +11,7 @@ interface ButtonProps {
   label?: string;
   skeleton?: boolean;
   selected?: boolean;
-  onClick: (e: React.MouseEvent) => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 export const Button: React.FC<ButtonProps> = ({

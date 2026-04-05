@@ -1,6 +1,6 @@
 import type { Brand } from '@/white-label/types'
 import type { GlassType } from '@/style-selector/types'
-import { API_BASE_URL, API_LANGUAGE, BRAND_STORE_IDS } from './config'
+import { API_BASE_URL, API_LANGUAGE, BRAND_STORE_IDS } from '@/style-selector/api/config'
 
 // ── Tipos del response de la API ────────────────────────────────────────────
 

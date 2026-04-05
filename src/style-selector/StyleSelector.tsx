@@ -12,7 +12,7 @@ const skeleton = _skeleton !== null && (_skeleton === '' || _skeleton === 'true'
 
 const sharedSkeletonImport = skeletonEnabled
   ? import('@/shared/components/skeleton-loader')
-  : import('./WizardStep2Skeleton')
+  : import('./StyleSelectorSkeleton')
 const SharedSkeleton = lazy(() => sharedSkeletonImport!)
 
 const StyleSelector = () => {

@@ -309,7 +309,7 @@ src/
     WizardStep1.scss               — on-demand CSS (?inline)
     WizardStep2.scss               — on-demand CSS (?inline)
     WizardStep1Skeleton.tsx        — skeleton step 1
-    WizardStep2Skeleton.tsx        — skeleton step 2
+    StyleSelectorSkeleton.tsx        — skeleton step 2
   products-index/
     bootstrap/
       index.tsx                    — products-index bootstrap (CSS inject + brand + React mount)

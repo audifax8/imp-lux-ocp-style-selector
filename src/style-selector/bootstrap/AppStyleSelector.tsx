@@ -1,5 +1,5 @@
-import { DataProvider } from "../providers/data"
-import StyleSelector from "../StyleSelector"
+import { DataProvider } from '@/style-selector/context/data'
+import StyleSelector from '@/style-selector/StyleSelector'
 
 const AppStyleSelector = () => (
   <DataProvider>

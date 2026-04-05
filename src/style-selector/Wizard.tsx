@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
 import type { GlassType } from './types'
 import WizardStep1Skeleton from './WizardStep1Skeleton'
-import WizardStep2Skeleton from './WizardStep2Skeleton'
+import StyleSelectorSkeleton from './StyleSelectorSkeleton'
 import DarkModeSwitch from '@/shared/components/dark-mode-switch'
 import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
 import { useLabels } from '@/labels/useLabels'
@@ -57,7 +57,7 @@ const Wizard = () => {
         </Suspense>
       ) : (
         <Suspense fallback={skeletonEnabled
-          ? <SharedSkeleton /> : <WizardStep2Skeleton />
+          ? <SharedSkeleton /> : <StyleSelectorSkeleton />
         }>
           <WizardStep2
             type={selectedType}

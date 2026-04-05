@@ -1,11 +1,6 @@
 import React from 'react';
 
 import './index.scss';
-
-//impl example
-//<Card title="Test" skeleton={true} />
-//<Card title="Test" skeleton={false} />
-
 interface ModelCardProps {
   title?: string;
   imageSrc?: string;

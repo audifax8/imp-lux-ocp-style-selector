@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { Card } from '@/style-selector/components/card'
 import { ModelCard } from '@/style-selector/components/model';
 import { Header } from '@/style-selector/components/header'
 import { SubNav } from '@/style-selector/components/sub-nav'
-import { useData } from '@/style-selector/providers/context'
+import { useData } from '@/style-selector/context/context'
 import { activeBrand } from '@/white-label/detect'
 import { getSVGURLByType } from '@/shared/assets';
-import type { Category, Model, Step } from './api/models'
-import { CategoryFilterComponent } from './components/category-filter';
+import type { Category, Model, Step } from '@/style-selector/api/models'
+import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
 
 const Style = () => {
   const { types, categories } = useData()
@@ -44,14 +44,14 @@ const Style = () => {
     }
   };
 
-  const onHeaderClick = (step: Step) => {
+  const onHeaderClick = (step?: Step) => {
     if (step?.id === 0) {
       setSelectedStep(steps[0]);
       setSelectedCategory(undefined);
     }
   };
 
-  const onCategoryClick = (e: React.MouseEvent, category: Category) => {
+  const onCategoryClick = (category: Category) => {
     setSelectedCategory(category);
     const models = categories?.find(cat => cat.category === category.category);
     setFilteredModels(models?.models);
@@ -80,6 +80,7 @@ const Style = () => {
               title={model.label}
               imageSrc={model.thumbnailUrl}
               imageAlt={model.label}
+              //TODO
               //onClick={(e: React.MouseEvent) => onClick(e, model.label)}
             />
         )}

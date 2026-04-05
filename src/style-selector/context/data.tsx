@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { fetchModels, mapData, type Output } from '@/style-selector/api/models';
 import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
 import { activeBrand } from '@/white-label/detect'
-import { DataContext } from '@/style-selector/providers/context';
+import { DataContext } from '@/style-selector/context/context';
 
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { Category } from '@/style-selector/api/models';
-import { Button } from '../category-button';
+import { Button } from '@/style-selector/components/category-button';
 
 
 import './index.scss';
@@ -9,7 +9,7 @@ import './index.scss';
 interface CategoryFilterProps {
   subCategories?: Category[],
   selectedCategory?: Category,
-  onClick: (e: React.MouseEvent, category: Category) => void;
+  onClick?: (category: Category) => void;
 }
 
 export const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
@@ -28,7 +28,7 @@ export const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
                 role="none"
                 className={`category-filter-nav-item ${category.category === selectedCategory?.category ? 'category-filter-nav-item__selected' : ''}`}
                 key={i}>
-                  <Button label={category.category} onClick={(e) => onClick(e, category)}/>
+                  <Button label={category.category} onClick={() => onClick?.(category)}/>
               </li>))}
       </ul>
     </div>
