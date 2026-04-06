@@ -87,6 +87,14 @@ $breakpoint: 600px;
   }
 }
 
+.header-switch {
+  display: flex;
+
+  & .theme-switch {
+    display: flex;
+  }
+}
+
 .header-menu {
   display: flex;
   height: 80px;

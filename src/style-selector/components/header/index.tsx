@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Logo } from '@/style-selector/components/logo';
 import { getSVGURL } from '@/shared/assets';
 import { SkeletonVariant } from '@/declarations/enums';
 import { Skeleton } from '@/shared/components/skeleton';
 import type { Step } from '@/style-selector/api/models';
+import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
 
 import './index.scss';
+import DarkModeSwitch from '@/shared/components/dark-mode-switch';
 interface HeaderProps {
   steps?: Step[];
   selectedStep?: Step;
@@ -22,6 +24,8 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const isClickable = typeof onClick === 'function';
   const Component = isClickable ? 'button' : 'div';
+
+  const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   
   return (
     <header className="header">
@@ -58,6 +62,12 @@ export const Header: React.FC<HeaderProps> = ({
             )}
         </ul>
       </nav>
+      <div className="header-switch">
+        <DarkModeSwitch
+          theme={theme}
+          onToggle={() => setTheme(prev => toggleTheme(prev))}
+        />
+      </div>
       <div className="header-menu" aria-label="Menu" role="button" tabIndex={0}>
         {!skeleton ? 
           <Logo className={'header-menu__icon'} url={getSVGURL('Menu', 'wl')} height={20} width={20} /> :
