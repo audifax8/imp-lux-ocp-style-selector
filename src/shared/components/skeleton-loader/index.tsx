@@ -4,9 +4,8 @@
 // Se activa con ?skeletonLoader=true. Solo se descarga cuando se renderiza.
 // CSS inyectado a nivel de módulo (patrón del proyecto).
 // =============================================================================
-import { Logo } from '@/style-selector/components/logo'
 import skeletonStyles from './index.scss?inline'
-import { getSVGURL } from '@/shared/assets'
+import { activeBrand } from '@/white-label/detect'
 
 const styleEl = document.createElement('style')
 styleEl.dataset.id = 'shared-skeleton'
@@ -14,11 +13,13 @@ styleEl.textContent = skeletonStyles
 document.head.appendChild(styleEl)
 
 const SharedSkeleton = () => (
-  <div className="demo">
+  <div className={`style-selector-skeleton style-selector-skeleton-${activeBrand}`}>
     <div className="demo-scene">
       {/* role="status" + aria-live="polite": announces loading state to AT on mount */}
       <div className="demo-overlay" role="status" aria-live="polite">
-        <Logo className={'demo-brand'} url={getSVGURL('EssilorLuxotticaBlack', 'wl')} />
+        <div className='demo-brand'>
+          <span className='demo-brand-logo'></span>
+        </div>
         <p className="demo-title">Starting your Remix experience</p>
         <div
           className="demo-progress"

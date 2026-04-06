@@ -1,18 +1,18 @@
-// =============================================================================
-// SCSS DEMO — inyectado inline desde el bootstrap
-// Layout: pantalla de carga RTR a viewport completo.
-//   Fondo: gradiente gris neutro (simula entorno de estudio con suelo reflectante)
-//   Contenido: brand + título + barra de progreso centrados, ligeramente por encima del centro
-// =============================================================================
+$loader-wl-black: './svg/wl/black/loader.svg';
+$loader-wl-light: './svg/wl/light/loader.svg';
 
-$breakpoint: 600px;
-
-.demo {
-  min-height: 100vh;
-  font-family: var(--sans);
+@mixin dark-vars {
+  //TODO
+  --ss-loader: url('#{$loader-wl-light}');
 }
 
-// ── Scene (full-viewport gradient background) ─────────────────────────────────
+:root {
+  --ss-loader: url('#{$loader-wl-black}');
+}
+
+.style-selector-skeleton-rbn {
+  --ss-loader: url('./svg/rbn/light/loader.svg');
+}
 
 .demo-scene {
   width: 100%;
@@ -20,14 +20,6 @@ $breakpoint: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    linear-gradient(
-      180deg,
-      var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00))
-      87.07%,
-      var(--color-generic-neutral-dark-background, #818181) 100%),
-      url(<path-to-image>)
-      lightgray -49.465px -9px / 126.381% 100.956% no-repeat;
 }
 
 // ── Overlay (centered content block) ─────────────────────────────────────────
@@ -43,49 +35,64 @@ $breakpoint: 600px;
 
 .demo-brand {
   display: flex;
+  width: 156px;
+  height: 78px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
   aspect-ratio: 2/1;
+
+  &-logo {
+    height: 100%;
+    width: 100%;
+    background-image: var(--ss-loader);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 }
 
 // ── Title ─────────────────────────────────────────────────────────────────────
 
 .demo-title {
-  color: var(--color-generic-neutral-ultra-dark-text, #000);
+  color: var(--color-generic-neutral-ultra-dark-text);
   text-align: center;
-  font-family: var(--typography-body-2xl-family, Inter);
-  font-size: var(--typography-body-2xl-size, 24px);
+  //
+  font-family: var(--typography-body-2xl-family);
+  font-size: var(--typography-body-2xl-size);
   font-style: normal;
   font-weight: 700;
-  line-height: var(--typography-body-2xl-line-height, 30px); /* 125% */
-  letter-spacing: var(--typography-body-2xl-letter-spacing, 0);
+  line-height: var(--typography-body-2xl-line-height); /* 125% */
+  letter-spacing: var(--typography-body-2xl-letter-spacing);
 }
 
 // ── Progress bar ──────────────────────────────────────────────────────────────
 
 .demo-progress {
-  margin-top: var(--spacing-2xl, 40px);;
+  margin-top: var(--spacing-2xl);
   width: 232px;
   background: rgba(255, 255, 255, 0.5);
   overflow: hidden;
   display: flex;
   height: 8px;
-  padding: var(--spacing-none, 0);
+  padding: var(--spacing-none);
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--spacing-none, 0);
-  border-radius: var(--radius-default, 6px);
-  border: 1px solid var(--color-stepper-light-active-border, #FFF);
+  gap: var(--spacing-none);
+  border-radius: var(--radius-default);
+  //
+  border: 1px solid var(--color-stepper-light-active-border);
 }
 
 .demo-progress__fill {
   display: flex;
-  padding: var(--spacing-2xs, 4px) var(--spacing-none, 0);
+  //
+  padding: var(--spacing-2xs) var(--spacing-none);
   align-items: center;
-  gap: var(--spacing-none, 0);
+  gap: var(--spacing-none);
   flex: 1 0 0;
   width: 20%;
-  background: var(--color-stepper-light-checked-background, #FFF);
+  //
+  background: var(--color-stepper-light-checked-background);
 }

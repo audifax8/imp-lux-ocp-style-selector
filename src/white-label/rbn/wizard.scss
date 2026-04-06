@@ -54,10 +54,27 @@
 }
 
 
+// Logo rbn: 112×49px (aspect ratio ~2.3:1, muy diferente al wl 141×16px)
+// Se escala al 50% del tamaño natural para encajar en el header.
+$logo-rbn-black: './svg/rbn/black/logo.svg';
+$logo-rbn-light: './svg/rbn/light/logo.svg';
+
 .header-logo {
-  height: 73px !important;
+  width: 73px;
+  height: 32px;
+  aspect-ratio: 73 / 32;
+
   &__icon {
-    background-image: url("https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/rbn/assets/svg/RemixLogoBlack.svg") !important;
-    height: 73px !important;
+    --ss-logo: url('#{$logo-rbn-black}');
   }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .header-logo__icon {
+    --ss-logo: url('#{$logo-rbn-light}');
+  }
+}
+
+[data-theme='dark'] .header-logo__icon {
+  --ss-logo: url('#{$logo-rbn-light}');
 }

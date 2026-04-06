@@ -19,7 +19,10 @@ $breakpoint: 600px;
   justify-content: center;
   margin-left: 20px;
   width: 140.4px;
-  height: 15.251px;
+  //height: 15.251px;
+  //width: 140.4px;
+  //height: 15.251px;
+//aspect-ratio: 140.40/15.25;
   aspect-ratio: 140.40/15.25;
 
   & .yr-skeleton {
@@ -31,7 +34,7 @@ $breakpoint: 600px;
 
 .header-logo__icon {
   height: 100%;
-  background-image: url("https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/EssilorLuxotticaBlack.svg");
+  background-image: var(--ss-logo);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

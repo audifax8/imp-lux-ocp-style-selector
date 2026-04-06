@@ -8,6 +8,32 @@ $bp-desktop-biz: 1440px;
 $bp-desktop:    1920px;
 
 // =============================================================================
+// Logo paths — default brand (wl): 141×16px
+// rbn overrides --ss-logo en white-label/rbn/wizard.scss
+// black = logo oscuro para fondos claros (light mode)
+// light = logo claro para fondos oscuros (dark mode)
+// =============================================================================
+$logo-wl-black: './svg/wl/black/logo.svg';
+$logo-wl-light: './svg/wl/light/logo.svg';
+
+// Light mode (default)
+.header-logo__icon {
+  --ss-logo: url('#{$logo-wl-black}');
+}
+
+// Dark mode — sistema
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .header-logo__icon {
+    --ss-logo: url('#{$logo-wl-light}');
+  }
+}
+
+// Dark mode — toggle explícito
+[data-theme='dark'] .header-logo__icon {
+  --ss-logo: url('#{$logo-wl-light}');
+}
+
+// =============================================================================
 // Variables de background por resolución — light (default)
 // Sobreescritas en dark más abajo.
 // Aplicadas a .style-selector y .style-selector-skeleton para que el

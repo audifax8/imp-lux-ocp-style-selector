@@ -210,6 +210,26 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `context/data.tsx` — `DataProvider`; fetches models al montar, mapea con `mapData()`, completa el deferred promise y expone datos via context
 - `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`)
 
+### Logos (solo modo startWithStyleSelector)
+Variable CSS `--ss-logo` — declarada en `.header-logo__icon` vía `style-selector/index.scss` (?inline, solo este modo). El componente `Header` usa `background-image: var(--ss-logo)` en `.header-logo__icon`; cuando `skeleton={true}` renderiza el skeleton en su lugar.
+
+SCSS vars de ruta por brand:
+
+| Brand | SCSS vars | Tamaño natural | Contenedor |
+|---|---|---|---|
+| wl (default) | `$logo-wl-black/light` | 141×16px | heredado de `.header-logo` (140.4×15.251px) |
+| rbn | `$logo-rbn-black/light` | 112×49px | 56×24.5px (50% natural, aspect-ratio: 112/49) |
+
+- `black` = logo oscuro → usado en **light mode** (fondo claro)
+- `light` = logo claro → usado en **dark mode** (fondo oscuro)
+
+Dark mode: mismo patrón doble (`prefers-color-scheme` + `[data-theme='dark']`) en ambos archivos.
+
+Dónde vive cada override:
+- `style-selector/index.scss` — define `$logo-wl-*` + sets `--ss-logo` para todos los brands por defecto
+- `white-label/rbn/wizard.scss` — define `$logo-rbn-*` + overrides `--ss-logo` + ajusta dimensiones de `.header-logo`
+- Otros brands usan el logo wl sin override adicional
+
 ### Background images (solo modo startWithStyleSelector)
 Imágenes en `public/imgs/background/{light|dark}/`. Aplicadas a `.style-selector` y `.style-selector-skeleton` para que el fondo sea consistente tanto en estado cargado como durante el skeleton.
 
@@ -431,6 +451,11 @@ public/
                                      Mobile / Tablet Portrait / Tablet Landscape /
                                      Desktop Biz xs / Desktop Biz / Desktop
     dark/                          — mismas 6 variantes para dark mode
+  svg/
+    wl/black/logo.svg              — logo EssilorLuxottica oscuro (141×16px) — light mode, brands no-rbn
+    wl/light/logo.svg              — logo EssilorLuxottica claro (141×16px) — dark mode, brands no-rbn
+    rbn/black/logo.svg             — logo Ray-Ban oscuro (112×49px) — light mode, brand rbn
+    rbn/light/logo.svg             — logo Ray-Ban claro (112×49px) — dark mode, brand rbn
 scripts/
   bundle-size.mjs                  — snapshot de tamaños por modo, appends a bundle-sizes.log
   audit.mjs                        — post-build auditor: presencia de chunks, umbrales de tamaño,
