@@ -162,10 +162,11 @@ Loaders (`src/white-label/`):
 
 ## CSS architecture
 ```
-imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (CSS vars, dark mode, reset, sr-only)
+imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (skeleton vars, shimmer)
                                                 loaded via <link>, always — no mode-specific content
 
 style-selector/bootstrap/index.tsx           ← style-selector/index.scss?inline + white-label/loader-wizard
+                                                index.scss incluye breakpoints de background + var --ss-bg
 configurator/bootstrap/index.tsx             ← configurator/configurator.scss?inline + white-label/loader-configurator
 products-index/bootstrap/index.tsx           ← products-index/index.scss?inline + white-label/loader-index
 configurator/model/Model.tsx                 ← model/model.scss?inline (skeleton de gafas)
@@ -207,7 +208,32 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve importando `style.tsx` cuando el `DataProvider` lo señaliza
 - `context/context.ts` — `DataContext` con `types` y `categories`
 - `context/data.tsx` — `DataProvider`; fetches models al montar, mapea con `mapData()`, completa el deferred promise y expone datos via context
-- `index.scss` — ?inline CSS (container, typography, nav, toggle, skeletons)
+- `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`)
+
+### Background images (solo modo startWithStyleSelector)
+Imágenes en `public/imgs/background/{light|dark}/`. Aplicadas a `.style-selector` y `.style-selector-skeleton` para que el fondo sea consistente tanto en estado cargado como durante el skeleton.
+
+Variable CSS `--ss-bg` — se declara en ambas clases y se sobreescribe por breakpoint y tema:
+
+| SCSS var | Breakpoint | Device |
+|---|---|---|
+| (default) | < 768px | Mobile |
+| `$bp-tablet-p` | ≥ 768px | Tablet Portrait |
+| `$bp-tablet-l` | ≥ 1024px | Tablet Landscape |
+| `$bp-desktop-xs` | ≥ 1280px | Desktop Biz xs |
+| `$bp-desktop-biz` | ≥ 1440px | Desktop Biz |
+| `$bp-desktop` | ≥ 1920px | Desktop |
+
+Dark mode: sobreescrito con `@media (prefers-color-scheme: dark) :root:not([data-theme='light'])` + `[data-theme='dark']` (mismo patrón que `theme.scss`).
+
+Archivos disponibles:
+- `public/imgs/background/light/Device=Mobile, Mode=Light.png`
+- `public/imgs/background/light/Device=Tablet Portrait, Mode=Light.png`
+- `public/imgs/background/light/Device=Tablet Landscape, Mode=Light.png`
+- `public/imgs/background/light/Device=Desktop Biz xs, Mode=Light.png`
+- `public/imgs/background/light/Device=Desktop Biz, Mode=Light.png`
+- `public/imgs/background/light/Device=Desktop, Mode=Light.png`
+- `public/imgs/background/dark/` — mismas 6 variantes en dark
 
 ### Componentes (`style-selector/components/`)
 - `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step: Step) => void`; logo via CSS background-image (`.header-logo__icon`)
@@ -283,7 +309,8 @@ Single-page component. Internal state manages type selection vs. model grid view
 `src/shared/` — código compartido entre todos los modos:
 - `mode/detect.ts` — mode singleton (`startWithStyleSelector | configurator | index`)
 - `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
-- `styles/theme.scss` — CSS bundle (vars, dark mode, reset, sr-only, reduced-motion)
+- `styles/theme.scss` — CSS bundle (skeleton vars light/dark, shimmer animation). Dark mode: `@media prefers-color-scheme` + `[data-theme='dark']` fuera del media query para que el toggle JS funcione independientemente del sistema
+- `styles/critical.scss` — design tokens compartidos: tipografía (`--typography-*`), spacing (`--spacing-*`), radii (`--radius-*`), strokes (`--stroke-*` en px), colores semánticos; todos los tamaños en `rem` (base 18px); strokes en `px`
 - `components/DarkModeSwitch.tsx` — toggle component; usado en todos los modos
 - `components/SharedSkeleton.tsx` — skeleton alternativo compartido entre configurator y style-selector; activado con `?skeletonLoader=true`; chunk lazy propio con preload inmediato a nivel de módulo cuando el param está activo (`sharedSkeletonImport = import(...)` antes de que React monte); esto garantiza que `lazy()` resuelve síncronamente y `<SharedSkeleton />` puede usarse sin `<Suspense>` wrapper propio; cuando el param no está presente el chunk no se descarga y los skeletons originales se usan sin coste de red
 
@@ -302,7 +329,8 @@ src/
   shared/
     mode/detect.ts                 — mode singleton (startWithStyleSelector | configurator | index)
     theme/darkMode.ts              — theme detection + toggle
-    styles/theme.scss              — CSS bundle (vars, dark mode, reset, sr-only)
+    styles/theme.scss              — CSS bundle (skeleton vars, shimmer); dark mode via media query + [data-theme='dark']
+    styles/critical.scss           — design tokens: tipografía, spacing, radii en rem; strokes en px; colores semánticos
     components/DarkModeSwitch.tsx  — shared dark mode toggle component
     components/SharedSkeleton.tsx  — shared skeleton (lazy chunk); active via ?skeleton=true
     components/SharedSkeleton.scss — ?inline CSS for SharedSkeleton
@@ -332,7 +360,7 @@ src/
     style.tsx                      — componente principal Style; gestiona step state (type → model); usa useData()
     StyleSelector.tsx              — wrapper; lazy StyleSelectorComponent o StyleSelectorSkeleton; soporta ?skeleton / ?skeletonLoader
     StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true)
-    index.scss                     — ?inline CSS (container, typography, nav, toggle, skeletons)
+    index.scss                     — ?inline CSS (layout, breakpoints $bp-tablet-p/l/desktop-xs/biz/full, var --ss-bg para background images por resolución y tema)
     components/
       header/                      — Header; steps nav + logo CSS; selectedStep: Step; onClick?: (step) => void
       sub-nav/                     — SubNav; breadcrumb/back nav; todos los props opcionales
@@ -398,6 +426,11 @@ public/
                                      window.configureParams de ejemplo, y <link> CSS bundle
                                      IMPORTANTE: el index.html raíz (/) es solo para dev server —
                                      todo lo que debe aparecer en dist/ debe estar en public/index.html
+  imgs/background/
+    light/                         — 6 imágenes PNG de fondo para modo startWithStyleSelector (light)
+                                     Mobile / Tablet Portrait / Tablet Landscape /
+                                     Desktop Biz xs / Desktop Biz / Desktop
+    dark/                          — mismas 6 variantes para dark mode
 scripts/
   bundle-size.mjs                  — snapshot de tamaños por modo, appends a bundle-sizes.log
   audit.mjs                        — post-build auditor: presencia de chunks, umbrales de tamaño,

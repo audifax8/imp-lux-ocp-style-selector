@@ -1,0 +1,40 @@
+@mixin dark-vars {
+  //TODO
+}
+
+:root {
+  --radius-default: 0.333rem;  /* 6px */
+  --radius-fixed: 1.111rem;    /* 20px */
+  --stroke-thin: 1px;
+  --stroke-heavy: 4px;
+
+  --spacing-none: 0;
+  --spacing-xs: 0.444rem;   /* 8px */
+  --spacing-sm: 0.667rem;   /* 12px */
+  --spacing-base: 0.889rem; /* 16px */
+  --spacing-lg: 1.333rem;   /* 24px */
+  --spacing-2xl: 2.222rem;  /* 40px */
+  --spacing-3xl: 2.667rem;  /* 48px */
+  --spacings-md: 0.444rem;  /* 8px */
+  --spacings-base: 0.889rem; /* 16px */
+
+  --color-generic-neutral-ultra-light-border: #FFF;
+  --color-stepper-brand-default-title: #767676;
+  --color-stepper-brand-checked-title: #0354A6;
+  --color-stepper-brand-checked-border: #0354A6;
+  --color-overlay-light-alpha-0: rgba(255, 255, 255, 0.00);
+  --color-overlay-light-alpha-80: rgba(255, 255, 255, 0.80);
+  --color-generic-neutral-dark-background: #818181;
+  --color-generic-focus-border: #0354A6;
+  --color-generic-neutral-ultra-dark-text: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include dark-vars;
+  }
+}
+
+:root[data-theme='dark'] {
+  @include dark-vars;
+}

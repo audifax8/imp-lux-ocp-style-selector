@@ -1,25 +1,58 @@
 // Brand: rbn
+
+@mixin dark-vars {
+  //TODO
+  --accent: #ff6b74;
+  --accent-bg: rgba(255, 107, 116, 0.15);
+  --accent-border: rgba(255, 107, 116, 0.45);
+}
+
 :root {
+  /* Headings/Heading 5 */
+  --typography-h5-family: 'Inter';
+  --typography-h5-size: 0.778rem;   /* 14px */
+  --typography-h5-line-height: 0.889rem; /* 16px */
+  --typography-h5-letter-spacing: 0;
+
+  /* Headings/Heading 3 */
+  --typography-h3-family: 'Inter';
+  --typography-h3-size: 1rem;       /* 18px */
+  --typography-h3-line-height: 1.333rem; /* 24px */
+  --typography-h3-letter-spacing: 0;
+
+  /* Texts/Text lg Bold */
+  --typography-body-lg-family: 'Inter';
+  --typography-body-lg-size: 1rem;       /* 18px */
+  --typography-body-lg-line-height: 1.5rem; /* 27px */
+  --typography-body-lg-letter-spacing: 0;
+
+  /* Texts/Text xs */
+  --typography-body-xs-family: 'Inter';
+  --typography-body-xs-size: 0.667rem;   /* 12px */
+  --typography-body-xs-line-height: 0.889rem; /* 16px */
+  --typography-body-xs-letter-spacing: 0;
+
+  /* Texts/Text 2xl Bold */
+  --typography-body-2xl-family: 'Inter';
+  --typography-body-2xl-size: 1.333rem; /* 24px */
+  --typography-body-2xl-line-height: 1.875rem; /* 30px  */
+  --typography-body-2xl-letter-spacing: 0;
+
   --accent: #e63946;
   --accent-bg: rgba(230, 57, 70, 0.1);
   --accent-border: rgba(230, 57, 70, 0.45);
 }
 
-// Dark: fallback sin JS
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --accent: #ff6b74;
-    --accent-bg: rgba(255, 107, 116, 0.15);
-    --accent-border: rgba(255, 107, 116, 0.45);
+    @include dark-vars;
   }
 }
 
-// Dark: toggle explícito del usuario
 :root[data-theme='dark'] {
-  --accent: #ff6b74;
-  --accent-bg: rgba(255, 107, 116, 0.15);
-  --accent-border: rgba(255, 107, 116, 0.45);
+  @include dark-vars;
 }
+
 
 .header-logo {
   height: 73px !important;

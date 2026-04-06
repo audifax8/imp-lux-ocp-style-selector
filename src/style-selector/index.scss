@@ -1,16 +1,101 @@
-$breakpoint: 600px;
+// =============================================================================
+// Breakpoints — modo startWithStyleSelector
+// =============================================================================
+$bp-tablet-p:    768px;
+$bp-tablet-l:   1024px;
+$bp-desktop-xs: 1280px;
+$bp-desktop-biz: 1440px;
+$bp-desktop:    1920px;
 
+// =============================================================================
+// Variables de background por resolución — light (default)
+// Sobreescritas en dark más abajo.
+// Aplicadas a .style-selector y .style-selector-skeleton para que el
+// background sea consistente tanto en el estado cargado como en el skeleton.
+// =============================================================================
+.style-selector,
+.style-selector-skeleton {
+  --ss-bg: url('./imgs/background/light/Device=Mobile, Mode=Light.png');
+
+  @media (min-width: $bp-tablet-p) {
+    --ss-bg: url('./imgs/background/light/Device=Tablet Portrait, Mode=Light.png');
+  }
+  @media (min-width: $bp-tablet-l) {
+    --ss-bg: url('./imgs/background/light/Device=Tablet Landscape, Mode=Light.png');
+  }
+  @media (min-width: $bp-desktop-xs) {
+    --ss-bg: url('./imgs/background/light/Device=Desktop Biz xs, Mode=Light.png');
+  }
+  @media (min-width: $bp-desktop-biz) {
+    --ss-bg: url('./imgs/background/light/Device=Desktop Biz, Mode=Light.png');
+  }
+  @media (min-width: $bp-desktop) {
+    --ss-bg: url('./imgs/background/light/Device=Desktop, Mode=Light.png');
+  }
+}
+
+// Dark mode — sistema
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    .style-selector,
+    .style-selector-skeleton {
+      --ss-bg: url('./imgs/background/dark/Device=Mobile, Mode=Dark.png');
+
+      @media (min-width: $bp-tablet-p) {
+        --ss-bg: url('./imgs/background/dark/Device=Tablet Portrait, Mode=Dark.png');
+      }
+      @media (min-width: $bp-tablet-l) {
+        --ss-bg: url('./imgs/background/dark/Device=Tablet Landscape, Mode=Dark.png');
+      }
+      @media (min-width: $bp-desktop-xs) {
+        --ss-bg: url('./imgs/background/dark/Device=Desktop Biz xs, Mode=Dark.png');
+      }
+      @media (min-width: $bp-desktop-biz) {
+        --ss-bg: url('./imgs/background/dark/Device=Desktop Biz, Mode=Dark.png');
+      }
+      @media (min-width: $bp-desktop) {
+        --ss-bg: url('./imgs/background/dark/Device=Desktop, Mode=Dark.png');
+      }
+    }
+  }
+}
+
+// Dark mode — toggle explícito
+[data-theme='dark'] {
+  .style-selector,
+  .style-selector-skeleton {
+    --ss-bg: url('./imgs/background/dark/Device=Mobile, Mode=Dark.png');
+
+    @media (min-width: $bp-tablet-p) {
+      --ss-bg: url('./imgs/background/dark/Device=Tablet Portrait, Mode=Dark.png');
+    }
+    @media (min-width: $bp-tablet-l) {
+      --ss-bg: url('./imgs/background/dark/Device=Tablet Landscape, Mode=Dark.png');
+    }
+    @media (min-width: $bp-desktop-xs) {
+      --ss-bg: url('./imgs/background/dark/Device=Desktop Biz xs, Mode=Dark.png');
+    }
+    @media (min-width: $bp-desktop-biz) {
+      --ss-bg: url('./imgs/background/dark/Device=Desktop Biz, Mode=Dark.png');
+    }
+    @media (min-width: $bp-desktop) {
+      --ss-bg: url('./imgs/background/dark/Device=Desktop, Mode=Dark.png');
+    }
+  }
+}
+
+// =============================================================================
+// Layout
+// =============================================================================
 .style-selector {
   min-height: 100vh;
   background:
     linear-gradient(
       180deg,
-      var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00))
-      87.07%,
-      var(--color-generic-neutral-dark-background, #818181) 100%),
-      url(<path-to-image>)
-      lightgray -49.465px -9px / 126.381% 100.956% no-repeat;
-
+      var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00)) 87.07%,
+      var(--color-generic-neutral-dark-background, #818181) 100%
+    ),
+    var(--ss-bg) lightgray center / cover no-repeat;
 
   &__elements {
     margin-top: 16px;
@@ -20,7 +105,7 @@ $breakpoint: 600px;
     align-items: center;
     gap: 16px;
 
-    @media (max-width: $breakpoint) {
+    @media (max-width: $bp-tablet-p) {
       margin: 0 16px;
     }
   }
@@ -32,7 +117,31 @@ $breakpoint: 600px;
     flex-flow: wrap;
     justify-content: center;
 
-    @media (max-width: $breakpoint) {
+    @media (max-width: $bp-tablet-p) {
+      margin: 0 16px;
+    }
+  }
+}
+
+.style-selector-skeleton {
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      180deg,
+      var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00)) 87.07%,
+      var(--color-generic-neutral-dark-background, #818181) 100%
+    ),
+    var(--ss-bg) lightgray center / cover no-repeat;
+
+  &__elements {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+
+    @media (max-width: $bp-tablet-p) {
       margin: 0 16px;
     }
   }
