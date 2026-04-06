@@ -3,7 +3,7 @@
 ## What it is
 Self-contained React 19 widget (embeddable). Three initialization modes:
 - **configurator** (default) — glasses configurator experience with RTR (Real-Time Rendering)
-- **style-selector** (wizard) — picks glasses type → model → opens product page
+- **style-selector** (startWithStyleSelector) — picks glasses type → model → opens product page
 - **products-index** (index) — product index listing
 - **demo** — sandbox para probar layouts desktop/mobile con brand CSS activo; sin skeleton; acceso al estilo base compartido
 
@@ -110,7 +110,7 @@ Detection priority:
 2. `?mode=` URL param
 3. `'configurator'` (default)
 
-Valid modes: `'wizard'` | `'configurator'` | `'index'` | `'demo'`
+Valid modes: `'startWithStyleSelector'` | `'configurator'` | `'index'` | `'demo'`
 
 **Isolation rule:** each mode's chunks never load in the other modes.
 All mode-specific CSS (including white-label CSS) is `?inline` — injected by the bootstrap before React mounts.
@@ -121,14 +121,14 @@ All mode-specific CSS (including white-label CSS) is `?inline` — injected by t
 2. Detects active mode
 3. Sets `role=region` + `aria-label` on container
 4. Branches lazy import:
-   - `import('@/style-selector/bootstrap')` → wizard
+   - `import('@/style-selector/bootstrap')` → startWithStyleSelector
    - `import('@/products-index/bootstrap')` → index
    - `import('@/configurator/bootstrap')` → configurator (default)
 
 **Style-selector bootstrap** (`style-selector/bootstrap/index.tsx`):
-- Injects `style-selector/wizard.scss?inline` (container + typography + skeleton + wizard styles)
+- Injects `style-selector/index.scss?inline` (container + typography + skeleton + style-selector styles)
 - Injects active white-label CSS via `white-label/loader-wizard`
-- `createRoot` + `<AppStyleSelector />` (LabelsProvider + Wizard)
+- `createRoot` + `<AppStyleSelector />` (DataProvider + StyleSelector)
 
 **Configurator bootstrap** (`configurator/bootstrap/index.tsx`):
 - Injects `configurator/configurator.scss?inline` (container + typography + skeleton + configurator styles)
@@ -165,22 +165,27 @@ Loaders (`src/white-label/`):
 imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (CSS vars, dark mode, reset, sr-only)
                                                 loaded via <link>, always — no mode-specific content
 
-style-selector/bootstrap/index.tsx           ← style-selector/wizard.scss?inline + white-label/loader-wizard
+style-selector/bootstrap/index.tsx           ← style-selector/index.scss?inline + white-label/loader-wizard
 configurator/bootstrap/index.tsx             ← configurator/configurator.scss?inline + white-label/loader-configurator
 products-index/bootstrap/index.tsx           ← products-index/index.scss?inline + white-label/loader-index
-style-selector/WizardStep1.tsx               ← WizardStep1.scss?inline (on-demand, when step loads)
-style-selector/WizardStep2.tsx               ← WizardStep2.scss?inline (on-demand, when step loads)
 configurator/model/Model.tsx                 ← model/model.scss?inline (skeleton de gafas)
 configurator/model/ModelContent.tsx          ← model/model-content.scss?inline (gafas reales, SOLO tras resolver skeleton)
 ```
 
 ## API config (no .env — runtime only)
-`src/style-selector/api/config.ts` — priority for each value:
-1. `window.__IMP_LUX_API_URL__` / `window.__IMP_LUX_API_LANG__`
-2. `?apiUrl=` / `?lang=` URL params
-3. Hardcoded defaults (`https://www.ray-ban.com` / `en`)
+`src/style-selector/api/config.ts` — priority for `API_LANGUAGE`:
+1. `window.__IMP_LUX_API_LANG__`
+2. `?lang=` URL param
+3. Hardcoded default `'en'`
 
-Models endpoint: `GET {API_BASE_URL}/wcs/resources/store/{storeId}/remix/models?language={lang}`
+`BRAND_URLS` — per-brand full base URL map (replaces old `API_BASE_URL` + `BRAND_STORE_IDS` pattern):
+- `rbn` → `https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=`
+- `oak` → `https://www.oakley.com/en-us/oneConfigurator/models?language=`
+- `sgh` → `https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=` (TODO: real URL)
+- `bliz` → `https://www.bliz.com/wcs/shop/colorama/models?language=` (TODO: real URL)
+- `cdm` → `https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=` (TODO: real URL)
+
+Models endpoint: `GET {BRAND_URLS[brand]}{lang}` — URL constructed directly from `BRAND_URLS[brand] + API_LANGUAGE`
 
 ## Labels service
 `src/labels/` — i18n hook-based service.
@@ -193,13 +198,30 @@ Models endpoint: `GET {API_BASE_URL}/wcs/resources/store/{storeId}/remix/models?
 Used in every component. While API loads or on error, `DEFAULT_LABELS` are shown silently.
 Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 
-## Style-selector (2-step wizard)
-- `Wizard.tsx` — step orchestrator + theme toggle
-- `WizardStep1` — lazy chunk; glass type selection (sunglasses / eyeglasses / kids-sunglasses)
-- `WizardStep2` — lazy chunk; fetches models, shows category filters + model grid
-- `wizard.scss` — ?inline CSS (container, typography, nav, toggle, skeletons)
+## Style-selector
+Single-page component. Internal state manages type selection vs. model grid view.
 
-Step SCSS loaded via `?inline` and injected at module level when chunk loads.
+- `StyleSelector.tsx` — wrapper; monta `StyleSelectorComponent` (lazy via deferred promise) o `StyleSelectorSkeleton` (si `?skeleton` param activo); soporta `?skeletonLoader=true` (shared skeleton alternativo) y `?skeleton=true` (muestra skeleton directamente sin cargar el componente real)
+- `style.tsx` — componente principal (`Style`); gestiona estado: tipo seleccionado, categoría, step; renderiza `Header` + `SubNav` + cards de tipo (step 1) o `CategoryFilterComponent` + grid de modelos (step 2); usa `useData()` del context
+- `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
+- `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve importando `style.tsx` cuando el `DataProvider` lo señaliza
+- `context/context.ts` — `DataContext` con `types` y `categories`
+- `context/data.tsx` — `DataProvider`; fetches models al montar, mapea con `mapData()`, completa el deferred promise y expone datos via context
+- `index.scss` — ?inline CSS (container, typography, nav, toggle, skeletons)
+
+### Componentes (`style-selector/components/`)
+- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step: Step) => void`; logo via CSS background-image (`.header-logo__icon`)
+- `sub-nav/` — `SubNav`; acepta `steps?`, `selectedStep?: Step`, `onClick?: (step?: Step) => void`; back/close buttons solo visibles cuando `onClick` y `selectedStep?.id` son truthy
+- `category-filter/` — `CategoryFilterComponent`; `onClick?: (category: Category) => void`
+- `category-button/` — `Button`; `onClick?: (e: React.MouseEvent) => void` (ahora opcional)
+- `card/` — `Card`; tarjeta de tipo de gafa (step 1)
+- `model/` — `ModelCard`; tarjeta de modelo (step 2)
+- `logo/` — `Logo`; renderiza SVG via URL
+- `img/` — componente de imagen
+
+### Steps internos (gestionados por state en `style.tsx`)
+- **Step 0 (Type)**: grid de tipos de gafa usando `types` del context; click llama `onClick(type)` → filtra categorías → avanza a step 1
+- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; back desde `Header`/`SubNav` vuelve al step 0
 
 ## Products-index
 - `Index.tsx` — main chunk; theme toggle + lazy `IndexContent`
@@ -259,7 +281,7 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 
 ## Shared
 `src/shared/` — código compartido entre todos los modos:
-- `mode/detect.ts` — mode singleton (`wizard | configurator | index`)
+- `mode/detect.ts` — mode singleton (`startWithStyleSelector | configurator | index`)
 - `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
 - `styles/theme.scss` — CSS bundle (vars, dark mode, reset, sr-only, reduced-motion)
 - `components/DarkModeSwitch.tsx` — toggle component; usado en todos los modos
@@ -278,7 +300,7 @@ Step SCSS loaded via `?inline` and injected at module level when chunk loads.
 src/
   main.tsx                         — tiny entry, sync setup + mode branch
   shared/
-    mode/detect.ts                 — mode singleton (wizard | configurator | index)
+    mode/detect.ts                 — mode singleton (startWithStyleSelector | configurator | index)
     theme/darkMode.ts              — theme detection + toggle
     styles/theme.scss              — CSS bundle (vars, dark mode, reset, sr-only)
     components/DarkModeSwitch.tsx  — shared dark mode toggle component
@@ -297,19 +319,29 @@ src/
   style-selector/
     bootstrap/
       index.tsx                    — style-selector bootstrap (CSS inject + brand + React mount)
-      AppStyleSelector.tsx         — LabelsProvider + Wizard
+      AppStyleSelector.tsx         — DataProvider + StyleSelector
     api/
-      config.ts                    — runtime API config (no .env)
-      models.ts                    — fetchModels, getCategoriesByType, getModelsByType
+      config.ts                    — runtime API config; BRAND_URLS per-brand URL map + API_LANGUAGE
+      models.ts                    — fetchModels (usa BRAND_URLS), mapData, types: Model, Category, Step, etc.
+    context/
+      context.ts                   — DataContext (types, categories)
+      data.tsx                     — DataProvider; fetches + maps models, completes deferred promise
+    lazy-imports/
+      index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise()
     types.ts                       — GlassType, etc.
-    Wizard.tsx                     — step orchestrator, theme toggle
-    wizard.scss                    — ?inline CSS (container, typography, nav, toggle, skeletons)
-    WizardStep1.tsx                — lazy chunk
-    WizardStep2.tsx                — lazy chunk
-    WizardStep1.scss               — on-demand CSS (?inline)
-    WizardStep2.scss               — on-demand CSS (?inline)
-    WizardStep1Skeleton.tsx        — skeleton step 1
-    StyleSelectorSkeleton.tsx        — skeleton step 2
+    style.tsx                      — componente principal Style; gestiona step state (type → model); usa useData()
+    StyleSelector.tsx              — wrapper; lazy StyleSelectorComponent o StyleSelectorSkeleton; soporta ?skeleton / ?skeletonLoader
+    StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true)
+    index.scss                     — ?inline CSS (container, typography, nav, toggle, skeletons)
+    components/
+      header/                      — Header; steps nav + logo CSS; selectedStep: Step; onClick?: (step) => void
+      sub-nav/                     — SubNav; breadcrumb/back nav; todos los props opcionales
+      category-filter/             — CategoryFilterComponent; onClick?: (category) => void
+      category-button/             — Button; onClick opcional
+      card/                        — Card; tarjeta de tipo de gafa (step 0)
+      model/                       — ModelCard; tarjeta de modelo (step 1)
+      logo/                        — Logo SVG via URL
+      img/                         — componente de imagen
   products-index/
     bootstrap/
       index.tsx                    — products-index bootstrap (CSS inject + brand + React mount)
@@ -373,7 +405,8 @@ scripts/
 ```
 
 ## Pending
-- `BRAND_STORE_IDS` in `style-selector/api/config.ts`: all set to `'10151'` (only rbn known) — update when others available
+- `BRAND_URLS` in `style-selector/api/config.ts`: `sgh`, `bliz`, `cdm` still use placeholder rbn URL — update when real URLs available
+- `console.log({ brand })` left in `style-selector/api/models.ts` `fetchModels` — remove before production
 - Labels API endpoint not live yet — defaults always used until implemented
 - Delete `main` branch on both repos after changing default branch in GitHub Settings
 - `configurator/bootstrap/AppConfigurator.tsx`: re-enable `LabelsProvider` when configurator i18n is needed

@@ -25,10 +25,10 @@ container.setAttribute('aria-label', 'Style Selector')
 
 // ── Cargar el bootstrap del modo activo de forma lazy ─────────────────────────
 // Vite produce dos árboles de chunks completamente separados:
-//   bootstrap       → wizard (CSS + JS)
+//   bootstrap       → startWithStyleSelector (CSS + JS)
 //   bootstrap-configurator → configurador (CSS + JS)
 // El modo inactivo nunca se descarga.
-if (activeMode === 'wizard') {
+if (activeMode === 'startWithStyleSelector') {
   import('@/style-selector/bootstrap').then(({ mount }) => mount(container!))
 } else if (activeMode === 'index') {
   import('@/products-index/bootstrap').then(({ mount }) => mount(container!))

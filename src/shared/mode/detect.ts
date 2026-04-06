@@ -2,9 +2,9 @@
 // Prioridad: 1) window.__IMP_LUX_MODE__  2) URL param ?mode=  3) 'configurator' por defecto
 //
 // Uso desde el host:
-//   window.__IMP_LUX_MODE__ = 'wizard'  → antes de cargar el widget JS
-//   https://example.com/?mode=wizard    → via URL param
-export const MODES = ['wizard', 'configurator', 'index', 'demo'] as const
+//   window.__IMP_LUX_MODE__ = 'startWithStyleSelector'  → antes de cargar el widget JS
+//   https://example.com/?mode=startWithStyleSelector    → via URL param
+export const MODES = ['startWithStyleSelector', 'configurator', 'index', 'demo'] as const
 export type Mode = (typeof MODES)[number]
 
 const isMode = (value: unknown): value is Mode =>
