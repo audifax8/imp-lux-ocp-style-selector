@@ -19,10 +19,6 @@ $breakpoint: 600px;
   justify-content: center;
   margin-left: 20px;
   width: 140.4px;
-  //height: 15.251px;
-  //width: 140.4px;
-  //height: 15.251px;
-//aspect-ratio: 140.40/15.25;
   aspect-ratio: 140.40/15.25;
 
   & .yr-skeleton {
@@ -37,7 +33,7 @@ $breakpoint: 600px;
   background-image: var(--ss-logo);
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
+  //background-position: center;
 }
 
 .header-nav {

@@ -12,15 +12,26 @@ styleEl.dataset.id = 'shared-skeleton'
 styleEl.textContent = skeletonStyles
 document.head.appendChild(styleEl)
 
+//TODO
+import rbnStyles from './white-label/rbn.scss?inline'
+if (activeBrand === 'rbn') {
+  console.log('here');
+  const rbnStyleEl = document.createElement('style')
+  rbnStyleEl.dataset.id = 'rbn-skeleton'
+  rbnStyleEl.textContent = rbnStyles
+  document.head.appendChild(rbnStyleEl)
+}
+
 const SharedSkeleton = () => (
   <div className={`style-selector-skeleton style-selector-skeleton-${activeBrand}`}>
     <div className="demo-scene">
-      {/* role="status" + aria-live="polite": announces loading state to AT on mount */}
       <div className="demo-overlay" role="status" aria-live="polite">
         <div className='demo-brand'>
           <span className='demo-brand-logo'></span>
         </div>
+        {/* TODO translations */}
         <p className="demo-title">Starting your Remix experience</p>
+        {/* TODO progress */}
         <div
           className="demo-progress"
           role="progressbar"

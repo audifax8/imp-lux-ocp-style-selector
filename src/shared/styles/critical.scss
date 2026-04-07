@@ -13,16 +13,16 @@ $bp-desktop:    1920px;
 // black = logo oscuro para fondos claros (light mode)
 // light = logo claro para fondos oscuros (dark mode)
 // =============================================================================
-$logo-wl-black: './svg/wl/black/logo.svg';
-$logo-wl-light: './svg/wl/light/logo.svg';
+$logo-black: './svg/wl/black/logo.svg';
+$logo-light: './svg/wl/light/logo.svg';
 
 @mixin dark-vars {
   //TODO
-  --ss-logo: url('#{$logo-wl-light}');
+  --ss-logo: url('#{$logo-light}');
 }
 
 :root {
-  --ss-logo: url('#{$logo-wl-black}');
+  --ss-logo: url('#{$logo-black}');
   --radius-default: 0.333rem;  /* 6px */
   --radius-fixed: 1.111rem;    /* 20px */
   --stroke-thin: 1px;
@@ -47,6 +47,7 @@ $logo-wl-light: './svg/wl/light/logo.svg';
   --color-generic-neutral-dark-background: #818181;
   --color-generic-focus-border: #0354A6;
   --color-generic-neutral-ultra-dark-text: #000;
+  --light-gray: lightgray;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -144,10 +145,10 @@ $logo-wl-light: './svg/wl/light/logo.svg';
   background:
     linear-gradient(
       180deg,
-      var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00)) 87.07%,
-      var(--color-generic-neutral-dark-background, #818181) 100%
+      var(--color-overlay-light-alpha-0) 87.07%,
+      var(--color-generic-neutral-dark-background) 100%
     ),
-    var(--ss-bg) lightgray center / cover no-repeat;
+    var(--ss-bg) var(--light-gray) center / cover no-repeat;
 
   &__elements {
     margin-top: 16px;
@@ -180,10 +181,10 @@ $logo-wl-light: './svg/wl/light/logo.svg';
   background:
     linear-gradient(
       180deg,
-      var(--color-overlay-light-alpha-0, rgba(255, 255, 255, 0.00)) 87.07%,
-      var(--color-generic-neutral-dark-background, #818181) 100%
+      var(--color-overlay-light-alpha-0) 87.07%,
+      var(--color-generic-neutral-dark-background) 100%
     ),
-    var(--ss-bg) lightgray center / cover no-repeat;
+    var(--ss-bg) var(--light-gray) center / cover no-repeat;
 
   &__elements {
     display: flex;

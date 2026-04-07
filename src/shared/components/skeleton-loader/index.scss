@@ -1,17 +1,37 @@
+// Brand: rbn
+
 $loader-wl-black: './svg/wl/black/loader.svg';
 $loader-wl-light: './svg/wl/light/loader.svg';
+
 
 @mixin dark-vars {
   //TODO
   --ss-loader: url('#{$loader-wl-light}');
 }
 
-:root {
-  --ss-loader: url('#{$loader-wl-black}');
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include dark-vars;
+  }
 }
 
-.style-selector-skeleton-rbn {
-  --ss-loader: url('./svg/rbn/light/loader.svg');
+:root[data-theme='dark'] {
+  @include dark-vars;
+}
+
+:root {
+  --ss-loader: url('#{$loader-wl-black}');
+  --radius-default: 6px;
+  --color-stepper-light-active-border: #FFF;
+  --spacing-2xs: 4px;
+  --spacing-none: 0;
+  --color-stepper-light-checked-background: #FFF;
+
+  /* Texts/Text 2xl Bold */
+  --typography-body-2xl-family: 'Inter';
+  --typography-body-2xl-size: 1.333rem; /* 24px */
+  --typography-body-2xl-line-height: 1.875rem; /* 30px  */
+  --typography-body-2xl-letter-spacing: 0;
 }
 
 .demo-scene {

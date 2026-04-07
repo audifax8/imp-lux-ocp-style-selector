@@ -56,8 +56,8 @@
 
 // Logo rbn: 112×49px (aspect ratio ~2.3:1, muy diferente al wl 141×16px)
 // Se escala al 50% del tamaño natural para encajar en el header.
-$logo-rbn-black: './svg/rbn/black/logo.svg';
-$logo-rbn-light: './svg/rbn/light/logo.svg';
+$logo-black: './svg/rbn/black/logo.svg';
+$logo-light: './svg/rbn/light/logo.svg';
 
 .header-logo {
   width: 73px;
@@ -65,16 +65,16 @@ $logo-rbn-light: './svg/rbn/light/logo.svg';
   aspect-ratio: 73 / 32;
 
   &__icon {
-    --ss-logo: url('#{$logo-rbn-black}');
+    --ss-logo: url('#{$logo-black}');
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .header-logo__icon {
-    --ss-logo: url('#{$logo-rbn-light}');
+    --ss-logo: url('#{$logo-light}');
   }
 }
 
 [data-theme='dark'] .header-logo__icon {
-  --ss-logo: url('#{$logo-rbn-light}');
+  --ss-logo: url('#{$logo-light}');
 }
