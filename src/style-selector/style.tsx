@@ -4,19 +4,16 @@ import { Card } from '@/style-selector/components/card'
 import { ModelCard } from '@/style-selector/components/model';
 import { Header } from '@/style-selector/components/header'
 import { SubNav } from '@/style-selector/components/sub-nav'
-import { useData } from '@/style-selector/context/context'
 import { activeBrand } from '@/white-label/detect'
 import { getSVGURLByType } from '@/shared/assets';
 import type { Category, Model, Step } from '@/style-selector/api/models'
 import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
 import { StyleSelectorInitStrategy } from '@/configurator/model/strategy/StyleSelectorInitStrategy';
-import { useInitStrategy } from '@/configurator/model/useInitStrategy';
+import { useInitStyleSelectorStrategy } from '@/configurator/model/useInitStyleSelectorStrategy';
 
 const Style = () => {
   const strategy = useMemo(() => new StyleSelectorInitStrategy(), [])
-  const { phase1Data, phase2Data } = useInitStrategy(strategy)
-  console.log({ phase1Data, phase2Data });
-  const { types, categories } = useData()
+  const { phase1Data } = useInitStyleSelectorStrategy(strategy)
   const [, setSelectedType] = useState<string>('');
   const [filteredModels, setFilteredModels] = useState<Model[]>();
   const [subCategories, setSubCategories] = useState<Category[]>();
@@ -39,7 +36,7 @@ const Style = () => {
 
   const onClick = (type: string) => {
     setSelectedType(type);
-    const filtered = categories?.filter(category => category.type === type);
+    const filtered = phase1Data?.categories?.filter(category => category.type === type);
     setSubCategories(filtered);
     if (filtered && filtered[0].models) {
       setSelectedCategory(filtered[0]);
@@ -58,7 +55,7 @@ const Style = () => {
 
   const onCategoryClick = (category: Category) => {
     setSelectedCategory(category);
-    const models = categories?.find(cat => cat.category === category.category);
+    const models = phase1Data?.categories?.find(cat => cat.category === category.category);
     setFilteredModels(models?.models);
   };
 
@@ -67,7 +64,7 @@ const Style = () => {
       <Header steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       <SubNav steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       {!selectedCategory && (<main className='style-selector__elements'>
-        {types?.map((type) =>
+        {phase1Data?.types?.map((type) =>
           <Card
             key={type}
             title={type}
