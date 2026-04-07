@@ -60,8 +60,8 @@ const Style = () => {
   };
 
   return (
-    <div className='style-selector'>
-      <Header steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
+    <div className={`style-selector style-selector-${activeBrand}`}>
+      <Header steps={STEPS} selectedStep={selectedStep} onClick={onHeaderClick} />
       <SubNav steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       {!selectedCategory && (<main className='style-selector__elements'>
         {phase1Data?.types?.map((type) =>

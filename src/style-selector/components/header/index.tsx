@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
-import { Logo } from '@/style-selector/components/logo';
-import { getSVGURL } from '@/shared/assets';
-import { SkeletonVariant } from '@/declarations/enums';
-import { Skeleton } from '@/shared/components/skeleton';
 import type { Step } from '@/style-selector/api/models';
+
+import { SkeletonVariant } from '@/declarations/enums';
+
+import { Skeleton } from '@/shared/components/skeleton';
 import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
+import DarkModeSwitch from '@/shared/components/dark-mode-switch';
 
 import './index.scss';
-import DarkModeSwitch from '@/shared/components/dark-mode-switch';
 interface HeaderProps {
   steps?: Step[];
   selectedStep?: Step;
@@ -26,13 +26,15 @@ export const Header: React.FC<HeaderProps> = ({
   const Component = isClickable ? 'button' : 'div';
 
   const [theme, setTheme] = useState<Theme>(getCurrentTheme)
+  //                      <Skeleton className="header-logo__icon yr-skeleton" variant={SkeletonVariant.text} />
+
   
   return (
     <header className="header">
       <div className="header-logo" aria-label="Menu" role="button" tabIndex={0}>
         {!skeleton ? 
-          <div className={'header-logo__icon'}> </div> :
-          <Skeleton className='header-logo__icon yr-skeleton' variant={SkeletonVariant.text} />
+          <div className="header-logo__icon"></div> :
+          <Skeleton className="header-logo__icon yr-skeleton" variant={SkeletonVariant.text} />
         }
       </div>
       
@@ -44,12 +46,11 @@ export const Header: React.FC<HeaderProps> = ({
         >
           {steps?.map(
             (step, i) =>
-              (<li
+              (!skeleton ? (<li
                 role="none"
-                className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''} ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''}`}
                 key={i}>
                   <Component
-                    className='header-nav-items'
+                    className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''} ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''}`}
                     onClick={() => onClick?.(step)}
                     {...(isClickable && {
                       type: 'button',
@@ -58,8 +59,9 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <a role="menuitem">{step?.name}</a>
                   </Component>
-              </li>)
-            )}
+              </li>) : (<Skeleton className="header-nav-item__skeleton yr-skeleton" variant={SkeletonVariant.text} />))
+          )
+        } 
         </ul>
       </nav>
       <div className="header-switch">
@@ -70,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
       <div className="header-menu" aria-label="Menu" role="button" tabIndex={0}>
         {!skeleton ? 
-          <Logo className={'header-menu__icon'} url={getSVGURL('Menu', 'wl')} height={20} width={20} /> :
+          <div className="header-menu__icon"></div> :
           <Skeleton className='header-menu__icon yr-skeleton' variant={SkeletonVariant.text} />
         }
       </div>

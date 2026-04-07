@@ -1,11 +1,4 @@
-// =============================================================================
-// Breakpoints — modo startWithStyleSelector
-// =============================================================================
-$bp-tablet-p:    768px;
-$bp-tablet-l:   1024px;
-$bp-desktop-xs: 1280px;
-$bp-desktop-biz: 1440px;
-$bp-desktop:    1920px;
+@use '_variables' as *;
 
 // =============================================================================
 // Logo paths — default brand (wl): 141×16px
@@ -15,14 +8,18 @@ $bp-desktop:    1920px;
 // =============================================================================
 $logo-black: './svg/wl/black/logo.svg';
 $logo-light: './svg/wl/light/logo.svg';
+$menu-light: './svg/wl/light/menu.svg';
+$menu-black: './svg/wl/light/menu.svg';
 
 @mixin dark-vars {
   //TODO
   --ss-logo: url('#{$logo-light}');
+  --ss-menu-icon: url('#{$menu-light}');
 }
 
 :root {
   --ss-logo: url('#{$logo-black}');
+  --ss-menu-icon: url('#{$menu-black}');
   --radius-default: 0.333rem;  /* 6px */
   --radius-fixed: 1.111rem;    /* 20px */
   --stroke-thin: 1px;
@@ -42,11 +39,14 @@ $logo-light: './svg/wl/light/logo.svg';
   --color-stepper-brand-default-title: #767676;
   --color-stepper-brand-checked-title: #0354A6;
   --color-stepper-brand-checked-border: #0354A6;
+  --color-stepper-brand-active-title: #0354A6;
+  --color-stepper-brand-active-border: #0354A6;
   --color-overlay-light-alpha-0: rgba(255, 255, 255, 0.00);
   --color-overlay-light-alpha-80: rgba(255, 255, 255, 0.80);
   --color-generic-neutral-dark-background: #818181;
   --color-generic-focus-border: #0354A6;
   --color-generic-neutral-ultra-dark-text: #000;
+  --color-stepper-brand-default-border: #D8D8D8;
   --light-gray: lightgray;
 }
 
