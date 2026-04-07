@@ -99,9 +99,7 @@ export function mapData(data: InputData): Output {
 // ── Fetch ───────────────────────────────────────────────────────────────────
 
 export const fetchModels = async (brand: Brand): Promise<InputData> => {
-  console.log({ brand });
   const brand_url = BRAND_URLS[brand]
-  //https://www.oakley.com/en-us/oneConfigurator/models?language=en
   const url = `${brand_url + API_LANGUAGE}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)

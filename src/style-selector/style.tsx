@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Card } from '@/style-selector/components/card'
 import { ModelCard } from '@/style-selector/components/model';
@@ -9,8 +9,13 @@ import { activeBrand } from '@/white-label/detect'
 import { getSVGURLByType } from '@/shared/assets';
 import type { Category, Model, Step } from '@/style-selector/api/models'
 import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
+import { StyleSelectorInitStrategy } from '@/configurator/model/strategy/StyleSelectorInitStrategy';
+import { useInitStrategy } from '@/configurator/model/useInitStrategy';
 
 const Style = () => {
+  const strategy = useMemo(() => new StyleSelectorInitStrategy(), [])
+  const { phase1Data, phase2Data } = useInitStrategy(strategy)
+  console.log({ phase1Data, phase2Data });
   const { types, categories } = useData()
   const [, setSelectedType] = useState<string>('');
   const [filteredModels, setFilteredModels] = useState<Model[]>();

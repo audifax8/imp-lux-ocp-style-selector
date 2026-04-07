@@ -13,9 +13,10 @@
 
 import { useState, useEffect } from 'react'
 import type { IInitStrategy, InitPhase1Data, InitPhase2Data } from './strategy/types'
+import type { Output } from '@/style-selector/api/models'
 
 export interface InitState {
-  phase1Data: InitPhase1Data | null
+  phase1Data: InitPhase1Data | Output | null
   phase2Data: InitPhase2Data | null
   phase1Error: Error | null
   phase2Error: Error | null
@@ -29,7 +30,7 @@ const INITIAL_STATE: InitState = {
 }
 
 export const useInitStrategy = (
-  strategy: IInitStrategy<InitPhase1Data, InitPhase2Data>,
+  strategy: IInitStrategy<InitPhase1Data | Output, InitPhase2Data>,
 ): InitState => {
   const [state, setState] = useState<InitState>(INITIAL_STATE)
 

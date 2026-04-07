@@ -6,6 +6,7 @@
 import modelContentStyles from './model-content.scss?inline'
 import { activeBrand } from '@/white-label/detect'
 import type { InitPhase1Data, InitPhase2Data } from '@/configurator/model/strategy/types'
+import type { Output } from '@/style-selector/api/models'
 
 const styleEl = document.createElement('style')
 styleEl.dataset.id = 'configurator-model-content'
@@ -13,7 +14,7 @@ styleEl.textContent = modelContentStyles
 document.head.appendChild(styleEl)
 
 interface ModelContentProps {
-  phase1Data: InitPhase1Data
+  phase1Data: InitPhase1Data | Output
   phase2Data: InitPhase2Data | null
 }
 

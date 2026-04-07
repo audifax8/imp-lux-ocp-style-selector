@@ -2,11 +2,12 @@
 // Mocks — simulan las llamadas a APIs externas
 // =============================================================================
 
+import type { Output } from '@/style-selector/api/models'
 import type { InitPhase1Data, InitPhase2Data } from './types'
 
 // ── Fase 1 ────────────────────────────────────────────────────────────────────
 // Datos mínimos para mostrar las gafas: modelo, colección, precio.
-export const fetchPhase1Mock = (): Promise<InitPhase1Data> =>
+export const fetchPhase1Mock = (): Promise<InitPhase1Data | Output> =>
   new Promise(resolve =>
     setTimeout(
       () =>

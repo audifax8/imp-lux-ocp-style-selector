@@ -12,10 +12,9 @@ styleEl.dataset.id = 'shared-skeleton'
 styleEl.textContent = skeletonStyles
 document.head.appendChild(styleEl)
 
-//TODO
+//TODO Refactor by brand
 import rbnStyles from './white-label/rbn.scss?inline'
 if (activeBrand === 'rbn') {
-  console.log('here');
   const rbnStyleEl = document.createElement('style')
   rbnStyleEl.dataset.id = 'rbn-skeleton'
   rbnStyleEl.textContent = rbnStyles
