@@ -9,17 +9,22 @@
 $logo-black: './svg/wl/black/logo.svg';
 $logo-light: './svg/wl/light/logo.svg';
 $menu-light: './svg/wl/light/menu.svg';
-$menu-black: './svg/wl/light/menu.svg';
+$menu-black: './svg/wl/black/menu.svg';
+$arrow-left-light: './svg/wl/light/arrow-left.svg';
+$arrow-left-dark: './svg/wl/black/arrow-left.svg';
 
 @mixin dark-vars {
   //TODO
   --ss-logo: url('#{$logo-light}');
   --ss-menu-icon: url('#{$menu-light}');
+  --arrow-left: url('#{$arrow-left-light}');
 }
 
 :root {
   --ss-logo: url('#{$logo-black}');
   --ss-menu-icon: url('#{$menu-black}');
+  --arrow-left: url('#{$arrow-left-dark}');
+
   --radius-default: 0.333rem;  /* 6px */
   --radius-fixed: 1.111rem;    /* 20px */
   --stroke-thin: 1px;
