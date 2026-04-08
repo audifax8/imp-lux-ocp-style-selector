@@ -1,7 +1,7 @@
 // Brand: rbn
 
 // Brand: rbn
-$menu-black: './svg/rbn/black/menu.svg';
+$menu-dark: './svg/rbn/dark/menu.svg';
 $menu-light: './svg/rbn/light/menu.svg';
 
 @mixin dark-vars {
@@ -49,7 +49,7 @@ $menu-light: './svg/rbn/light/menu.svg';
   --typography-body-sm-line-height: 1.313rem; /* 21px */
   --typography-body-sm-letter-spacing: 0;
 
-  --ss-menu-icon: url('#{$menu-black}');
+  --ss-menu-icon: url('#{$menu-dark}');
   --accent: #e63946;
   --accent-bg: rgba(230, 57, 70, 0.1);
   --accent-border: rgba(230, 57, 70, 0.45);
@@ -68,7 +68,7 @@ $menu-light: './svg/rbn/light/menu.svg';
 
 // Logo rbn: 112×49px (aspect ratio ~2.3:1, muy diferente al wl 141×16px)
 // Se escala al 50% del tamaño natural para encajar en el header.
-$logo-black: './svg/rbn/black/logo.svg';
+$logo-dark: './svg/rbn/dark/logo.svg';
 $logo-light: './svg/rbn/light/logo.svg';
 
 .style-selector-rbn {
@@ -78,7 +78,7 @@ $logo-light: './svg/rbn/light/logo.svg';
     aspect-ratio: 73 / 32;
 
     &__icon {
-      --ss-logo: url('#{$logo-black}');
+      --ss-logo: url('#{$logo-dark}');
       height: inherit;
       width: inherit;
     }

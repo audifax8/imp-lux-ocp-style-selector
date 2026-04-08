@@ -1,5 +1,5 @@
 // Brand: rbn
-$loader-black: './svg/rbn/black/loader.svg';
+$loader-dark: './svg/rbn/dark/loader.svg';
 $loader-light: './svg/rbn/light/loader.svg';
 
 @mixin dark-vars {
@@ -7,7 +7,7 @@ $loader-light: './svg/rbn/light/loader.svg';
 }
 
 :root {
-  --ss-loader: url('#{$loader-black}');
+  --ss-loader: url('#{$loader-dark}');
 }
 
 @media (prefers-color-scheme: dark) {

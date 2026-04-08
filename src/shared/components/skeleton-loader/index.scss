@@ -1,6 +1,6 @@
 // Brand: rbn
 
-$loader-wl-black: './svg/wl/black/loader.svg';
+$loader-wl-dark: './svg/wl/dark/loader.svg';
 $loader-wl-light: './svg/wl/light/loader.svg';
 
 
@@ -20,7 +20,7 @@ $loader-wl-light: './svg/wl/light/loader.svg';
 }
 
 :root {
-  --ss-loader: url('#{$loader-wl-black}');
+  --ss-loader: url('#{$loader-wl-dark}');
   --radius-default: 6px;
   --color-stepper-light-active-border: #FFF;
   --spacing-2xs: 4px;

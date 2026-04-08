@@ -217,8 +217,8 @@ SCSS vars de ruta por brand:
 
 | Brand | SCSS vars | Tamaño natural | Contenedor |
 |---|---|---|---|
-| wl (default) | `$logo-wl-black/light` | 141×16px | heredado de `.header-logo` (140.4×15.251px) |
-| rbn | `$logo-rbn-black/light` | 112×49px | 56×24.5px (50% natural, aspect-ratio: 112/49) |
+| wl (default) | `$logo-wl-dark/light` | 141×16px | heredado de `.header-logo` (140.4×15.251px) |
+| rbn | `$logo-rbn-dark/light` | 112×49px | 56×24.5px (50% natural, aspect-ratio: 112/49) |
 
 - `black` = logo oscuro → usado en **light mode** (fondo claro)
 - `light` = logo claro → usado en **dark mode** (fondo oscuro)
@@ -452,9 +452,9 @@ public/
                                      Desktop Biz xs / Desktop Biz / Desktop
     dark/                          — mismas 6 variantes para dark mode
   svg/
-    wl/black/logo.svg              — logo EssilorLuxottica oscuro (141×16px) — light mode, brands no-rbn
+    wl/dark/logo.svg              — logo EssilorLuxottica oscuro (141×16px) — light mode, brands no-rbn
     wl/light/logo.svg              — logo EssilorLuxottica claro (141×16px) — dark mode, brands no-rbn
-    rbn/black/logo.svg             — logo Ray-Ban oscuro (112×49px) — light mode, brand rbn
+    rbn/dark/logo.svg             — logo Ray-Ban oscuro (112×49px) — light mode, brand rbn
     rbn/light/logo.svg             — logo Ray-Ban claro (112×49px) — dark mode, brand rbn
 scripts/
   bundle-size.mjs                  — snapshot de tamaños por modo, appends a bundle-sizes.log

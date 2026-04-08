@@ -6,12 +6,12 @@
 // black = logo oscuro para fondos claros (light mode)
 // light = logo claro para fondos oscuros (dark mode)
 // =============================================================================
-$logo-black: './svg/wl/black/logo.svg';
+$logo-dark: './svg/wl/dark/logo.svg';
 $logo-light: './svg/wl/light/logo.svg';
 $menu-light: './svg/wl/light/menu.svg';
-$menu-black: './svg/wl/black/menu.svg';
+$menu-dark: './svg/wl/dark/menu.svg';
 $arrow-left-light: './svg/wl/light/arrow-left.svg';
-$arrow-left-dark: './svg/wl/black/arrow-left.svg';
+$arrow-left-dark: './svg/wl/dark/arrow-left.svg';
 
 @mixin dark-vars {
   //TODO
@@ -21,8 +21,8 @@ $arrow-left-dark: './svg/wl/black/arrow-left.svg';
 }
 
 :root {
-  --ss-logo: url('#{$logo-black}');
-  --ss-menu-icon: url('#{$menu-black}');
+  --ss-logo: url('#{$logo-dark}');
+  --ss-menu-icon: url('#{$menu-dark}');
   --arrow-left: url('#{$arrow-left-dark}');
 
   --radius-default: 0.333rem;  /* 6px */
