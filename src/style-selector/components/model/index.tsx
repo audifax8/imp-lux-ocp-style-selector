@@ -16,7 +16,6 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   onClick,
 }) => {
   const isClickable = typeof onClick === 'function';
-
   const Component = isClickable ? 'button' : 'div';
 
   return (

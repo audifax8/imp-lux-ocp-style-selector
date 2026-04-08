@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import type { Step } from '@/style-selector/api/models';
 
 import { SkeletonVariant } from '@/declarations/enums';
 
 import { Skeleton } from '@/shared/components/skeleton';
-import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
-import DarkModeSwitch from '@/shared/components/dark-mode-switch';
+//import { getCurrentTheme, type Theme } from '@/shared/theme/darkMode'
+//import DarkModeSwitch from '@/shared/components/dark-mode-switch';
+
+/*<DarkModeSwitch
+          theme={theme}
+          onToggle={() => setTheme(prev => toggleTheme(prev))}
+        />*/
 
 import './index.scss';
 interface HeaderProps {
@@ -25,9 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isClickable = typeof onClick === 'function';
   const Component = isClickable ? 'button' : 'div';
 
-  const [theme, setTheme] = useState<Theme>(getCurrentTheme)
-  //                      <Skeleton className="header-logo__icon yr-skeleton" variant={SkeletonVariant.text} />
-
+  //const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   
   return (
     <header className="header">
@@ -65,10 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
         </ul>
       </nav>
       <div className="header-switch">
-        <DarkModeSwitch
-          theme={theme}
-          onToggle={() => setTheme(prev => toggleTheme(prev))}
-        />
+        {/*  */}
       </div>
       <div className="header-menu" aria-label="Menu" role="button" tabIndex={0}>
         {!skeleton ? 

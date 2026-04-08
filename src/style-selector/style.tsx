@@ -59,6 +59,10 @@ const Style = () => {
     setFilteredModels(models?.models);
   };
 
+  const onModelClick = (model: Model) => {
+    window.open(`https://cid-impl.fluidconfigure.com/lux-ocp/staging/index.html?&vendorId=${model.vendorId}`, '_blank');
+  };
+
   return (
     <div className={`style-selector style-selector-${activeBrand}`}>
       <Header steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
@@ -82,8 +86,7 @@ const Style = () => {
               title={model.label}
               imageSrc={model.thumbnailUrl}
               imageAlt={model.label}
-              //TODO
-              //onClick={(e: React.MouseEvent) => onClick(e, model.label)}
+              onClick={() => onModelClick(model)}
             />
         )}
       </main>)}
