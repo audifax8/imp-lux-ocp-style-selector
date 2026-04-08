@@ -1,0 +1,10 @@
+// _typography.scss
+
+@mixin body-xs {
+  font-family: var(--typography-body-xs-family);
+  font-size: var(--typography-body-xs-size);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--typography-body-xs-line-height);
+  letter-spacing: var(--typography-body-xs-letter-spacing);
+}

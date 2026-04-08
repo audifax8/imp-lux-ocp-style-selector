@@ -45,6 +45,10 @@ export const BRAND_STORE_IDS: Record<Brand, string> = {
   cdm:  '10151', // TODO
 }
 
+//examples
+//https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=it
+//https://www.ray-ban.com/wcs/resources/store/26152/remix/models?language=it
+
 // Actualiza los valores cuando se conozcan los IDs reales de cada brand.
 export const BRAND_URLS: Record<Brand, string> = {
   rbn:  'https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=',

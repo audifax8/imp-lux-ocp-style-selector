@@ -24,9 +24,9 @@ export const SubNav: React.FC<SubNavProps> = ({
   const Component = isClickable ? 'button' : 'div';
 
   return (
-    <div className="demo-subnav">
-      <div className='demo-subnav__back'>
-        {skeleton && <Skeleton className='demo-subnav__back' variant={SkeletonVariant.rectangular} />}
+    <div className="subnav">
+      <div className='subnav__back'>
+        {skeleton && <Skeleton className='subnav__back' variant={SkeletonVariant.rectangular} />}
         {!skeleton && onClick && selectedStep?.id ?
           <Component
             className='header-nav-items'
@@ -40,16 +40,19 @@ export const SubNav: React.FC<SubNavProps> = ({
           </Component> : <></>
         }
       </div>
-      <div className="demo-subnav__center">
-        <div className="demo-subnav__title">
-          {!skeleton ? <span className="demo-subnav__title">{selectedStep?.name}</span> : <Skeleton className='demo-subnav__title' variant={SkeletonVariant.text} />}
+      <div className="subnav__center">
+        <div className="subnav__title">
+          {!skeleton ?
+            <span className="subnav__title">{selectedStep?.name}</span> :
+            <Skeleton className='subnav__title' variant={SkeletonVariant.text} />
+          }
         </div>
-        <div className="demo-subnav__count">
-          {!skeleton ? <span className="demo-subnav__count">{((selectedStep?.id || 0) + 1 ) + '/' + (steps?.length)}</span> : <Skeleton className='demo-subnav__count' variant={SkeletonVariant.text} />}
+        <div className="subnav__count">
+          {!skeleton ? <span className="subnav__count">{((selectedStep?.id || 0) + 1 ) + '/' + (steps?.length)}</span> : <Skeleton className='subnav__count' variant={SkeletonVariant.text} />}
         </div>
       </div>
-      <div className='demo-subnav__close'>
-        {skeleton && <Skeleton className='demo-subnav__close' variant={SkeletonVariant.rectangular} />}
+      <div className='subnav__close'>
+        {skeleton && <Skeleton className='subnav__close' variant={SkeletonVariant.rectangular} />}
         {!skeleton && onClick && selectedStep?.id ?
           <Component
             className='header-nav-items'
@@ -60,7 +63,8 @@ export const SubNav: React.FC<SubNavProps> = ({
             })}
           >
             <Logo className={'yr-button__icon'} url={getSVGURL('CloseBlack', 'wl')} height={16} width={16} />
-          </Component> : <></>
+          </Component> :
+          <></>
         }
       </div>
     </div>
