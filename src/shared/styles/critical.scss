@@ -41,17 +41,22 @@ $arrow-left-dark: './svg/wl/black/arrow-left.svg';
   --spacings-base: 0.889rem; /* 16px */
 
   --color-generic-neutral-ultra-light-border: #FFF;
+  --color-generic-neutral-ultra-light-background: #FFF;
   --color-stepper-brand-default-title: #767676;
   --color-stepper-brand-checked-title: #0354A6;
   --color-stepper-brand-checked-border: #0354A6;
+  --color-generic-focus-border: #0354A6;
   --color-stepper-brand-active-title: #0354A6;
   --color-stepper-brand-active-border: #0354A6;
   --color-overlay-light-alpha-0: rgba(255, 255, 255, 0.00);
   --color-overlay-light-alpha-80: rgba(255, 255, 255, 0.80);
+  --color-category-border: rgba(255, 255, 255, 0.75);
   --color-generic-neutral-dark-background: #818181;
   --color-generic-focus-border: #0354A6;
   --color-generic-neutral-ultra-dark-text: #000;
+  --color-generic-neutral-ultra-dark-text: #000;
   --color-stepper-brand-default-border: #D8D8D8;
+  --color-generic-neutral-medium-border: #D8D8D8;
   --light-gray: lightgray;
 }
 

@@ -43,6 +43,12 @@ $menu-light: './svg/rbn/light/menu.svg';
   --typography-body-2xl-line-height: 1.875rem; /* 30px  */
   --typography-body-2xl-letter-spacing: 0;
 
+  /* Texts/Text sm */
+  --typography-body-sm-family: 'Inter';
+  --typography-body-sm-size: 0.875rem; /* 14px */
+  --typography-body-sm-line-height: 1.313rem; /* 21px */
+  --typography-body-sm-letter-spacing: 0;
+
   --ss-menu-icon: url('#{$menu-black}');
   --accent: #e63946;
   --accent-bg: rgba(230, 57, 70, 0.1);

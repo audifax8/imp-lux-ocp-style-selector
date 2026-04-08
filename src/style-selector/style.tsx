@@ -60,6 +60,7 @@ const Style = () => {
   };
 
   const onModelClick = (model: Model) => {
+    //TODO
     window.open(`https://cid-impl.fluidconfigure.com/lux-ocp/staging/index.html?&vendorId=${model.vendorId}`, '_blank');
   };
 
@@ -67,29 +68,46 @@ const Style = () => {
     <div className={`style-selector style-selector-${activeBrand}`}>
       <Header steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       <SubNav steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
-      {!selectedCategory && (<main className='style-selector__elements'>
-        {phase1Data?.types?.map((type) =>
-          <Card
-            key={type}
-            title={type}
-            imageSrc={getSVGURLByType(type, activeBrand, 'img')}
-            imageAlt={type}
-            onClick={() => onClick(type)}
-          />)}
-      </main>)}
-      {selectedCategory && (<main className='style-selector__models'>
-        <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
-        {filteredModels?.map(
-          (model) => 
-            <ModelCard
-              key={model.modelCode}
-              title={model.label}
-              imageSrc={model.thumbnailUrl}
-              imageAlt={model.label}
-              onClick={() => onModelClick(model)}
+      {/* types render */}
+      {!selectedCategory && (
+        <main className='style-selector__elements'>
+          {phase1Data?.types?.map((type) =>
+            <Card
+              key={type}
+              title={type}
+              imageSrc={getSVGURLByType(type, activeBrand, 'img')}
+              imageAlt={type}
+              onClick={() => onClick(type)}
             />
-        )}
+      )}
       </main>)}
+      {selectedCategory && (
+        <main className='style-selector__models'>
+          <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
+          <div className="style-selector__models-list">
+            <ul className="style-selector__models-list"
+              role="list"
+              aria-label="">
+                {filteredModels?.map(
+                  (model, i) =>
+                    (<li
+                      role="none"
+                      className={`style-selector__models-list-item`}
+                      key={i}>
+                        <ModelCard
+                          key={model.modelCode}
+                          title={model.label}
+                          imageSrc={model.thumbnailUrl}
+                          imageAlt={model.label}
+                          onClick={() => onModelClick(model)}
+                        />
+                    </li>
+                  )
+                )}
+            </ul>
+          </div>
+        </main>
+      )}
     </div>
   )
 }

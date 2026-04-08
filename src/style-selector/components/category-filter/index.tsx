@@ -26,9 +26,9 @@ export const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
             (category, i) =>
               (<li
                 role="none"
-                className={`category-filter-nav-item ${category.category === selectedCategory?.category ? 'category-filter-nav-item__selected' : ''}`}
+                className="category-filter-nav-item"
                 key={i}>
-                  <Button label={category.category} onClick={() => onClick?.(category)}/>
+                  <Button selected={category.category === selectedCategory?.category} label={category.category} onClick={() => onClick?.(category)}/>
               </li>))}
       </ul>
     </div>
