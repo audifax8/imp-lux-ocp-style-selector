@@ -128,7 +128,7 @@ All mode-specific CSS (including white-label CSS) is `?inline` — injected by t
 **Style-selector bootstrap** (`style-selector/bootstrap/index.tsx`):
 - Injects `style-selector/index.scss?inline` (container + typography + skeleton + style-selector styles)
 - Injects active white-label CSS via `white-label/loader-wizard`
-- `createRoot` + `<AppStyleSelector />` (DataProvider + StyleSelector)
+- `createRoot` + `<AppStyleSelector />` (StyleSelector — DataProvider removed, data fetched via StyleSelectorInitStrategy)
 
 **Configurator bootstrap** (`configurator/bootstrap/index.tsx`):
 - Injects `configurator/configurator.scss?inline` (container + typography + skeleton + configurator styles)
@@ -164,6 +164,8 @@ Loaders (`src/white-label/`):
 ```
 imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (skeleton vars, shimmer)
                                                 loaded via <link>, always — no mode-specific content
+                                                NOTA: critical.scss ya NO está en el bundle CSS —
+                                                sus vars se inyectan como parte de cada mode ?inline
 
 style-selector/bootstrap/index.tsx           ← style-selector/index.scss?inline + white-label/loader-wizard
                                                 index.scss incluye breakpoints de background + var --ss-bg
@@ -171,6 +173,7 @@ configurator/bootstrap/index.tsx             ← configurator/configurator.scss?
 products-index/bootstrap/index.tsx           ← products-index/index.scss?inline + white-label/loader-index
 configurator/model/Model.tsx                 ← model/model.scss?inline (skeleton de gafas)
 configurator/model/ModelContent.tsx          ← model/model-content.scss?inline (gafas reales, SOLO tras resolver skeleton)
+shared/components/skeleton-loader/index.tsx  ← skeleton-loader/index.scss?inline + white-label/rbn.scss?inline (solo ?skeletonLoader=true)
 ```
 
 ## API config (no .env — runtime only)
@@ -203,11 +206,11 @@ Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 Single-page component. Internal state manages type selection vs. model grid view.
 
 - `StyleSelector.tsx` — wrapper; monta `StyleSelectorComponent` (lazy via deferred promise) o `StyleSelectorSkeleton` (si `?skeleton` param activo); soporta `?skeletonLoader=true` (shared skeleton alternativo) y `?skeleton=true` (muestra skeleton directamente sin cargar el componente real)
-- `style.tsx` — componente principal (`Style`); gestiona estado: tipo seleccionado, categoría, step; renderiza `Header` + `SubNav` + cards de tipo (step 1) o `CategoryFilterComponent` + grid de modelos (step 2); usa `useData()` del context
+- `style.tsx` — componente principal (`Style`); gestiona estado: tipo seleccionado, categoría, step; renderiza `Header` + `SubNav` + cards de tipo (step 0) o `CategoryFilterComponent` + grid de modelos (step 1); usa `StyleSelectorInitStrategy` + `useInitStyleSelectorStrategy` para obtener datos (`phase1Data.types`, `phase1Data.categories`); ya NO usa `useData()` del context
 - `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
-- `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve importando `style.tsx` cuando el `DataProvider` lo señaliza
-- `context/context.ts` — `DataContext` con `types` y `categories`
-- `context/data.tsx` — `DataProvider`; fetches models al montar, mapea con `mapData()`, completa el deferred promise y expone datos via context
+- `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve importando `style.tsx`
+- `context/context.ts` — `DataContext` con `types` y `categories` (legacy; ya no usado por `style.tsx`)
+- `context/data.tsx` — `DataProvider` (legacy; ya no usado)
 - `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`)
 
 ### Logos (solo modo startWithStyleSelector)
@@ -226,9 +229,9 @@ SCSS vars de ruta por brand:
 Dark mode: mismo patrón doble (`prefers-color-scheme` + `[data-theme='dark']`) en ambos archivos.
 
 Dónde vive cada override:
-- `style-selector/index.scss` — define `$logo-wl-*` + sets `--ss-logo` para todos los brands por defecto
-- `white-label/rbn/wizard.scss` — define `$logo-rbn-*` + overrides `--ss-logo` + ajusta dimensiones de `.header-logo`
-- Otros brands usan el logo wl sin override adicional
+- `shared/styles/critical.scss` — define todas las variables de iconos e iconos: `--ss-logo`, `--arrow-left`, `--menu`, `--ss-loader` para todos los brands por defecto (wl); dark/light via doble selector
+- `white-label/rbn/wizard.scss` — overrides `--ss-logo`, `--menu`, `--ss-loader` para rbn + ajusta dimensiones de `.header-logo` (73×32px, aspect-ratio: 112/49)
+- Otros brands usan iconos wl sin override adicional
 
 ### Background images (solo modo startWithStyleSelector)
 Imágenes en `public/imgs/background/{light|dark}/`. Aplicadas a `.style-selector` y `.style-selector-skeleton` para que el fondo sea consistente tanto en estado cargado como durante el skeleton.
@@ -256,18 +259,18 @@ Archivos disponibles:
 - `public/imgs/background/dark/` — mismas 6 variantes en dark
 
 ### Componentes (`style-selector/components/`)
-- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step: Step) => void`; logo via CSS background-image (`.header-logo__icon`)
-- `sub-nav/` — `SubNav`; acepta `steps?`, `selectedStep?: Step`, `onClick?: (step?: Step) => void`; back/close buttons solo visibles cuando `onClick` y `selectedStep?.id` son truthy
-- `category-filter/` — `CategoryFilterComponent`; `onClick?: (category: Category) => void`
-- `category-button/` — `Button`; `onClick?: (e: React.MouseEvent) => void` (ahora opcional)
-- `card/` — `Card`; tarjeta de tipo de gafa (step 1)
-- `model/` — `ModelCard`; tarjeta de modelo (step 2)
+- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step?: Step) => void`; logo via CSS `--ss-logo`, menu icon via `--menu` CSS var; skeleton via `Skeleton` component
+- `sub-nav/` — `SubNav`; acepta `steps?`, `selectedStep?: Step`, `onClick?: (step?: Step) => void`; visible solo en mobile; muestra back arrow (izquierda) + step title + progress counter e.g. "1/2" (centro); solo visible cuando `onClick` y `selectedStep?.id` son truthy; arrow via `--arrow-left` CSS var
+- `category-filter/` — `CategoryFilterComponent`; acepta `subCategories?: Category[]`, `selectedCategory?: Category`, `onClick?: (category: Category) => void`
+- `category-button/` — `Button`; acepta `label?`, `skeleton?`, `selected?`, `onClick?: (e: React.MouseEvent) => void`; selected state via `.yr-button__selected`
+- `card/` — `Card`; tarjeta de tipo de gafa (step 0); se renderiza como `<button>` o `<div>` según si `onClick` está presente
+- `model/` — `ModelCard`; tarjeta de modelo (step 1); imagen con `loading='eager'`
 - `logo/` — `Logo`; renderiza SVG via URL
 - `img/` — componente de imagen
 
 ### Steps internos (gestionados por state en `style.tsx`)
-- **Step 0 (Type)**: grid de tipos de gafa usando `types` del context; click llama `onClick(type)` → filtra categorías → avanza a step 1
-- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; back desde `Header`/`SubNav` vuelve al step 0
+- **Step 0 (Type)**: grid de tipos de gafa usando `phase1Data?.types`; click llama `onClick(type)` → filtra categorías de `phase1Data?.categories` → avanza a step 1
+- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; back desde `Header`/`SubNav` vuelve al step 0; click en modelo abre `https://cid-impl.fluidconfigure.com/lux-ocp/staging/index.html?&vendorId={model.vendorId}` en nueva pestaña
 
 ## Products-index
 - `Index.tsx` — main chunk; theme toggle + lazy `IndexContent`
@@ -284,10 +287,13 @@ Archivos disponibles:
 - `model/model.scss` — ?inline CSS del skeleton (keyframe + shapes shimmer)
 - `model/model-content.scss` — ?inline CSS del contenido (gafas, info modelo, badge, recomendaciones, animación `mc-fade-in`)
 - `model/useInitStrategy.ts` — hook que orquesta la cadena Fase 1 → Fase 2 con flag `cancelled` para cleanup en desmontaje
+- `model/useInitStyleSelectorStrategy.ts` — hook que orquesta la inicialización del modo style-selector via `StyleSelectorInitStrategy`
 - `model/strategy/types.ts` — interfaces `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data`
 - `model/strategy/mocks.ts` — `fetchPhase1Mock` (~900ms, datos de modelo) + `fetchPhase2Mock` (~600ms, recomendaciones + sessionId)
+- `model/strategy/core.ts` — lógica de core compartida entre strategies
 - `model/strategy/configurator-init.ts` — chunk preloadeable (nombre fijo); re-exporta `getInitQueryParams`, `RTRSkeleton`, `Caretaker`, `Originator`, `LoadingState`; consolida las deps de init en un único dynamic import
-- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy`; executePhase1: `import('./configurator-init')` (un solo import, resuelve de caché), Logger+Performance desde params, LoadingState+Originator+Caretaker, RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
+- `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy` para el configurator; executePhase1: `import('./configurator-init')` (un solo import, resuelve de caché), Logger+Performance desde params, LoadingState+Originator+Caretaker, RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
+- `model/strategy/StyleSelectorInitStrategy.ts` — implementación concreta de `IInitStrategy` para style-selector; fetchea modelos y mapea types/categories a `phase1Data`
 - `model/strategy/base.ts` — `BaseStrategy` abstract class; provee `runMicrotask/runIdle/runAnimation` via `@/libs/helpers.schedule`
 - `model/strategy/rtr-skeleton.ts` — `RTRSkeleton extends BaseStrategy`; descarga script (`downloadScript`), carga assets en idle (`loadRTRAssets`), inicia viewer en `requestAnimationFrame` (`initRTR`); errores propagan via `runAnimation`
 
@@ -330,9 +336,14 @@ Archivos disponibles:
 - `mode/detect.ts` — mode singleton (`startWithStyleSelector | configurator | index`)
 - `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
 - `styles/theme.scss` — CSS bundle (skeleton vars light/dark, shimmer animation). Dark mode: `@media prefers-color-scheme` + `[data-theme='dark']` fuera del media query para que el toggle JS funcione independientemente del sistema
-- `styles/critical.scss` — design tokens compartidos: tipografía (`--typography-*`), spacing (`--spacing-*`), radii (`--radius-*`), strokes (`--stroke-*` en px), colores semánticos; todos los tamaños en `rem` (base 18px); strokes en `px`
+- `styles/theme.scss` — CSS bundle (skeleton vars, shimmer animation)
+- `styles/critical.scss` — design tokens compartidos: tipografía (`--typography-*`), spacing (`--spacing-*`), radii (`--radius-*`), strokes (`--stroke-*` en px), colores semánticos, variables de iconos/logos (`--ss-logo`, `--arrow-left`, `--menu`, `--ss-loader`, etc.) por brand y tema; todos los tamaños en `rem` (base 18px); strokes en `px`
+- `styles/_typography.scss` — partial de tipografía; importado por `critical.scss`
+- `styles/_variables.scss` — partial de variables CSS; importado por `critical.scss`
+- `assets/index.ts` — `getSVGURL(name, brand)` + `getSVGURLByType(name, brand, type)` — URLs de assets remotos en CDN Fluid
 - `components/DarkModeSwitch.tsx` — toggle component; usado en todos los modos
-- `components/SharedSkeleton.tsx` — skeleton alternativo compartido entre configurator y style-selector; activado con `?skeletonLoader=true`; chunk lazy propio con preload inmediato a nivel de módulo cuando el param está activo (`sharedSkeletonImport = import(...)` antes de que React monte); esto garantiza que `lazy()` resuelve síncronamente y `<SharedSkeleton />` puede usarse sin `<Suspense>` wrapper propio; cuando el param no está presente el chunk no se descarga y los skeletons originales se usan sin coste de red
+- `components/skeleton/` — `Skeleton` component; shimmer placeholder con `variant?: SkeletonVariant`; usado por Card, SubNav, Header, Button
+- `components/skeleton-loader/` — full-screen loading skeleton con brand logo + animated progress bar; activado con `?skeletonLoader=true`; inyecta `index.scss?inline` + brand override CSS; `--ss-loader` CSS var por tema; rbn override en `white-label/rbn.scss`
 
 ## WCAG AAA
 - Root font: `112.5%` (respects browser font-size preference)
@@ -350,10 +361,13 @@ src/
     mode/detect.ts                 — mode singleton (startWithStyleSelector | configurator | index)
     theme/darkMode.ts              — theme detection + toggle
     styles/theme.scss              — CSS bundle (skeleton vars, shimmer); dark mode via media query + [data-theme='dark']
-    styles/critical.scss           — design tokens: tipografía, spacing, radii en rem; strokes en px; colores semánticos
+    styles/critical.scss           — design tokens: tipografía, spacing, radii en rem; strokes en px; colores semánticos; icon/logo vars por brand y tema
+    styles/_typography.scss        — partial de tipografía
+    styles/_variables.scss         — partial de variables CSS
+    assets/index.ts                — getSVGURL + getSVGURLByType (CDN Fluid asset URLs)
     components/DarkModeSwitch.tsx  — shared dark mode toggle component
-    components/SharedSkeleton.tsx  — shared skeleton (lazy chunk); active via ?skeleton=true
-    components/SharedSkeleton.scss — ?inline CSS for SharedSkeleton
+    components/skeleton/           — Skeleton shimmer component (SkeletonVariant)
+    components/skeleton-loader/    — full-screen loading skeleton (?skeletonLoader=true); index.tsx + index.scss?inline + white-label/rbn.scss
   white-label/
     detect.ts                      — brand singleton
     types.ts                       — Brand type + BRANDS const
@@ -377,17 +391,17 @@ src/
     lazy-imports/
       index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise()
     types.ts                       — GlassType, etc.
-    style.tsx                      — componente principal Style; gestiona step state (type → model); usa useData()
+    style.tsx                      — componente principal Style; gestiona step state (type → model); usa StyleSelectorInitStrategy + useInitStyleSelectorStrategy
     StyleSelector.tsx              — wrapper; lazy StyleSelectorComponent o StyleSelectorSkeleton; soporta ?skeleton / ?skeletonLoader
     StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true)
     index.scss                     — ?inline CSS (layout, breakpoints $bp-tablet-p/l/desktop-xs/biz/full, var --ss-bg para background images por resolución y tema)
     components/
-      header/                      — Header; steps nav + logo CSS; selectedStep: Step; onClick?: (step) => void
-      sub-nav/                     — SubNav; breadcrumb/back nav; todos los props opcionales
-      category-filter/             — CategoryFilterComponent; onClick?: (category) => void
-      category-button/             — Button; onClick opcional
-      card/                        — Card; tarjeta de tipo de gafa (step 0)
-      model/                       — ModelCard; tarjeta de modelo (step 1)
+      header/                      — Header; steps nav + logo CSS (--ss-logo) + menu icon (--menu); onClick?: (step?) => void
+      sub-nav/                     — SubNav; mobile only; back arrow (--arrow-left) + step title + progress "1/2"; todos los props opcionales
+      category-filter/             — CategoryFilterComponent; subCategories?, selectedCategory?, onClick?: (category) => void
+      category-button/             — Button; label?, skeleton?, selected?, onClick opcional
+      card/                        — Card; tarjeta de tipo de gafa (step 0); button o div según onClick
+      model/                       — ModelCard; tarjeta de modelo (step 1); loading='eager'
       logo/                        — Logo SVG via URL
       img/                         — componente de imagen
   products-index/
@@ -416,11 +430,14 @@ src/
       model.scss                   — ?inline CSS del skeleton (keyframe + shapes)
       model-content.scss           — ?inline CSS del contenido (gafas, info, badge, recomendaciones, mc-fade-in)
       useInitStrategy.ts           — hook; Fase 1 → Fase 2 chain; cancelled flag para cleanup
+      useInitStyleSelectorStrategy.ts — hook; orquesta StyleSelectorInitStrategy para el modo style-selector
       strategy/
         types.ts                   — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
         mocks.ts                   — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
+        core.ts                    — lógica de core compartida entre strategies
         configurator-init.ts       — chunk preloadeable (nombre fijo); re-exporta deps de executePhase1 (9.1 KB / 3.4 KB gz)
-        ConfiguratorInitStrategy.ts — executePhase1: import('./configurator-init') (un solo import de caché), RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
+        ConfiguratorInitStrategy.ts — implementación para configurator; executePhase1: import('./configurator-init'), RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
+        StyleSelectorInitStrategy.ts — implementación para style-selector; fetchea modelos y mapea types/categories a phase1Data
         base.ts                    — BaseStrategy abstract; runMicrotask/runIdle/runAnimation
         rtr-skeleton.ts            — RTRSkeleton extends BaseStrategy; downloadScript + loadRTRAssets (idle) + initRTR (rAF)
   libs/helpers.ts                  — schedule, runAsync, runIdle, getInitQueryParams
@@ -453,9 +470,22 @@ public/
     dark/                          — mismas 6 variantes para dark mode
   svg/
     wl/dark/logo.svg              — logo EssilorLuxottica oscuro (141×16px) — light mode, brands no-rbn
-    wl/light/logo.svg              — logo EssilorLuxottica claro (141×16px) — dark mode, brands no-rbn
+    wl/dark/arrow-left.svg        — flecha izquierda oscura — light mode (SubNav back button)
+    wl/dark/category.svg          — icono categoría oscuro — light mode
+    wl/dark/loader.svg            — icono loader oscuro — light mode (skeleton-loader)
+    wl/dark/menu.svg              — icono menu oscuro — light mode (Header)
+    wl/light/logo.svg             — logo EssilorLuxottica claro (141×16px) — dark mode, brands no-rbn
+    wl/light/arrow-left.svg       — flecha izquierda clara — dark mode
+    wl/light/category.svg         — icono categoría claro — dark mode
+    wl/light/loader.svg           — icono loader claro — dark mode
+    wl/light/menu.svg             — icono menu claro — dark mode
     rbn/dark/logo.svg             — logo Ray-Ban oscuro (112×49px) — light mode, brand rbn
-    rbn/light/logo.svg             — logo Ray-Ban claro (112×49px) — dark mode, brand rbn
+    rbn/dark/loader.svg           — icono loader oscuro rbn — light mode
+    rbn/dark/menu.svg             — icono menu oscuro rbn — light mode
+    rbn/light/logo.svg            — logo Ray-Ban claro (112×49px) — dark mode, brand rbn
+    rbn/light/arrow-left.svg      — flecha izquierda clara rbn — dark mode
+    rbn/light/loader.svg          — icono loader claro rbn — dark mode
+    rbn/light/menu.svg            — icono menu claro rbn — dark mode
 scripts/
   bundle-size.mjs                  — snapshot de tamaños por modo, appends a bundle-sizes.log
   audit.mjs                        — post-build auditor: presencia de chunks, umbrales de tamaño,

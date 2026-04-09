@@ -4,10 +4,6 @@ import { SkeletonVariant } from '@/declarations/enums';
 
 import './index.scss';
 
-//impl example
-//<Card title="Test" skeleton={true} />
-//<Card title="Test" skeleton={false} />
-
 interface CardProps {
   title?: string;
   imageSrc?: string;
