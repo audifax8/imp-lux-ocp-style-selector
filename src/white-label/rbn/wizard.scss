@@ -89,19 +89,6 @@ $logo-light: './svg/rbn/light/logo.svg';
   }
 }
 
-/*
-.style-selector {
-  &-skeleton {
-    color: red;
-    background-color: red;
-    & .header-nav-items {
-      & .menuitem {
-        color: transparent;
-      }
-    }
-  }
-}
-*/
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .header-logo__icon {
     --ss-logo: url('#{$logo-light}');

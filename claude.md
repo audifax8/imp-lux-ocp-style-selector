@@ -211,7 +211,7 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve importando `style.tsx`
 - `context/context.ts` — `DataContext` con `types` y `categories` (legacy; ya no usado por `style.tsx`)
 - `context/data.tsx` — `DataProvider` (legacy; ya no usado)
-- `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`)
+- `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto` (sin flex:1, altura de contenido); `__models` es `flex:1; overflow:hidden; flex-column` (category-filter estático); `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem` (solo la lista hace scroll; padding horizontal aquí, no en `__models`)
 
 ### Logos (solo modo startWithStyleSelector)
 Variable CSS `--ss-logo` — declarada en `.header-logo__icon` vía `style-selector/index.scss` (?inline, solo este modo). El componente `Header` usa `background-image: var(--ss-logo)` en `.header-logo__icon`; cuando `skeleton={true}` renderiza el skeleton en su lugar.
@@ -393,7 +393,7 @@ src/
     style.tsx                      — componente principal Style; gestiona step state (type → model); usa StyleSelectorInitStrategy + useInitStyleSelectorStrategy
     StyleSelector.tsx              — wrapper; lazy StyleSelectorComponent o StyleSelectorSkeleton; soporta ?skeleton / ?skeletonLoader
     StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true)
-    index.scss                     — ?inline CSS (layout, breakpoints $bp-tablet-p/l/desktop-xs/biz/full, var --ss-bg para background images por resolución y tema)
+    index.scss                     — ?inline CSS (layout, breakpoints, var --ss-bg para background images; scroll: style-selector=height:100vh+flex+overflow:hidden, __elements=overflow-y:auto, __models=flex:1+overflow:hidden, __models-list=flex:1+overflow-y:auto+padding:0 16rem)
     components/
       header/                      — Header; steps nav + logo CSS (--ss-logo) + menu icon (--menu); onClick?: (step?) => void
       sub-nav/                     — SubNav; mobile only; back arrow (--arrow-left) + step title + progress "1/2"; todos los props opcionales

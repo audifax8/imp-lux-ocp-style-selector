@@ -84,28 +84,26 @@ const Style = () => {
       {selectedCategory && (
         <main className='style-selector__models'>
           <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
-          <div className="style-selector__models-list">
-            <ul className="style-selector__models-list"
-              role="list"
-              aria-label="">
-                {filteredModels?.map(
-                  (model, i) =>
-                    (<li
-                      role="none"
-                      className={`style-selector__models-list-item`}
-                      key={i}>
-                        <ModelCard
-                          key={model.modelCode}
-                          title={model.label}
-                          imageSrc={model.thumbnailUrl}
-                          imageAlt={model.label}
-                          onClick={() => onModelClick(model)}
-                        />
-                    </li>
-                  )
-                )}
-            </ul>
-          </div>
+          <ul className="style-selector__models-list"
+            role="list"
+            aria-label="">
+              {filteredModels?.map(
+                (model, i) =>
+                  (<li
+                    role="none"
+                    className={`style-selector__models-list-item`}
+                    key={i}>
+                      <ModelCard
+                        key={model.modelCode}
+                        title={model.label}
+                        imageSrc={model.thumbnailUrl}
+                        imageAlt={model.label}
+                        onClick={() => onModelClick(model)}
+                      />
+                  </li>
+                )
+              )}
+          </ul>
         </main>
       )}
     </div>

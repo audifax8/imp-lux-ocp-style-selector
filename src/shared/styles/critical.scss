@@ -161,27 +161,26 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
     var(--ss-bg) var(--light-gray) center / cover no-repeat;
 
   &__elements {
-    margin-top: 16px;
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 16px;
+    gap: 1rem;
 
     @media (max-width: $bp-tablet-p) {
-      margin: 0 16px;
+      margin: 0 1rem;
     }
   }
 
   &__models {
-    margin: 0 256px;
     display: flex;
-    gap: 16px;
+    gap: 1rem;
     flex-flow: wrap;
     justify-content: center;
 
     @media (max-width: $bp-tablet-p) {
-      margin: 0 16px;
+      margin: 0 1rem;
     }
   }
 }
@@ -201,11 +200,11 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 16px;
-    margin-top: 16px;
+    gap: 1rem;
+    margin-top: 1rem;
 
     @media (max-width: $bp-tablet-p) {
-      margin: 0 16px;
+      margin: 0 1rem;
     }
   }
 }
