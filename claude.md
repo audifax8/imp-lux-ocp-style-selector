@@ -336,7 +336,6 @@ Archivos disponibles:
 - `mode/detect.ts` — mode singleton (`startWithStyleSelector | configurator | index`)
 - `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
 - `styles/theme.scss` — CSS bundle (skeleton vars light/dark, shimmer animation). Dark mode: `@media prefers-color-scheme` + `[data-theme='dark']` fuera del media query para que el toggle JS funcione independientemente del sistema
-- `styles/theme.scss` — CSS bundle (skeleton vars, shimmer animation)
 - `styles/critical.scss` — design tokens compartidos: tipografía (`--typography-*`), spacing (`--spacing-*`), radii (`--radius-*`), strokes (`--stroke-*` en px), colores semánticos, variables de iconos/logos (`--ss-logo`, `--arrow-left`, `--menu`, `--ss-loader`, etc.) por brand y tema; todos los tamaños en `rem` (base 18px); strokes en `px`
 - `styles/_typography.scss` — partial de tipografía; importado por `critical.scss`
 - `styles/_variables.scss` — partial de variables CSS; importado por `critical.scss`
@@ -381,7 +380,7 @@ src/
   style-selector/
     bootstrap/
       index.tsx                    — style-selector bootstrap (CSS inject + brand + React mount)
-      AppStyleSelector.tsx         — DataProvider + StyleSelector
+      AppStyleSelector.tsx         — StyleSelector (DataProvider removed)
     api/
       config.ts                    — runtime API config; BRAND_URLS per-brand URL map + API_LANGUAGE
       models.ts                    — fetchModels (usa BRAND_URLS), mapData, types: Model, Category, Step, etc.
