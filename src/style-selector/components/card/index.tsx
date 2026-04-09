@@ -32,22 +32,22 @@ export const Card: React.FC<CardProps> = ({
         'aria-label': title,
       })}
     >
-      <div className='card__content'>
+      <div className='card-content'>
         {!skeleton ?
-          <h2 className='card__title'>{title}</h2> :
-          <Skeleton className='card__title' variant={SkeletonVariant.text} />}
+          <h2 className='card-title'>{title}</h2> :
+          <Skeleton className='card-title' variant={SkeletonVariant.text} />}
       </div>
 
-      <div className='card__image-wrapper'>
+      <div className='card-image-wrapper'>
         {!skeleton ?
           <img
             src={imageSrc}
             alt={imageAlt}
-            className='card__image'
+            className="card-image"
             loading='eager'
           /> :
           <Skeleton
-            className={'card__image'}
+            className="card-image card-image__skeleton"
             variant={SkeletonVariant.rectangular}
           />
 }

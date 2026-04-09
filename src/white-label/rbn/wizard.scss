@@ -6,10 +6,6 @@ $menu-light: './svg/rbn/light/menu.svg';
 
 @mixin dark-vars {
   //TODO
-  --accent: #ff6b74;
-  --accent-bg: rgba(255, 107, 116, 0.15);
-  --accent-border: rgba(255, 107, 116, 0.45);
-  --ss-menu-icon: url('#{$menu-light}');
 }
 
 :root {
@@ -49,10 +45,13 @@ $menu-light: './svg/rbn/light/menu.svg';
   --typography-body-sm-line-height: 1.313rem; /* 21px */
   --typography-body-sm-letter-spacing: 0;
 
+  /* Texts/Text base Bold */
+  --typography-body-base-family: 'Inter';
+  --typography-body-base-size: 1rem;
+  --typography-body-base-line-height: 1.25rem; /* 125% */
+  --typography-body-base-letter-spacing: 0;
+
   --ss-menu-icon: url('#{$menu-dark}');
-  --accent: #e63946;
-  --accent-bg: rgba(230, 57, 70, 0.1);
-  --accent-border: rgba(230, 57, 70, 0.45);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -73,8 +72,8 @@ $logo-light: './svg/rbn/light/logo.svg';
 
 .style-selector-rbn {
   .header-logo {
-    width: 73px;
-    height: 32px;
+    width: 4.563rem;
+    height: 2rem;
     aspect-ratio: 73 / 32;
 
     &__icon {
@@ -88,6 +87,15 @@ $logo-light: './svg/rbn/light/logo.svg';
     }
   }
 }
+
+.style-selector-skeleton-rbn {
+  .header-logo {
+    width: 4.563rem;
+    height: 2rem;
+    aspect-ratio: 73 / 32;
+  }
+}
+
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .header-logo__icon {

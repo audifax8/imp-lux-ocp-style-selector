@@ -110,8 +110,8 @@ const myDesignsModels: MyDesignModel =  [
 
 //const uiSettingsURL = 'https://cdn-prod.fluidconfigure.com/static/configs/3.13.0/prod/prod/1581/product/22956/ui-settings-en_US.json';
 const uiSettingsURL = 'https://cdn-prod.fluidconfigure.com/static/configs/3.13.0/prod/prod/1581/product/22956/ui-settings-it_IT.json';
-const SUNGLASSES_CATEGORY_LABEL = 'Sunglasses';
-const EYEGLASSES_CATEGORY_LABEL = 'Eyeglasses';
+const SUNGLASSES_CATEGORY_LABEL = 'sunglasses';
+const EYEGLASSES_CATEGORY_LABEL = 'eyeglasses';
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<Output>({});
@@ -123,8 +123,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     ]).then(([data, ui]) => {
       console.log({ data, ui });
       const l10n = new i18n(ui);
-      const sunglassesLabel = l10n.getLang(CATEGORY_LABEL + SUNGLASSES_CATEGORY_LABEL.toLowerCase(), SUNGLASSES_CATEGORY_LABEL.toLowerCase()).toLowerCase();
-      const eyeglassesLabel = l10n.getLang(CATEGORY_LABEL + EYEGLASSES_CATEGORY_LABEL.toLowerCase(), EYEGLASSES_CATEGORY_LABEL.toLowerCase()).toLowerCase();
+      const sunglassesLabel = l10n.getLang(CATEGORY_LABEL + SUNGLASSES_CATEGORY_LABEL, SUNGLASSES_CATEGORY_LABEL).toLowerCase();
+      const eyeglassesLabel = l10n.getLang(CATEGORY_LABEL + EYEGLASSES_CATEGORY_LABEL, EYEGLASSES_CATEGORY_LABEL).toLowerCase();
       const t = translateModels(l10n, data);
       console.log({ data, ui, l10n, t, sunglassesLabel, eyeglassesLabel });
     }).catch((e) => {
@@ -134,6 +134,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     fetchModels(activeBrand)
       .then((data) => {
         const mapped = mapData(data);
+        console.log(mapped);
         setData(mapped);
         completeStyleSelectorPromise();
       })

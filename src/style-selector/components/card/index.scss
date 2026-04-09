@@ -1,70 +1,71 @@
-$breakpoint: 600px;
+@use '../../../shared/styles/variables' as *;
 
 .card {
   margin: 0 auto;
   display: flex;
-  padding: var(--spacing-base, 16px);
+  padding: var(--spacing-base);
   align-items: flex-start;
-  gap: var(--spacing-base, 16px);
+  gap: var(--spacing-base);
   align-self: stretch;
   justify-self: stretch;
-  width: 442px;
+  width: 27.625rem;
 
-  border-radius: var(--radius-fixed, 20px);
-  border-bottom: var(--stroke-thin, 1px) solid var(--color-generic-neutral-ultra-light-border, #FFF);
-  background: var(--color-overlay-light-alpha-80, rgba(255, 255, 255, 0.80));
+  border-radius: var(--radius-fixed);
+  border-bottom: var(--stroke-thin) solid var(--color-generic-neutral-ultra-light-border);
+  background: var(--color-overlay-light-alpha-80);
   background-blend-mode: hard-light;
 
   /* Elevation/Light/02 Bottom */
   box-shadow: 0 0 2.945px 0 rgba(40, 41, 61, 0.04), 0 5.891px 11.782px 0 rgba(96, 97, 112, 0.16);
 
-  @media (max-width: $breakpoint) {
+  @media (max-width:  $bp-mobile) {
     width: 100%;
   }
 
-  & .card__content {
+  & .card-content {
     flex: 1;
 
-    & .card__title {
-      color: var(--color-generic-neutral-ultra-dark-text, #000);
-      /* Texts/Text base Bold */
-      font-family: var(--typography-body-base-family, Inter);
-      font-size: var(--typography-body-base-size, 16px);
+    & .card-title {
+      color: var(--color-generic-neutral-ultra-dark-text);
+      font-family: var(--typography-body-base-family);
+      font-size: var(--typography-body-base-size);
       font-style: normal;
       font-weight: 700;
-      line-height: var(--typography-body-base-line-height, 20px); /* 125% */
-      letter-spacing: var(--typography-body-base-letter-spacing, 0);
+      line-height: var(--typography-body-base-line-height);
+      letter-spacing: var(--typography-body-base-letter-spacing);
+      text-transform: capitalize;
+      position: absolute;
 
       &.yr-skeleton {
         display: block;
-        height: 20px;
-        width: 100px;
+        height: 1.25rem;
+        width: 6.25rem;
       }
     }
   }
-  & .card__image-wrapper {
+  & .card-image-wrapper {
     flex-shrink: 0;
   }
 }
 
 
-.card__image {
+.card-image {
   display: flex;
-  width: 168px;
-  height: 108px;
-  padding: var(--spacing-base, 16px);
+  width: 10.5rem;
+  height: 6.75rem;
+  padding: var(--spacing-base);
   align-items: flex-start;
-  gap: var(--spacing-base, 16px);
+  gap: var(--spacing-base);
   align-self: stretch;
-
   flex-direction: column;
   aspect-ratio: 16/9;
-
-  border-radius: var(--radius-fixed, 20px);
-  border-bottom: var(--stroke-thin, 1px) solid var(--color-generic-neutral-ultra-light-border, #FFF);
-  background: var(--color-overlay-light-alpha-80, rgba(255, 255, 255, 0.80));
-  background-blend-mode: hard-light;
-
+  border-radius: var(--radius-fixed);
   /* Elevation/Light/02 Bottom */
   box-shadow: 0 0 2.945px 0 rgba(40, 41, 61, 0.04), 0 5.891px 11.782px 0 rgba(96, 97, 112, 0.16);
+}
+
+.card-image:not(.card-image__skeleton) {
+  border-bottom: var(--stroke-thin) solid var(--color-generic-neutral-ultra-light-border);
+  background: var(--color-overlay-light-alpha-80);
+  background-blend-mode: hard-light;
 }
