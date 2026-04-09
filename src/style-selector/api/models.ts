@@ -106,6 +106,12 @@ export const fetchModels = async (brand: Brand): Promise<InputData> => {
   return res.json() as Promise<InputData>
 }
 
+export const fetchUiSetting = async (url: string): Promise<InputData> => {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
+  return res.json() as Promise<InputData>
+}
+
 // ── Tipos de salida ──────────────────────────────────────────────────────────
 
 export interface ModelCategory {

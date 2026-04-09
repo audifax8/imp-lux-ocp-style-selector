@@ -12,7 +12,7 @@ import { Logger } from '@/models/logger'
 import { Performance } from '@/models/performance'
 
 import { fetchModels, mapData, type Output } from '@/style-selector/api/models';
-import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
+//import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
 
 export class StyleSelectorInitStrategy
   implements IInitStrategy<Output, Output>
@@ -35,7 +35,7 @@ export class StyleSelectorInitStrategy
       this.caretaker.addMemento(this.originator.saveMemento());
       const models = await fetchModels(activeBrand);
       const mapped = mapData(models);
-      await completeStyleSelectorPromise();
+      //await completeStyleSelectorPromise();
       return mapped;
     } catch (e) {
       console.log(e);

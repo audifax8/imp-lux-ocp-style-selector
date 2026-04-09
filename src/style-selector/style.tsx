@@ -71,16 +71,20 @@ const Style = () => {
       {/* types render */}
       {!selectedCategory && (
         <main className='style-selector__elements'>
-          {phase1Data?.types?.map((type) =>
-            <Card
-              key={type}
-              title={type}
-              imageSrc={getSVGURLByType(type, activeBrand, 'img')}
-              imageAlt={type}
-              onClick={() => onClick(type)}
-            />
+          {phase1Data?.types
+            ? phase1Data.types.map((type) =>
+                <Card
+                  key={type}
+                  title={type}
+                  imageSrc={getSVGURLByType(type, activeBrand, 'img')}
+                  imageAlt={type}
+                  onClick={() => onClick(type)}
+                />
+              )
+            : [0, 1, 2].map(i => <Card key={i} skeleton />)
+          }
+        </main>
       )}
-      </main>)}
       {selectedCategory && (
         <main className='style-selector__models'>
           <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
