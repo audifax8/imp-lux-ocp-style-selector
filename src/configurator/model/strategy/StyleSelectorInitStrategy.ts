@@ -11,7 +11,7 @@ import { activeBrand } from '@/white-label/detect'
 import { Logger } from '@/models/logger'
 import { Performance } from '@/models/performance'
 
-import { fetchModels, mapData, type Output } from '@/style-selector/api/models';
+import { fetchModels, mapData, Models, type Output } from '@/style-selector/api/models';
 //import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
 
 export class StyleSelectorInitStrategy
@@ -33,6 +33,9 @@ export class StyleSelectorInitStrategy
       this.caretaker = new Caretaker();
       this.originator.setState(state);
       this.caretaker.addMemento(this.originator.saveMemento());
+      const m = new Models(params);
+      console.log(m);
+      m.init();
       const models = await fetchModels(activeBrand);
       const mapped = mapData(models);
       //await completeStyleSelectorPromise();

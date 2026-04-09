@@ -127,7 +127,9 @@ export function getInitQueryParams(): MergedParams {
     skipPreload,
     ocHierarchy,
     locale,
-    rtrVersion
+    rtrVersion,
+    endpoint,
+    lang,
   } = queryParams;
   //const e2eParam = getQueryParam('e2e')?.toLowerCase();
 
@@ -163,11 +165,13 @@ export function getInitQueryParams(): MergedParams {
     apiKey,
     useProdEndpoint: parseBoolParam(useProdEndpoint),
     ocHierarchy: ocHierarchy ?? configureParams?.ocHierarchy,
-    rtrVersion: rtrVersion
+    rtrVersion: rtrVersion,
+    endpoint: endpoint ?? '//one-configurator-services-mockup.luxdeepblue.com',
+    lang: lang ?? 'en'
   };
   const mergedParams = {
-    ...configureParams,
-    ...params
+    ...params,
+    ...configureParams
   };
 
   return mergedParams as MergedParams;

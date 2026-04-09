@@ -91,6 +91,14 @@
     color: var(--color-stepper-brand-active-title);
     border-bottom: var(--stroke-heavy) solid var(--color-stepper-brand-active-border);
   }
+
+  &__disabled {
+    color: var(--color-stepper-brand-default-title);
+    border-bottom: var(--stroke-heavy) solid var(--color-stepper-brand-default-border);
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+  }
 }
 
 .header-switch {

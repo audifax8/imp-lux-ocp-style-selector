@@ -2,6 +2,7 @@ import type { AttributeValue } from '@fluid.inc/yr-configure-wrapper/core';
 
 import type { FetchPriority, ResolutionType, SkeletonVariant } from '@/declarations/enums';
 import type { KeyString } from '@/declarations/types';
+import type { Brand } from '@/white-label/types';
 
 export interface ImageData {
   resolution: ResolutionType;
@@ -24,7 +25,7 @@ export interface ConfigureParams {
   vendorId: string;
   currency?: string;
   region?: string;
-  endpoint?: string;
+  endpoint: string;
   subscriptionKey?: string;
 }
 
@@ -65,6 +66,8 @@ export interface ConfigureInitParams {
   skipPreload?: boolean;
   ocHierarchy?: string;
   rtrVersion?: string;
+  brand: Brand;
+  lang: string;
 }
 
 export interface SkeletonProps {

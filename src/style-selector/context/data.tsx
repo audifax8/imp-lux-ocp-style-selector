@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, type ReactNode } from 'react';
 
-import { fetchModels, fetchUiSetting, mapData, type Output } from '@/style-selector/api/models';
+import { fetchModels, mapData, type Output } from '@/style-selector/api/models';
 import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
 import { activeBrand } from '@/white-label/detect'
 import { DataContext } from '@/style-selector/context/context';
-import { i18n } from '@/models/i18n';
+//import { i18n } from '@/models/i18n';
 
 /*
 const getLabel = (models: any, vendorId: string) => {
@@ -48,6 +47,7 @@ const getLabelFromModels = (model: any, models: any) => {
 };
 */
 
+/*
 const CATEGORY_LABEL = 'style_selector_category_label_';
 const translateModels = (l10n: any, models: any) => {
   const translatedModels: any = {};
@@ -109,32 +109,32 @@ const myDesignsModels: MyDesignModel =  [
 */
 
 //const uiSettingsURL = 'https://cdn-prod.fluidconfigure.com/static/configs/3.13.0/prod/prod/1581/product/22956/ui-settings-en_US.json';
-const uiSettingsURL = 'https://cdn-prod.fluidconfigure.com/static/configs/3.13.0/prod/prod/1581/product/22956/ui-settings-it_IT.json';
-const SUNGLASSES_CATEGORY_LABEL = 'sunglasses';
-const EYEGLASSES_CATEGORY_LABEL = 'eyeglasses';
+//const uiSettingsURL = 'https://cdn-prod.fluidconfigure.com/static/configs/3.13.0/prod/prod/1581/product/22956/ui-settings-it_IT.json';
+//const SUNGLASSES_CATEGORY_LABEL = 'sunglasses';
+//const EYEGLASSES_CATEGORY_LABEL = 'eyeglasses';
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<Output>({});
 
   useEffect(() => {
-    Promise.all([
+    /*Promise.all([
       fetchModels(activeBrand),
       fetchUiSetting(uiSettingsURL)
     ]).then(([data, ui]) => {
-      console.log({ data, ui });
-      const l10n = new i18n(ui);
+      //console.log({ data, ui });
+      /*const l10n = new i18n(ui);
       const sunglassesLabel = l10n.getLang(CATEGORY_LABEL + SUNGLASSES_CATEGORY_LABEL, SUNGLASSES_CATEGORY_LABEL).toLowerCase();
       const eyeglassesLabel = l10n.getLang(CATEGORY_LABEL + EYEGLASSES_CATEGORY_LABEL, EYEGLASSES_CATEGORY_LABEL).toLowerCase();
       const t = translateModels(l10n, data);
       console.log({ data, ui, l10n, t, sunglassesLabel, eyeglassesLabel });
     }).catch((e) => {
       console.log(e);
-    });
+    });*/
 
     fetchModels(activeBrand)
       .then((data) => {
         const mapped = mapData(data);
-        console.log(mapped);
+        //console.log(mapped);
         setData(mapped);
         completeStyleSelectorPromise();
       })

@@ -28,7 +28,6 @@ export const Header: React.FC<HeaderProps> = ({
   onClick
 }) => {
   const isClickable = typeof onClick === 'function';
-  const Component = isClickable ? 'button' : 'div';
 
   //const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   
@@ -48,23 +47,25 @@ export const Header: React.FC<HeaderProps> = ({
           aria-label=""
         >
           {steps?.map(
-            (step, i) =>
-              (!skeleton ? (<li
+            (step, i) => {
+              const isDisabled = step.id > (selectedStep?.id ?? 0);
+              const StepComponent = (isClickable && !isDisabled) ? 'button' : 'div';
+              return !skeleton ? (<li
                 role="none"
                 key={i}>
-                  <Component
-                    className={`header-nav-item ${skeleton ? 'yr-skeleton' : ''} ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''}`}
-                    onClick={() => onClick?.(step)}
-                    {...(isClickable && {
+                  <StepComponent
+                    className={`header-nav-item ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''} ${isDisabled ? 'header-nav-item__disabled' : ''}`}
+                    onClick={!isDisabled ? () => onClick?.(step) : undefined}
+                    {...(isClickable && !isDisabled && {
                       type: 'button',
-                      'aria-label': '',
+                      'aria-label': step.name,
                     })}
                   >
                     <a role="menuitem">{step?.name}</a>
-                  </Component>
-              </li>) : (<Skeleton className="header-nav-item__skeleton yr-skeleton" variant={SkeletonVariant.text} />))
-          )
-        } 
+                  </StepComponent>
+              </li>) : (<Skeleton key={i} className="header-nav-item__skeleton yr-skeleton" variant={SkeletonVariant.text} />)
+          }
+        )}
         </ul>
       </nav>
       <div className="header-switch">

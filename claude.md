@@ -259,7 +259,7 @@ Archivos disponibles:
 - `public/imgs/background/dark/` — mismas 6 variantes en dark
 
 ### Componentes (`style-selector/components/`)
-- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step?: Step) => void`; logo via CSS `--ss-logo`, menu icon via `--menu` CSS var; skeleton via `Skeleton` component
+- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step: Step) => void`; logo via CSS `--ss-logo`, menu icon via `--menu` CSS var; skeleton via `Skeleton` component; steps con `id > selectedStep.id` reciben clase `header-nav-item__disabled` (opacity 0.35, cursor default, pointer-events none) y se renderizan como `div` sin onClick
 - `sub-nav/` — `SubNav`; acepta `steps?`, `selectedStep?: Step`, `onClick?: (step?: Step) => void`; visible solo en mobile; muestra back arrow (izquierda) + step title + progress counter e.g. "1/2" (centro); solo visible cuando `onClick` y `selectedStep?.id` son truthy; arrow via `--arrow-left` CSS var
 - `category-filter/` — `CategoryFilterComponent`; acepta `subCategories?: Category[]`, `selectedCategory?: Category`, `onClick?: (category: Category) => void`
 - `category-button/` — `Button`; acepta `label?`, `skeleton?`, `selected?`, `onClick?: (e: React.MouseEvent) => void`; selected state via `.yr-button__selected`
@@ -269,8 +269,18 @@ Archivos disponibles:
 - `img/` — componente de imagen
 
 ### Steps internos (gestionados por state en `style.tsx`)
-- **Step 0 (Type)**: grid de tipos de gafa usando `phase1Data?.types`; click llama `onClick(type)` → filtra categorías de `phase1Data?.categories` → avanza a step 1
-- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; back desde `Header`/`SubNav` vuelve al step 0; click en modelo abre `https://cid-impl.fluidconfigure.com/lux-ocp/staging/index.html?&vendorId={model.vendorId}` en nueva pestaña
+- **Step 0 (Type)**: grid de tipos de gafa usando `phase1Data?.types`; click en Card → filtra categorías → avanza a step 1; skeleton cards (×3) mientras `phase1Data` es null
+- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; click en modelo → avanza a step 2; back → step 0
+- **Step 2 (Inspiration)**: placeholder `style-selector__inspiration` (TODO: contenido); back → step 0
+
+### Navegación del stepper
+`onHeaderClick(step?)` — compartido por `Header` y `SubNav`:
+- Bloquea navegación hacia adelante: `step.id >= selectedStep.id → return`
+- `step.id === 0` → reset completo (step 0, `selectedCategory = undefined`)
+- `step.id === 1` → vuelve a step 1 conservando categoría (solo accesible desde step 2)
+- `SubNav` siempre pasa `steps[0]` → el botón back siempre retrocede a Type desde cualquier step
+
+Regla "no saltar": steps con `id > selectedStep.id` en el Header son visualmente disabled y no disparan onClick.
 
 ## Products-index
 - `Index.tsx` — main chunk; theme toggle + lazy `IndexContent`

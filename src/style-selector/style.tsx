@@ -29,6 +29,10 @@ const Style = () => {
     {
       id: 1,
       name: '2. Model'
+    },
+    {
+      id: 2,
+      name: '3. Inspiration'
     }
   ]
   const [steps] = useState<Step[]>(STEPS);
@@ -41,16 +45,27 @@ const Style = () => {
     if (filtered && filtered[0].models) {
       setSelectedCategory(filtered[0]);
       setFilteredModels(filtered[0].models);
-      //TODO
       setSelectedStep(steps[1]);
     }
   };
 
+  // Navegación hacia atrás (Header tabs + SubNav back button).
+  // Reglas:
+  //   - No se puede saltar hacia adelante desde el Header.
+  //   - Step 0: reset completo (tipo, categoría).
+  //   - Step 1: vuelve a la vista de modelos conservando la categoría.
+  //   - SubNav siempre llama con steps[0], por lo que desde cualquier step
+  //     el botón back retrocede a Type (cubre "step 3 → step 1" directamente).
   const onHeaderClick = (step?: Step) => {
-    if (step?.id === 0) {
+    console.log(step);
+    /*if (!step || step.id >= selectedStep.id) return;
+
+    if (step.id === 0) {
       setSelectedStep(steps[0]);
       setSelectedCategory(undefined);
-    }
+    } else if (step.id === 1) {
+      setSelectedStep(steps[1]);
+    }*/
   };
 
   const onCategoryClick = (category: Category) => {
@@ -60,16 +75,17 @@ const Style = () => {
   };
 
   const onModelClick = (model: Model) => {
-    //TODO
-    window.open(`https://cid-impl.fluidconfigure.com/lux-ocp/staging/index.html?&vendorId=${model.vendorId}`, '_blank');
+    setSelectedStep(steps[2]);
+    //TODO: cargar contenido de inspiración para el modelo seleccionado
+    console.log(model);
   };
 
   return (
     <div className={`style-selector style-selector-${activeBrand}`}>
       <Header steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       <SubNav steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
-      {/* types render */}
-      {!selectedCategory && (
+      {/* Step 0: Type */}
+      {selectedStep.id === 0 && (
         <main className='style-selector__elements'>
           {phase1Data?.types
             ? phase1Data.types.map((type) =>
@@ -85,7 +101,9 @@ const Style = () => {
           }
         </main>
       )}
-      {selectedCategory && (
+
+      {/* Step 1: Model */}
+      {selectedStep.id === 1 && (
         <main className='style-selector__models'>
           <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
           <ul className="style-selector__models-list"
@@ -95,7 +113,7 @@ const Style = () => {
                 (model, i) =>
                   (<li
                     role="none"
-                    className={`style-selector__models-list-item`}
+                    className='style-selector__models-list-item'
                     key={i}>
                       <ModelCard
                         key={model.modelCode}
@@ -108,6 +126,13 @@ const Style = () => {
                 )
               )}
           </ul>
+        </main>
+      )}
+
+      {/* Step 2: Inspiration */}
+      {selectedStep.id === 2 && (
+        <main className='style-selector__inspiration'>
+          {/* TODO: contenido de inspiración */}
         </main>
       )}
     </div>
