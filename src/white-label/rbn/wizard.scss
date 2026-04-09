@@ -48,8 +48,14 @@ $menu-light: './svg/rbn/light/menu.svg';
   /* Texts/Text base Bold */
   --typography-body-base-family: 'Inter';
   --typography-body-base-size: 1rem;
-  --typography-body-base-line-height: 1.25rem; /* 125% */
+  --typography-body-base-line-height: 1.25rem; /* 20px */
   --typography-body-base-letter-spacing: 0;
+
+  /* Headings/Heading 4 */
+  --typography-h4-family: 'Inter';
+  --typography-h4-size: 1rem;
+  --typography-h4-line-height: 1.25rem; /* 20px */
+  --typography-h4-letter-spacing: 0;
 
   --ss-menu-icon: url('#{$menu-dark}');
 }

@@ -1,38 +1,33 @@
-$breakpoint: 600px;
+@use '../../../shared/styles/variables' as *;
 
 .model-card {
   display: flex;
   width: 270.667px;
-  //height: 270.667px;
-  padding: var(--spacing-2xl, 40px) var(--spacing-none, 0) var(--spacing-base, 16px) var(--spacing-none, 0);
+  padding: var(--spacing-2xl) var(--spacing-none) var(--spacing-base) var(--spacing-none);
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
   aspect-ratio: 1/1;
-  border-radius: var(--radius-fixed, 20px);
-  border-bottom: var(--stroke-thin, 1px) solid var(--color-generic-neutral-ultra-light-border, #FFF);
-  background: var(--color-overlay-light-alpha-80, rgba(255, 255, 255, 0.80));
+  border-radius: var(--radius-fixed);
+  border-bottom: var(--stroke-thin) solid var(--color-generic-neutral-ultra-light-border);
+  background: var(--color-overlay-light-alpha-80);
   background-blend-mode: hard-light;
+  box-shadow: var(--alevation-botton);
 
-  /* Elevation/Light/02 Bottom */
-  box-shadow: 0 0 2.945px 0 rgba(40, 41, 61, 0.04), 0 5.891px 11.782px 0 rgba(96, 97, 112, 0.16);
-
-  @media (max-width: $breakpoint) {
+  @media (max-width:$bp-mobile) {
     display: flex;
     width: 163.5px;
-    //height: 163.5px;
-    padding: var(--spacing-lg, 24px) var(--spacing-none, 0) var(--spacing-xs, 8px) var(--spacing-none, 0);
+    padding: var(--spacing-lg) var(--spacing-none) var(--spacing-xs) var(--spacing-none);
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-2xs, 4px);
+    gap: var(--spacing-2xs);
     aspect-ratio: 1/1;
   }
 }
 
 .model-card__image-wrapper {
   display: flex;
-  //height: 152.25px;
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
@@ -40,7 +35,6 @@ $breakpoint: 600px;
   aspect-ratio: 16/9;
 
   img {
-    //height: inherit;
     width: 100%;
     object-fit: contain;
   }
@@ -48,21 +42,20 @@ $breakpoint: 600px;
 
 .model-card__content {
   display: flex;
-  padding: var(--spacing-2xl, 40px) var(--spacing-none, 0) var(--spacing-base, 16px) var(--spacing-none, 0);
-  @media (max-width: $breakpoint) {
+  padding: var(--spacing-2xl) var(--spacing-none) var(--spacing-base) var(--spacing-none);
+  @media (max-width:$bp-mobile) {
     padding: 0px;
   }
 }
 
 .model-card__title {
-  color: var(--color-generic-neutral-ultra-dark-text, #000);
+  color: var(--color-generic-neutral-ultra-dark-text);
   text-align: center;
 
-  /* Headings/Heading 4 */
-  font-family: var(--typography-h4-family, Inter);
-  font-size: var(--typography-h4-size, 16px);
+  font-family: var(--typography-h4-family);
+  font-size: var(--typography-h4-size);
   font-style: normal;
   font-weight: 700;
-  line-height: var(--typography-h4-line-height, 20px); /* 125% */
-  letter-spacing: var(--typography-h4-letter-spacing, 0);
+  line-height: var(--typography-h4-line-height);
+  letter-spacing: var(--typography-h4-letter-spacing);
 }

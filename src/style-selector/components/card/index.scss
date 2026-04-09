@@ -14,9 +14,7 @@
   border-bottom: var(--stroke-thin) solid var(--color-generic-neutral-ultra-light-border);
   background: var(--color-overlay-light-alpha-80);
   background-blend-mode: hard-light;
-
-  /* Elevation/Light/02 Bottom */
-  box-shadow: 0 0 2.945px 0 rgba(40, 41, 61, 0.04), 0 5.891px 11.782px 0 rgba(96, 97, 112, 0.16);
+  box-shadow: var(--alevation-botton);
 
   @media (max-width:  $bp-mobile) {
     width: 100%;
@@ -60,8 +58,7 @@
   flex-direction: column;
   aspect-ratio: 16/9;
   border-radius: var(--radius-fixed);
-  /* Elevation/Light/02 Bottom */
-  box-shadow: 0 0 2.945px 0 rgba(40, 41, 61, 0.04), 0 5.891px 11.782px 0 rgba(96, 97, 112, 0.16);
+  box-shadow: var(--alevation-botton);
 }
 
 .card-image:not(.card-image__skeleton) {
