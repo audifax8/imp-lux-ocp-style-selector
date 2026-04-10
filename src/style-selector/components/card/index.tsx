@@ -36,7 +36,7 @@ export const Card: React.FC<CardProps> = ({
     >
       <div className='card-content'>
         {!skeleton ?
-          <h2 className='card-title'>{title} ({length})</h2> :
+          <h2 className='card-title'>{title} {length && `(${length})`}</h2> :
           <Skeleton className='card-title' variant={SkeletonVariant.text} />}
       </div>
 

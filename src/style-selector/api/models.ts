@@ -56,6 +56,8 @@ export type Output = {
   typesTranslated?: Translated[];
   categories?: Category[];
   inspirations?: ApiModel[];
+  l10n?: i18n;
+  steps?: Step[]
 };
 
 export type Category = {
@@ -65,93 +67,12 @@ export type Category = {
   length?: number;
 };
 
-export function mapData(data: InputData): Output {
-  const types = Object.keys(data);
-
-  const categories = types.flatMap((type) => {
-    const groups = data[type];
-    const uniqueMap = new Map<string, Model>();
-    groups.forEach((group) => {
-      group.models.forEach((model) => {
-        if (!uniqueMap.has(model.modelCode)) {
-          uniqueMap.set(model.modelCode, model);
-        }
-      });
-    });
-
-    const allModels = Array.from(uniqueMap.values());
-    const allCategory = {
-      type,
-      category: "ALL",
-      models: allModels,
-    };
-
-    const normalCategories = groups.map((group) => ({
-      type,
-      category: group.category,
-      models: group.models,
-    }));
-
-    return [allCategory, ...normalCategories];
-  });
-
-  return {
-    types,
-    categories,
-  };
-}
-
 interface Translated {
   type: string;
   translation: string;
+  length?: number;
 }
 
-export function mapData2(data: InputData, myDesigns?: ApiModel[], inspirations?: ApiModel[]): Output {
-  const types: string[] = Object.keys(data);
-
-  const categories: Category[] = types.flatMap((type) => {
-    const groups = data[type];
-    const uniqueMap = new Map<string, Model>();
-    groups.forEach((group) => {
-      group.models.forEach((model) => {
-        if (!uniqueMap.has(model.modelCode)) {
-          uniqueMap.set(model.modelCode, model);
-        }
-      });
-    });
-
-    const allModels = Array.from(uniqueMap.values());
-    const allCategory = {
-      type,
-      category: "ALL",
-      models: allModels,
-    };
-
-    const normalCategories = groups.map((group) => ({
-      type,
-      category: group.category,
-      models: group.models,
-    }));
-
-    return [allCategory, ...normalCategories];
-  });
-
-  if (myDesigns && myDesigns.length) {
-    types.push('my designs');
-    categories.push({
-      type: 'myDesign',      
-      category: 'myDesign',
-      models: myDesigns,
-      length: myDesigns.length
-    });
-  }
-
-  return {
-    types,
-    categories,
-    inspirations
-  };
-}
 
 // ── Fetch ───────────────────────────────────────────────────────────────────
 
@@ -294,8 +215,8 @@ export class Models {
       return [allCategory, ...normalCategories];
     });
 
+    const MY_DESIGN = 'myDesign';
     if (myDesigns && myDesigns.length) {
-      const MY_DESIGN = 'myDesign';
       types.push(MY_DESIGN);
       const myDesignName = l10n.getLang(MY_DESIGN, MY_DESIGN);
       categories.push({
@@ -311,17 +232,62 @@ export class Models {
       const studioLabel = 'style_selector_category_label_';
       const merged = studioLabel + type;
       const translation = l10n.getLang(merged, type);
-      return {
+
+      const translated: Translated = {
         type,
         translation
+      };
+      if (type === MY_DESIGN && myDesigns?.length) {
+        translated.length = myDesigns?.length;
       }
+      return translated;
     });
 
+    const DEFAULT_STEPS: Step[] = [
+      {
+        id: 0,
+        name: 'type'
+      },
+      {
+        id: 1,
+        name: 'model'
+      },
+      /*{
+        id: 2,
+        name: 'inspiration'
+      }*/
+    ];
+
+    const steps = DEFAULT_STEPS.map(({ id, name }) => {
+      const studioLabel = 'style_selector_category_label_';
+      const merged = studioLabel + name;
+      const translation = l10n.getLang(merged, name);
+      return {
+        id,
+        name: translation
+      };
+    });
+
+    if (inspirations && inspirations.length) {
+      const name = 'inspirations';
+      const studioLabel = 'style_selector_category_label_';
+      const merged = studioLabel + name;
+      const translation = l10n.getLang(merged, name);
+      steps.push(
+        {
+          id: steps.length,
+          name: translation
+        }
+      );
+    }
+
     return {
+      l10n,
       types,
       categories,
       inspirations,
-      typesTranslated
+      typesTranslated,
+      steps
     };
   }
 

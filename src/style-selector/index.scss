@@ -135,7 +135,44 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 1rem;    
+    gap: 1rem;
+
+    &__container {
+      display: flex;
+      padding: var(--spacing-base);
+      gap: var(--spacing-xs);
+      margin: 0 auto;
+
+      &__label {
+        color: var(--color-generic-neutral-dark-text, #404040);
+        text-align: center;
+        /* Texts/Text sm */
+        font-family: var(--typography-body-sm-family, Inter);
+        font-size: var(--typography-body-sm-size, 14px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: var(--typography-body-sm-line-height, 21px); /* 150% */
+        letter-spacing: var(--typography-body-sm-letter-spacing, 0);
+      }
+
+      &__link{
+        color: var(--color-generic-neutral-dark-text, #404040);
+
+        /* Texts/Text sm */
+        font-family: var(--typography-body-sm-family, Inter);
+        font-size: var(--typography-body-sm-size, 14px);
+        font-style: normal;
+        font-weight: 700;
+        line-height: var(--typography-body-sm-line-height, 21px);
+        letter-spacing: var(--typography-body-sm-letter-spacing, 0);
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-decoration-skip-ink: none;
+        text-decoration-thickness: auto;
+        text-underline-offset: auto;
+        text-underline-position: from-font;
+      }
+    }
 
     &-list {
       flex: 1;

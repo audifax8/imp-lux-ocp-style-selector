@@ -11,30 +11,14 @@ import { CategoryFilterComponent } from '@/style-selector/components/category-fi
 import { useData } from '@/style-selector/context/context';
 
 const Style = () => {
-  const phase1Data = useData()
+  const phase1Data = useData();
   const [, setSelectedType] = useState<string>('');
   const [filteredModels, setFilteredModels] = useState<Model[]>();
+  const [selectedModel, setSelectedModel] = useState<Model>();
   const [filteredInspirations, setFilteredInspirations] = useState<ApiModel[]>();
   const [subCategories, setSubCategories] = useState<Category[]>();
   const [selectedCategory, setSelectedCategory] = useState<Category>();
-
-  //const STEPS = ['1. Type', '2. Prescription', '3. Model', '4. Inspiration']
-  //TODO
-  const STEPS: Step[] = [
-    {
-      id: 0,
-      name: '1. Type'
-    },
-    {
-      id: 1,
-      name: '2. Model'
-    },
-    {
-      id: 2,
-      name: '3. Inspiration'
-    }
-  ]
-  const [steps] = useState<Step[]>(STEPS);
+  const [steps] = useState<Step[]>(phase1Data?.steps ?? []);
   const [selectedStep, setSelectedStep] = useState<Step>(steps[0]);
 
   const onClick = (type: string) => {
@@ -76,19 +60,25 @@ const Style = () => {
     const { inspirations } = phase1Data;
     const ins = inspirations?.filter((inspiration) => inspiration.vendorId === model.vendorId);
     setFilteredInspirations(ins);
+    setSelectedModel(model);
+  };
+
+  const onSkipToCustomizationClick = () => {
+    //TODO
+    window.open(selectedModel?.pageUrl, '_blank');
   };
 
   return (
     <div className={`style-selector style-selector-${activeBrand}`}>
-      <Header steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
-      <SubNav steps={steps} selectedStep={selectedStep} onClick={onHeaderClick} />
+      <Header steps={phase1Data?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
+      <SubNav steps={phase1Data?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       {/* Step 0: Type */}
       {selectedStep.id === 0 && (
         <main className='style-selector__elements'>
           {phase1Data?.typesTranslated
             ? phase1Data.typesTranslated.map((type) =>
                 <Card
-                  length={3}
+                  length={type.length}
                   key={type.type}
                   title={type.translation}
                   imageSrc={getSVGURLByType(type.type, activeBrand, 'img')}
@@ -131,7 +121,15 @@ const Style = () => {
       {/* Step 2: Inspiration */}
       {selectedStep.id === 2 && (
         <main className='style-selector__inspiration'>
-          {/* TODO: contenido de inspiración */}
+          <div className='style-selector__inspiration__container'>
+            <p className='style-selector__inspiration__container__label'>Select trending styles or
+              <a
+                tabIndex={0}
+                className='style-selector__inspiration__container__link'
+                onClick={() => onSkipToCustomizationClick()}> skip to customization
+              </a>
+            </p>
+          </div>
           <ul className="style-selector__inspiration-list"
             role="list"
             aria-label="">
