@@ -3,6 +3,9 @@ import type { GlassType } from '@/style-selector/types'
 import { API_LANGUAGE, BRAND_URLS } from '@/style-selector/api/config'
 import type { MergedParams } from '@/declarations/types'
 import { i18n } from '@/models/i18n';
+import type { Originator } from '@/configurator/model/strategy/configurator-init';
+import type { Logger } from '@/models/logger';
+import type { Performance } from '@/models/performance';
 
 // ── Tipos del response de la API ────────────────────────────────────────────
 
@@ -50,6 +53,7 @@ export type InputData = Record<string, CategoryGroup[]>;
 
 export type Output = {
   types?: string[];
+  typesTranslated?: Translated[];
   categories?: Category[];
   inspirations?: ApiModel[];
 };
@@ -97,8 +101,13 @@ export function mapData(data: InputData): Output {
   };
 }
 
+interface Translated {
+  type: string;
+  translation: string;
+}
+
 export function mapData2(data: InputData, myDesigns?: ApiModel[], inspirations?: ApiModel[]): Output {
-  const types = Object.keys(data);
+  const types: string[] = Object.keys(data);
 
   const categories: Category[] = types.flatMap((type) => {
     const groups = data[type];
@@ -130,8 +139,8 @@ export function mapData2(data: InputData, myDesigns?: ApiModel[], inspirations?:
   if (myDesigns && myDesigns.length) {
     types.push('my designs');
     categories.push({
-      type: 'myDesigns',      
-      category: 'myDesigns',
+      type: 'myDesign',      
+      category: 'myDesign',
       models: myDesigns,
       length: myDesigns.length
     });
@@ -219,65 +228,143 @@ export class Models {
   private params: MergedParams = undefined!;
   private uiSettingsURL: string =
     '//cdn-prod.fluidconfigure.com/static/configs/3.13.0/prod/_workflow_/_customer_/product/_product_/ui-settings-_locale_.json';
-  //private SUNGLASSES_CATEGORY_LABEL: string = 'sunglasses';
-  //private EYEGLASSES_CATEGORY_LABEL: string = 'eyeglasses';
 
-  //private l10n: i18n = undefined!;
+  private logger: Logger | undefined = undefined!;
+  private performance: Performance | undefined = undefined!;
 
-  constructor(params: MergedParams) {
+  constructor(params: MergedParams, originator?: Originator) {
     this.params = params;
+    const state = originator?.getState();
+    this.logger = state?.getLogger();
+    this.performance = state?.getPerformance();
   }
 
-  public async init(): Promise<void> {
+  public async init(): Promise<Output> {
     try {
-      Promise.all([
+      this.performance?.processStart('parseModels');
+      const [ models, uiSetting, myDesigns, inspirations ] = await Promise.all([
         this.getModels(),
         this.getUiSettings(),
         this.getMyDesigns(),
         this.getInspirationsDesigns()
-      ]).then(([models, uiSetting, myDesigns, inspirations]) => {
-        const l10n = new i18n(uiSetting);
-        const mapped = this.mapModels(models, myDesigns, inspirations);
-        console.log({ models, uiSetting, l10n, myDesigns, inspirations, mapped });
-      }).catch((e) => console.log(e));
+      ]);
+      const l10n = new i18n(uiSetting);
+      const mappedModels =  this.mapModels(models, l10n, myDesigns, inspirations);
+      this.performance?.processEnd('parseModels');
+      this.performance?.logMeasure('parseModels');
+      return mappedModels;
     } catch(e) {
-      console.log(e);
+      this.performance?.processEnd('parseModels');
+      this.performance?.logMeasure('parseModels');
+      this.logger?.error('[MODELS] Error');
+      this.logger?.object(e);
+      return {};
     }
   }
 
-  private mapModels(models: InputData, myDesigns?: ApiModel[], inspirations?: ApiModel[]) {
-    return mapData2(models, myDesigns, inspirations);
+  private mapModels(models: InputData, l10n: i18n,  myDesigns?: ApiModel[], inspirations?: ApiModel[]): Output {
+    const types: string[] = Object.keys(models);
+    let typesTranslated: Translated[] = [];
+
+    const categories: Category[] = types.flatMap((type) => {
+      const groups = models[type];
+      const uniqueMap = new Map<string, Model>();
+      groups.forEach((group) => {
+        group.models.forEach((model) => {
+          if (!uniqueMap.has(model.modelCode)) {
+            uniqueMap.set(model.modelCode, model);
+          }
+        });
+      });
+
+      const allModels = Array.from(uniqueMap.values());
+      const allCategoryName = l10n.getLang('allLabel', 'All');
+      const allCategory = {
+        type,
+        category: allCategoryName,
+        models: allModels,
+      };
+
+      const normalCategories = groups.map((group) => ({
+        type,
+        category: group.category,
+        models: group.models,
+      }));
+
+      return [allCategory, ...normalCategories];
+    });
+
+    if (myDesigns && myDesigns.length) {
+      const MY_DESIGN = 'myDesign';
+      types.push(MY_DESIGN);
+      const myDesignName = l10n.getLang(MY_DESIGN, MY_DESIGN);
+      categories.push({
+        type: MY_DESIGN,      
+        category: myDesignName,
+        models: myDesigns,
+        length: myDesigns.length
+      });
+    }
+
+    typesTranslated = types.map((type: string) => {
+      //const studioLabel = 'styleSelectorCategoryLabel';
+      const studioLabel = 'style_selector_category_label_';
+      const merged = studioLabel + type;
+      const translation = l10n.getLang(merged, type);
+      return {
+        type,
+        translation
+      }
+    });
+
+    return {
+      types,
+      categories,
+      inspirations,
+      typesTranslated
+    };
   }
 
   private getUiSettingsUrl(): string {
     const { workflow, customer, product, locale } = this.params;
-    const lo = locale?.toString() || 'en_US'
     const url = this.uiSettingsURL
       .replace('_workflow_', workflow)
       .replace('_customer_', customer.toString())
       .replace('_product_', product.toString())
-      .replace('_locale_', lo);
-    console.log({ url });
+      .replace('_locale_', locale?.toString());
     return url;
   }
 
   private async getUiSettings(): Promise<unknown> {
+    this.performance?.processStart('getUiSettings');
     const url = this.getUiSettingsUrl();
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`);
+    this.performance?.processEnd('getUiSettings');
+    this.performance?.logMeasure('getUiSettings');
     return res.json() as Promise<unknown>
   }
 
   private getModelsUrl(): string {
-    const { endpoint, lang } = this.params;
-    console.log({ endpoint, lang });
-    return endpoint + lang;
+    const { endpoint, lang, store } = this.params;
+
+    const replaceStore = (urlBase: string, store: string) => {
+      return urlBase.replace(/store\/\d+/, `store/${store}`);
+    }
+    let url = endpoint;
+    if (store) {
+      url = replaceStore(url, store);
+    }
+    return url + lang;
   }
 
   private async getModels(): Promise<InputData> {
+    this.performance?.processStart('getModels');
     const url = this.getModelsUrl();
     const res = await fetch(url)
     if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
+    this.performance?.processEnd('getModels');
+    this.performance?.logMeasure('getModels');
     return res.json() as Promise<InputData>
   }
 

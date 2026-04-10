@@ -13,6 +13,10 @@ const StyleSelectorSkeleton = () => {
     {
       id: 1,
       name: '2. Model'
+    },
+    {
+      id: 2,
+      name: '3. Inspiration'
     }
   ];
 

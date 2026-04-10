@@ -2,17 +2,14 @@
 // ConfiguratorInitStrategy — implementación concreta del contrato IInitStrategy
 // =============================================================================
 
-import type { IInitStrategy } from './types'
+import type { IInitStrategy } from '@/configurator/model/strategy/types'
 import type { Caretaker } from '@/configurator/bootstrap/state/caretaker'
 import type { Originator } from '@/configurator/bootstrap/state/originator'
-
-import { activeBrand } from '@/white-label/detect'
 
 import { Logger } from '@/models/logger'
 import { Performance } from '@/models/performance'
 
-import { fetchModels, mapData, Models, type Output } from '@/style-selector/api/models';
-//import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
+import { Models, type Output } from '@/style-selector/api/models';
 
 export class StyleSelectorInitStrategy
   implements IInitStrategy<Output, Output>
@@ -33,13 +30,8 @@ export class StyleSelectorInitStrategy
       this.caretaker = new Caretaker();
       this.originator.setState(state);
       this.caretaker.addMemento(this.originator.saveMemento());
-      const m = new Models(params);
-      console.log(m);
-      m.init();
-      const models = await fetchModels(activeBrand);
-      const mapped = mapData(models);
-      //await completeStyleSelectorPromise();
-      return mapped;
+      const models = new Models(params, this.originator);
+      return await models.init();
     } catch (e) {
       console.log(e);
       return {} as Output

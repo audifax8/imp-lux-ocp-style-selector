@@ -2,7 +2,6 @@
 import {
   API_KEYS_MAP,
   DEFAULT_LOCALE,
-  OAK_CUSTOMER_ID,
   RBN_CUSTOMER_ID,
   WAYFARER_ID,
   WAYFARER_VENDOR_ID
@@ -130,6 +129,7 @@ export function getInitQueryParams(): MergedParams {
     rtrVersion,
     endpoint,
     lang,
+    store
   } = queryParams;
   //const e2eParam = getQueryParam('e2e')?.toLowerCase();
 
@@ -139,7 +139,8 @@ export function getInitQueryParams(): MergedParams {
   const apiKey = API_KEYS_MAP[customerId];
 
   const params = {
-    locale: locale !== undefined ? locale : parseInt(customer) === OAK_CUSTOMER_ID ? 'en' : DEFAULT_LOCALE,
+    //locale: locale !== undefined ? locale : parseInt(customer) === OAK_CUSTOMER_ID ? 'en' : DEFAULT_LOCALE,
+    locale: locale ?? DEFAULT_LOCALE,
     environment: 'prod',
     yrEnv: parseBoolParam(yrEnv),
     showPerformance: parseBoolParam(showPerformance),
@@ -167,7 +168,8 @@ export function getInitQueryParams(): MergedParams {
     ocHierarchy: ocHierarchy ?? configureParams?.ocHierarchy,
     rtrVersion: rtrVersion,
     endpoint: endpoint ?? '//one-configurator-services-mockup.luxdeepblue.com',
-    lang: lang ?? 'en'
+    lang: lang ?? 'en',
+    store: store ?? '10151'
   };
   const mergedParams = {
     ...params,

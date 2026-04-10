@@ -39,7 +39,7 @@ export interface ConfigureInitParams {
   /** The workflow from which to load configurations. The default is "prod". */
   workflow: string;
   /** The locale to use for this instance. The defaults is "en_us". You must have localization defined for this locale. */
-  locale?: string;
+  locale: string;
   //currency?: string;
   number?: string;
   /** Load the configurator with this recipe ID. If omitted, a blank recipe will be used with default values for each attribute. */
@@ -68,6 +68,7 @@ export interface ConfigureInitParams {
   rtrVersion?: string;
   brand: Brand;
   lang: string;
+  store: string;
 }
 
 export interface SkeletonProps {

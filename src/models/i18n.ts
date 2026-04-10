@@ -54,10 +54,8 @@ export class i18n {
         console.log('%cMissing Application Text Labels: Available at the global object applicationText', consoleCSS);
         applicationTextWarning = true;
       }*/
-      //window.applicationText[key] = _default;
       return this.replaceText(_default, replacements);
     }
-    //return _default;
   }
 
   private getConfigure2LocalizationKeys(): any {

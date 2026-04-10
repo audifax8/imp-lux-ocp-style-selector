@@ -16,15 +16,15 @@ import type { IInitStrategy } from './strategy/types'
 import type { Output } from '@/style-selector/api/models'
 
 export interface InitState {
-  phase1Data: Output | null
-  phase2Data: Output | null
+  phase1Data: Output;
+  phase2Data: Output;
   phase1Error: Error | null
   phase2Error: Error | null
 }
 
 const INITIAL_STATE: InitState = {
-  phase1Data: null,
-  phase2Data: null,
+  phase1Data: undefined!,
+  phase2Data: undefined!,
   phase1Error: null,
   phase2Error: null,
 }

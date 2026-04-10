@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { Card } from '@/style-selector/components/card'
 import { ModelCard } from '@/style-selector/components/model';
@@ -6,16 +6,15 @@ import { Header } from '@/style-selector/components/header'
 import { SubNav } from '@/style-selector/components/sub-nav'
 import { activeBrand } from '@/white-label/detect'
 import { getSVGURLByType } from '@/shared/assets';
-import type { Category, Model, Step } from '@/style-selector/api/models'
+import type { ApiModel, Category, Model, Step } from '@/style-selector/api/models'
 import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
-import { StyleSelectorInitStrategy } from '@/configurator/model/strategy/StyleSelectorInitStrategy';
-import { useInitStyleSelectorStrategy } from '@/configurator/model/useInitStyleSelectorStrategy';
+import { useData } from '@/style-selector/context/context';
 
 const Style = () => {
-  const strategy = useMemo(() => new StyleSelectorInitStrategy(), [])
-  const { phase1Data } = useInitStyleSelectorStrategy(strategy)
+  const phase1Data = useData()
   const [, setSelectedType] = useState<string>('');
   const [filteredModels, setFilteredModels] = useState<Model[]>();
+  const [filteredInspirations, setFilteredInspirations] = useState<ApiModel[]>();
   const [subCategories, setSubCategories] = useState<Category[]>();
   const [selectedCategory, setSelectedCategory] = useState<Category>();
 
@@ -57,27 +56,26 @@ const Style = () => {
   //   - SubNav siempre llama con steps[0], por lo que desde cualquier step
   //     el botón back retrocede a Type (cubre "step 3 → step 1" directamente).
   const onHeaderClick = (step?: Step) => {
-    console.log(step);
-    /*if (!step || step.id >= selectedStep.id) return;
-
+    if (!step || step.id >= selectedStep.id) return;
     if (step.id === 0) {
       setSelectedStep(steps[0]);
       setSelectedCategory(undefined);
     } else if (step.id === 1) {
       setSelectedStep(steps[1]);
-    }*/
+    }
   };
 
   const onCategoryClick = (category: Category) => {
     setSelectedCategory(category);
-    const models = phase1Data?.categories?.find(cat => cat.category === category.category);
+    const models = phase1Data?.categories?.find(cat => cat.category === category.category && cat.type === category.type);
     setFilteredModels(models?.models);
   };
 
   const onModelClick = (model: Model) => {
     setSelectedStep(steps[2]);
-    //TODO: cargar contenido de inspiración para el modelo seleccionado
-    console.log(model);
+    const { inspirations } = phase1Data;
+    const ins = inspirations?.filter((inspiration) => inspiration.vendorId === model.vendorId);
+    setFilteredInspirations(ins);
   };
 
   return (
@@ -87,14 +85,15 @@ const Style = () => {
       {/* Step 0: Type */}
       {selectedStep.id === 0 && (
         <main className='style-selector__elements'>
-          {phase1Data?.types
-            ? phase1Data.types.map((type) =>
+          {phase1Data?.typesTranslated
+            ? phase1Data.typesTranslated.map((type) =>
                 <Card
-                  key={type}
-                  title={type}
-                  imageSrc={getSVGURLByType(type, activeBrand, 'img')}
-                  imageAlt={type}
-                  onClick={() => onClick(type)}
+                  length={3}
+                  key={type.type}
+                  title={type.translation}
+                  imageSrc={getSVGURLByType(type.type, activeBrand, 'img')}
+                  imageAlt={type.type}
+                  onClick={() => onClick(type.type)}
                 />
               )
             : [0, 1, 2].map(i => <Card key={i} skeleton />)
@@ -133,6 +132,26 @@ const Style = () => {
       {selectedStep.id === 2 && (
         <main className='style-selector__inspiration'>
           {/* TODO: contenido de inspiración */}
+          <ul className="style-selector__inspiration-list"
+            role="list"
+            aria-label="">
+              {filteredInspirations?.map(
+                (model, i) =>
+                  (<li
+                    role="none"
+                    className='style-selector__inspiration-list-item'
+                    key={i}>
+                      <ModelCard
+                        key={model.modelCode}
+                        title={model.label}
+                        imageSrc={model.thumbnailUrl}
+                        imageAlt={model.label}
+                        onClick={() => onModelClick(model)}
+                      />
+                  </li>
+                )
+              )}
+          </ul>
         </main>
       )}
     </div>

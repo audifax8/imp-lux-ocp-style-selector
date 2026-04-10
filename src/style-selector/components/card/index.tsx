@@ -5,6 +5,7 @@ import { SkeletonVariant } from '@/declarations/enums';
 import './index.scss';
 
 interface CardProps {
+  length?: number;
   title?: string;
   imageSrc?: string;
   imageAlt?: string;
@@ -14,6 +15,7 @@ interface CardProps {
 
 export const Card: React.FC<CardProps> = ({
   title,
+  length,
   imageSrc,
   imageAlt,
   skeleton,
@@ -34,7 +36,7 @@ export const Card: React.FC<CardProps> = ({
     >
       <div className='card-content'>
         {!skeleton ?
-          <h2 className='card-title'>{title}</h2> :
+          <h2 className='card-title'>{title} ({length})</h2> :
           <Skeleton className='card-title' variant={SkeletonVariant.text} />}
       </div>
 
