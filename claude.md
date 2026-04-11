@@ -128,7 +128,7 @@ All mode-specific CSS (including white-label CSS) is `?inline` — injected by t
 **Style-selector bootstrap** (`style-selector/bootstrap/index.tsx`):
 - Injects `style-selector/index.scss?inline` (container + typography + skeleton + style-selector styles)
 - Injects active white-label CSS via `white-label/loader-wizard`
-- `createRoot` + `<AppStyleSelector />` (StyleSelector — DataProvider removed, data fetched via StyleSelectorInitStrategy)
+- `createRoot` + `<AppStyleSelector />` (DataProvider + StyleSelector)
 
 **Configurator bootstrap** (`configurator/bootstrap/index.tsx`):
 - Injects `configurator/configurator.scss?inline` (container + typography + skeleton + configurator styles)
@@ -189,7 +189,18 @@ shared/components/skeleton-loader/index.tsx  ← skeleton-loader/index.scss?inli
 - `bliz` → `https://www.bliz.com/wcs/shop/colorama/models?language=` (TODO: real URL)
 - `cdm` → `https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=` (TODO: real URL)
 
-Models endpoint: `GET {BRAND_URLS[brand]}{lang}` — URL constructed directly from `BRAND_URLS[brand] + API_LANGUAGE`
+Models endpoint: `GET {endpoint}/{lang}` — `endpoint` viene de `MergedParams` (URL dinámica con store reemplazable); fallback a `BRAND_URLS[brand] + API_LANGUAGE` vía `config.ts`
+
+### `Models` class (`api/models.ts`)
+Orquesta toda la carga de datos del modo style-selector:
+- `init()` — lanza en paralelo: `getModels()` + `getUiSettings()` + `getMyDesigns()` + `getInspirationsDesigns()`
+- `mapModels()` — construye `Output`: tipos, categorías con "All" deduplicado, `typesTranslated` (via `i18n`), `steps` dinámicos, `inspirations`
+- `getUiSettings()` — CDN URL construida desde params: `workflow/customer/product/locale`
+- `getModels()` — endpoint dinámico; reemplaza store ID si `params.store` presente
+- `getMyDesigns()` — retorna mock data solo si `?mockMyDesigns=true`; si no, array vacío (TODO: API real)
+- `getInspirationsDesigns()` — retorna mock data solo si `?mockInspirations=true`; si no, array vacío (TODO: API real)
+- **Steps dinámicos**: `DEFAULT_STEPS` = [type, model]; step "inspiration" se añade solo si `inspirations.length > 0`
+- **myDesign type**: si hay `myDesigns`, se añade tipo `"myDesign"` a `types` y `categories`
 
 ## Labels service
 `src/labels/` — i18n hook-based service.
@@ -206,12 +217,12 @@ Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 Single-page component. Internal state manages type selection vs. model grid view.
 
 - `StyleSelector.tsx` — wrapper; monta `StyleSelectorComponent` (lazy via deferred promise) o `StyleSelectorSkeleton` (si `?skeleton` param activo); soporta `?skeletonLoader=true` (shared skeleton alternativo) y `?skeleton=true` (muestra skeleton directamente sin cargar el componente real)
-- `style.tsx` — componente principal (`Style`); gestiona estado: tipo seleccionado, categoría, step; renderiza `Header` + `SubNav` + cards de tipo (step 0) o `CategoryFilterComponent` + grid de modelos (step 1); usa `StyleSelectorInitStrategy` + `useInitStyleSelectorStrategy` para obtener datos (`phase1Data.types`, `phase1Data.categories`); ya NO usa `useData()` del context
+- `style.tsx` — componente principal (`Style`); usa `useData()` del context (DataProvider); `steps` vienen de `phase1Data?.steps` (dinámicos, construidos por `Models.mapModels`); gestiona estado: tipo, categoría, modelo seleccionado, inspiraciones filtradas; renderiza 3 steps según `selectedStep?.id`
 - `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
-- `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve importando `style.tsx`
-- `context/context.ts` — `DataContext` con `types` y `categories` (legacy; ya no usado por `style.tsx`)
-- `context/data.tsx` — `DataProvider` (legacy; ya no usado)
-- `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto` (sin flex:1, altura de contenido); `__models` es `flex:1; overflow:hidden; flex-column` (category-filter estático); `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem` (solo la lista hace scroll; padding horizontal aquí, no en `__models`)
+- `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
+- `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, l10n)
+- `context/data.tsx` — `DataProvider`; usa `StyleSelectorInitStrategy` + `useInitStyleSelectorStrategy` internamente; llama `completeStyleSelectorPromise()` via `useEffect` cuando `phase1Data` llega; provee datos via `DataContext`
+- `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
 
 ### Logos (solo modo startWithStyleSelector)
 Variable CSS `--ss-logo` — declarada en `.header-logo__icon` vía `style-selector/index.scss` (?inline, solo este modo). El componente `Header` usa `background-image: var(--ss-logo)` en `.header-logo__icon`; cuando `skeleton={true}` renderiza el skeleton en su lugar.
@@ -269,9 +280,9 @@ Archivos disponibles:
 - `img/` — componente de imagen
 
 ### Steps internos (gestionados por state en `style.tsx`)
-- **Step 0 (Type)**: grid de tipos de gafa usando `phase1Data?.types`; click en Card → filtra categorías → avanza a step 1; skeleton cards (×3) mientras `phase1Data` es null
-- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; click en modelo → avanza a step 2; back → step 0
-- **Step 2 (Inspiration)**: placeholder `style-selector__inspiration` (TODO: contenido); back → step 0
+- **Step 0 (Type)**: grid de `Card` usando `phase1Data?.typesTranslated`; skeleton cards (×3) mientras datos son null; click → filtra categorías → avanza a step 1
+- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; click en modelo → si tiene inspiraciones → avanza a step 2 (`filteredInspirations` + `selectedModel`); si no → abre `model.pageUrl` en nueva pestaña
+- **Step 2 (Inspiration)**: label "Select trending styles or [skip to customization]" + grid de `ModelCard` con `filteredInspirations`; "skip to customization" → `window.open(selectedModel.pageUrl)`; step 2 solo aparece si la API devuelve inspirations (step dinámico)
 
 ### Navegación del stepper
 `onHeaderClick(step?)` — compartido por `Header` y `SubNav`:
@@ -280,7 +291,7 @@ Archivos disponibles:
 - `step.id === 1` → vuelve a step 1 conservando categoría (solo accesible desde step 2)
 - `SubNav` siempre pasa `steps[0]` → el botón back siempre retrocede a Type desde cualquier step
 
-Regla "no saltar": steps con `id > selectedStep.id` en el Header son visualmente disabled y no disparan onClick.
+Regla "no saltar": steps con `id > selectedStep.id` en el Header reciben clase `header-nav-item__disabled` (opacity 0.35, pointer-events none) y se renderizan como `div`.
 
 ## Products-index
 - `Index.tsx` — main chunk; theme toggle + lazy `IndexContent`
@@ -321,7 +332,7 @@ Regla "no saltar": steps con `id > selectedStep.id` en el Header son visualmente
 
 ## Libs
 `src/libs/helpers.ts` — utilidades de scheduling y params:
-- `getInitQueryParams()` — parsea URL params + `window.configureParams` → `MergedParams`
+- `getInitQueryParams()` — parsea URL params + `window.configureParams` → `MergedParams`; incluye `mockMyDesigns` y `mockInspirations` como booleans (via `parseBoolParam`)
 - `runAsync(fn)` — ejecuta sin bloquear via `queueMicrotask`
 - `runIdle(fn, timeout?)` — via `requestIdleCallback` (fallback: `setTimeout(0)`)
 - `schedule(fn, priority)` — abstracción unificada: `'microtask' | 'idle' | 'animation' | 'timeout'`
@@ -331,7 +342,7 @@ Regla "no saltar": steps con `id > selectedStep.id` en el Header son visualmente
 - `enums.ts` — `SkeletonVariant`, `ResolutionType`, `Media`, `Theme`, `RTRBackground`, `FetchPriority`, `ApiType`, `CheckPointType`
 - `types.ts` — `MergedParams`, `ConfigureJsons`, `GraphSettings`, `Preferences`, `ButtonProps`, etc.
 - `constants.ts` — Customer IDs (`RBN_CUSTOMER_ID`, `OAK_CUSTOMER_ID`), API key map, CDN/RTR URLs, skeleton resolution helpers
-- `interfaces.ts` — `ConfigureParams`, `ConfigureInitParams`, `RtrBaseAPI`, `InitRTRPayload`, `RtrAssetsAPI`, `QuickLink`, etc.
+- `interfaces.ts` — `ConfigureParams`, `ConfigureInitParams` (incluye `mockMyDesigns?`, `mockInspirations?`), `RtrBaseAPI`, `InitRTRPayload`, `RtrAssetsAPI`, `QuickLink`, etc.
 - `cfg-configure-core.d.ts` — module declaration for `@cfg.plat/configure-core`
 
 ## Models
@@ -390,13 +401,13 @@ src/
   style-selector/
     bootstrap/
       index.tsx                    — style-selector bootstrap (CSS inject + brand + React mount)
-      AppStyleSelector.tsx         — StyleSelector (DataProvider removed)
+      AppStyleSelector.tsx         — DataProvider + StyleSelector
     api/
       config.ts                    — runtime API config; BRAND_URLS per-brand URL map + API_LANGUAGE
-      models.ts                    — fetchModels (usa BRAND_URLS), mapData, types: Model, Category, Step, etc.
+      models.ts                    — clase Models con init(); fetchModels, fetchUiSetting; tipos: ApiModel, Model, Category, Step, Output, Translated; helpers: deduplicateByCode, rawCategoriesForType, getCategoriesByType, getModelsByType
     context/
-      context.ts                   — DataContext (types, categories)
-      data.tsx                     — DataProvider; fetches + maps models, completes deferred promise
+      context.ts                   — DataContext con Output completo (types, typesTranslated, categories, inspirations, steps, l10n)
+      data.tsx                     — DataProvider; usa StyleSelectorInitStrategy internamente; completeStyleSelectorPromise() via useEffect cuando phase1Data llega
     lazy-imports/
       index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise()
     types.ts                       — GlassType, etc.
