@@ -1,4 +1,6 @@
 @use '../../../shared/styles/variables' as *;
+@use '../../../shared/styles/typography' as *;
+
 // ── Sub-nav (mobile only) ─────────────────────────────────────────────────────
 .subnav {
   display: none;
@@ -53,13 +55,8 @@
   color: var(--color-generic-neutral-ultra-dark-text);
   text-align: center;
 
-  /* Texts/Text lg Bold */
-  font-family: var(--typography-body-lg-family);
-  font-size: var(--typography-body-lg-size);
-  font-style: normal;
+  @include typography-body-lg;
   font-weight: 700;
-  line-height: var(--typography-body-lg-line-height);
-  letter-spacing: var(--typography-body-lg-letter-spacing);
 
   &.yr-skeleton {
     display: block;
@@ -72,13 +69,8 @@
   color: var(--color-generic-neutral-ultra-dark-text);
   text-align: center;
 
-  /* Texts/Text xs */
-  font-family: var(--typography-body-xs-family);
-  font-size: var(--typography-body-xs-size);
-  font-style: normal;
+  @include typography-body-xs;
   font-weight: 400;
-  line-height: var(--typography-body-xs-line-height);
-  letter-spacing: var(--typography-body-xs-letter-spacing);
 
   &.yr-skeleton {
     display: block;

@@ -1,4 +1,5 @@
 @use '../../../shared/styles/variables' as *;
+@use '../../../shared/styles/typography' as *;
 
 .model-card {
   display: flex;
@@ -52,10 +53,6 @@
   color: var(--color-generic-neutral-ultra-dark-text);
   text-align: center;
 
-  font-family: var(--typography-h4-family);
-  font-size: var(--typography-h4-size);
-  font-style: normal;
+  @include typography-h4;
   font-weight: 700;
-  line-height: var(--typography-h4-line-height);
-  letter-spacing: var(--typography-h4-letter-spacing);
 }

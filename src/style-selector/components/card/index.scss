@@ -1,4 +1,5 @@
 @use '../../../shared/styles/variables' as *;
+@use '../../../shared/styles/typography' as *;
 
 .card {
   margin: 0 auto;
@@ -25,12 +26,8 @@
 
     & .card-title {
       color: var(--color-generic-neutral-ultra-dark-text);
-      font-family: var(--typography-body-base-family);
-      font-size: var(--typography-body-base-size);
-      font-style: normal;
+      @include typography-body-base;
       font-weight: 700;
-      line-height: var(--typography-body-base-line-height);
-      letter-spacing: var(--typography-body-base-letter-spacing);
       text-transform: capitalize;
       position: absolute;
 

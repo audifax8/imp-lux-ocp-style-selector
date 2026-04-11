@@ -1,5 +1,6 @@
 
 @use '../../../shared/styles/variables' as *;
+@use '../../../shared/styles/typography' as *;
 
 // ── Header ────────────────────────────────────────────────────────────────────
 .header {
@@ -74,12 +75,8 @@
   color: var(--color-stepper-brand-default-title);
   text-align: center;
 
-  font-family: var(--typography-h5-family, 'Inter');
-  font-size: var(--typography-h5-size);
-  font-style: normal;
+  @include typography-h5;
   font-weight: 700;
-  line-height: var(--typography-h5-line-height);
-  letter-spacing: var(--typography-h5-letter-spacing);
   text-transform: capitalize;
 
   &__skeleton {

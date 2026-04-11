@@ -1,3 +1,5 @@
+@use '../../../shared/styles/typography' as *;
+
 .yr-button {
   display: flex;
   padding: var(--spacings-md) var(--spacings-base);
@@ -30,13 +32,8 @@
     color: var(--color-generic-neutral-ultra-dark-text);
     text-align: center;
 
-    /* Texts/Text sm */
-    font-family: var(--typography-body-sm-family);
-    font-size: var(--typography-body-sm-size);
-    font-style: normal;
+    @include typography-body-sm;
     font-weight: 400;
-    line-height: var(--typography-body-sm-line-height);
-    letter-spacing: var(--typography-body-sm-letter-spacing);
     text-transform: capitalize;
 
     &.yr-skeleton {

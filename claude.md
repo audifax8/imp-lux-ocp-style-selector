@@ -222,6 +222,7 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, l10n)
 - `context/data.tsx` — `DataProvider`; usa `StyleSelectorInitStrategy` + `useInitStyleSelectorStrategy` internamente; llama `completeStyleSelectorPromise()` via `useEffect` cuando `phase1Data` llega; provee datos via `DataContext`
+- _(typography moved to `src/shared/styles/_typography.scss` — ver sección Shared)_
 - `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
 
 ### Logos (solo modo startWithStyleSelector)
@@ -358,7 +359,7 @@ Regla "no saltar": steps con `id > selectedStep.id` en el Header reciben clase `
 - `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
 - `styles/theme.scss` — CSS bundle (skeleton vars light/dark, shimmer animation). Dark mode: `@media prefers-color-scheme` + `[data-theme='dark']` fuera del media query para que el toggle JS funcione independientemente del sistema
 - `styles/critical.scss` — design tokens compartidos: tipografía (`--typography-*`), spacing (`--spacing-*`), radii (`--radius-*`), strokes (`--stroke-*` en px), colores semánticos, variables de iconos/logos (`--ss-logo`, `--arrow-left`, `--menu`, `--ss-loader`, etc.) por brand y tema; todos los tamaños en `rem` (base 18px); strokes en `px`
-- `styles/_typography.scss` — partial de tipografía; importado por `critical.scss`
+- `styles/_typography.scss` — mixins de tipografía compartidos: `typography-h3/h4/h5`, `typography-body-2xl/lg/base/sm/xs`; usan CSS vars de `critical.scss`; NO incluyen `font-weight` (varía por uso); importado via `@use '../../../shared/styles/typography' as *` en los SCSS de style-selector
 - `styles/_variables.scss` — partial de variables CSS; importado por `critical.scss`
 - `assets/index.ts` — `getSVGURL(name, brand)` + `getSVGURLByType(name, brand, type)` — URLs de assets remotos en CDN Fluid
 - `components/DarkModeSwitch.tsx` — toggle component; usado en todos los modos
@@ -382,7 +383,7 @@ src/
     theme/darkMode.ts              — theme detection + toggle
     styles/theme.scss              — CSS bundle (skeleton vars, shimmer); dark mode via media query + [data-theme='dark']
     styles/critical.scss           — design tokens: tipografía, spacing, radii en rem; strokes en px; colores semánticos; icon/logo vars por brand y tema
-    styles/_typography.scss        — partial de tipografía
+    styles/_typography.scss        — mixins de tipografía: typography-h3/h4/h5, typography-body-2xl/lg/base/sm/xs; usados en SCSS de style-selector
     styles/_variables.scss         — partial de variables CSS
     assets/index.ts                — getSVGURL + getSVGURLByType (CDN Fluid asset URLs)
     components/DarkModeSwitch.tsx  — shared dark mode toggle component

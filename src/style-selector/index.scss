@@ -1,4 +1,5 @@
 @use '../shared/styles/variables' as *;
+@use '../shared/styles/typography' as *;
 // =============================================================================
 // Logo paths — default brand (wl): 141×16px
 // rbn overrides --ss-logo en white-label/rbn/wizard.scss
@@ -144,27 +145,18 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
       margin: 0 auto;
 
       &__label {
-        color: var(--color-generic-neutral-dark-text, #404040);
+        color: var(--color-generic-neutral-dark-text);
         text-align: center;
-        /* Texts/Text sm */
-        font-family: var(--typography-body-sm-family, Inter);
-        font-size: var(--typography-body-sm-size, 14px);
-        font-style: normal;
+
+        @include typography-body-sm;
         font-weight: 400;
-        line-height: var(--typography-body-sm-line-height, 21px); /* 150% */
-        letter-spacing: var(--typography-body-sm-letter-spacing, 0);
       }
 
       &__link{
-        color: var(--color-generic-neutral-dark-text, #404040);
+        color: var(--color-generic-neutral-dark-text);
 
-        /* Texts/Text sm */
-        font-family: var(--typography-body-sm-family, Inter);
-        font-size: var(--typography-body-sm-size, 14px);
-        font-style: normal;
+        @include typography-body-sm;
         font-weight: 700;
-        line-height: var(--typography-body-sm-line-height, 21px);
-        letter-spacing: var(--typography-body-sm-letter-spacing, 0);
         text-decoration-line: underline;
         text-decoration-style: solid;
         text-decoration-skip-ink: none;
