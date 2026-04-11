@@ -193,7 +193,7 @@ export class Models {
    */
   private mapModels(models: InputData, l10n: i18n,  myDesigns?: ApiModel[], inspirations?: ApiModel[]): Output {
     const types: string[] = Object.keys(models);
-    let typesTranslated: Translated[] = [];
+    const typesTranslated: Translated[] = [];
 
     const categories: Category[] = types.flatMap((type) => {
       const groups = models[type];
@@ -225,7 +225,7 @@ export class Models {
 
     const MY_DESIGN = 'myDesign';
     if (myDesigns && myDesigns.length) {
-      types.push(MY_DESIGN);
+      //types.push(MY_DESIGN);
       const myDesignName = l10n.getLang(MY_DESIGN, MY_DESIGN);
       categories.push({
         type: MY_DESIGN,      
@@ -233,9 +233,18 @@ export class Models {
         models: myDesigns,
         length: myDesigns.length
       });
+
+      const translated: Translated = {
+        type: MY_DESIGN,
+        translation: myDesignName
+      };
+      if (myDesigns?.length) {
+        translated.length = myDesigns?.length;
+      }
+      typesTranslated.push(translated);
     }
 
-    typesTranslated = types.map((type: string) => {
+    types.forEach((type: string) => {
       //const studioLabel = 'styleSelectorCategoryLabel';
       const studioLabel = 'style_selector_category_label_';
       const merged = studioLabel + type;
@@ -245,10 +254,7 @@ export class Models {
         type,
         translation
       };
-      if (type === MY_DESIGN && myDesigns?.length) {
-        translated.length = myDesigns?.length;
-      }
-      return translated;
+      typesTranslated.push(translated);
     });
 
     const DEFAULT_STEPS: Step[] = [
@@ -342,45 +348,69 @@ export class Models {
     return res.json() as Promise<InputData>
   }
 
-  private getMyDesigns(): Promise<ApiModel[]> {
-    const { mockMyDesigns } = this.params;
-    if (!mockMyDesigns) {
-      return new Promise((resolve) => resolve([]))
-    } 
-    //TODO
+  private async getMyDesigns(): Promise<ApiModel[]> {
+    const { mockMyDesigns, getMyDesign } = this.params;
+
     const myDesignsModels: ApiModel[] =  [
       {
         "vendorId": "0RB3025CP",
         "modelCode": "0RB3025CP",
         "label": "0RB3025CP",
         "recipeId": 31970482,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/31970482/image/FFL,1.png?width=320`
       },
       {
         "vendorId": "0RB2140CP",
         "modelCode": "0RB2140CP",
         "label": "0RB2140CP",
         "recipeId": 41444424,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/41444424/image/FFL,1.png?width=320`
       },
       {
         "vendorId": "0RB3025CP",
         "modelCode": "0RB3025CP",
         "label": "0RB3025CP",
         "recipeId": 31970482,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/31970482/image/FFL,1.png?width=320`
       },
       {
         "vendorId": "0RB2140CP",
         "modelCode": "0RB2140CP",
         "label": "0RB2140CP",
         "recipeId": 41444424,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/41444424/image/FFL,1.png?width=320`
       }
     ];
-    return new Promise((resolve) => resolve(myDesignsModels))
+    if (mockMyDesigns) {
+      return new Promise((resolve) => resolve(myDesignsModels))
+    }
+
+    const hasMyDesigns = getMyDesign && getMyDesign instanceof Function;
+    if (hasMyDesigns) {
+      const responseModels = await getMyDesign();
+      if (responseModels.length) {
+        //TODO
+        // Transform my Design models
+        /*
+        const sanitizedMyDesignModels = responseModels.map((model) => {
+          model.label = getLabelFromModels(model, models);
+          model.thumbnailUrl = `https://prod.fluidconfigure.com/imagecomposer/recipe/${model.recipeId}/image/FFL,1.png?width=320`;
+          return model;
+        });*/
+        return new Promise((resolve) => resolve(responseModels));
+      }
+    }
+    return new Promise((resolve) => resolve([]))
   }
 
+  /**
+   * this method has not been defined yet by Lux
+   * @returns 
+   */
   private getInspirationsDesigns(): Promise<ApiModel[]> {
     const { mockInspirations } = this.params;
     if (!mockInspirations) {
@@ -393,28 +423,32 @@ export class Models {
         "modelCode": "0RB3025CP",
         "label": "0RB3025CP",
         "recipeId": 31970482,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/31970482/image/FFL,1.png?width=320`
       },
       {
         "vendorId": "0RB2140CP",
         "modelCode": "0RB2140CP",
         "label": "0RB2140CP",
         "recipeId": 41444424,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/41444424/image/FFL,1.png?width=320`
       },
       {
         "vendorId": "0RB3025CP",
         "modelCode": "0RB3025CP",
         "label": "0RB3025CP",
         "recipeId": 31970482,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-3025-aviator-large-metal-sunglasses?recipeId=31970482",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/31970482/image/FFL,1.png?width=320`
       },
       {
         "vendorId": "0RB2140CP",
         "modelCode": "0RB2140CP",
         "label": "0RB2140CP",
         "recipeId": 41444424,
-        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424"
+        "pageUrl": "https://www.ray-ban.com/usa/customize/rb-2140-original-wayfarer-sunglasses?recipeId=41444424",
+        "thumbnailUrl": `https://prod.fluidconfigure.com/imagecomposer/recipe/41444424/image/FFL,1.png?width=320`
       }
     ];
     return new Promise((resolve) => resolve(myDesignsModels))

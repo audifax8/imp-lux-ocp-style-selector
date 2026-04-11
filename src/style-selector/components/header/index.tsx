@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
   
   return (
     <header className="header">
-      <div className="header-logo" aria-label="Menu" role="button" tabIndex={0}>
+      <div className="header-logo">
         {!skeleton ? 
           <div className="header-logo__icon"></div> :
           <Skeleton className="header-logo__icon yr-skeleton" variant={SkeletonVariant.text} />
@@ -50,20 +50,27 @@ export const Header: React.FC<HeaderProps> = ({
             (step, i) => {
               const isDisabled = step.id > (selectedStep?.id ?? 0);
               const StepComponent = (isClickable && !isDisabled) ? 'button' : 'div';
-              return !skeleton ? (<li
-                role="none"
-                key={i}>
-                  <StepComponent
-                    className={`header-nav-item ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''} ${isDisabled ? 'header-nav-item__disabled' : ''}`}
-                    onClick={!isDisabled ? () => onClick?.(step) : undefined}
-                    {...(isClickable && !isDisabled && {
-                      type: 'button',
-                      'aria-label': step.name,
-                    })}
-                  >
-                    <a role="menuitem">{(step.id + 1)}. {step?.name}</a>
-                  </StepComponent>
-              </li>) : (<Skeleton key={i} className="header-nav-item__skeleton yr-skeleton" variant={SkeletonVariant.text} />)
+              return !skeleton ?
+                (<li
+                  className='header-nav-items'
+                  role="none"
+                  key={i}>
+                    <StepComponent
+                      className={`header-nav-item ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''} ${isDisabled ? 'header-nav-item__disabled' : ''}`}
+                      onClick={!isDisabled ? () => onClick?.(step) : undefined}
+                      {...(isClickable && !isDisabled && {
+                        type: 'button',
+                        'aria-label': step.name,
+                      })}
+                    >
+                      <a role="menuitem">{(step.id + 1)}. {step?.name}</a>
+                    </StepComponent>
+                </li>) :
+                (<Skeleton
+                  key={i}
+                  className="header-nav-item__skeleton yr-skeleton"
+                  variant={SkeletonVariant.text}
+                />)
           }
         )}
         </ul>
@@ -71,9 +78,9 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="header-switch">
         {/*  */}
       </div>
-      <div className="header-menu" aria-label="Menu" role="button" tabIndex={0}>
+      <div className="header-menu">
         {!skeleton ? 
-          <div className="header-menu__icon"></div> :
+          <div className="header-menu__icon" aria-label="Menu" role="button" tabIndex={0}></div> :
           <Skeleton className='header-menu__icon yr-skeleton' variant={SkeletonVariant.text} />
         }
       </div>

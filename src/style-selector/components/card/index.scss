@@ -17,6 +17,14 @@
   background-blend-mode: hard-light;
   box-shadow: var(--alevation-botton);
 
+  /*
+  &:focus-visible {
+    //TODO
+    //outline: var(--stroke-heavy) solid var(--color-generic-focus-border);
+    //outline-offset: 3px;
+  }
+  */
+
   @media (max-width:  $bp-mobile) {
     width: 100%;
   }

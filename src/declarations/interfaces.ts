@@ -71,6 +71,7 @@ export interface ConfigureInitParams {
   store: string;
   mockMyDesigns?: boolean;
   mockInspirations?: boolean;
+  getMyDesign?: unknown
 }
 
 export interface SkeletonProps {

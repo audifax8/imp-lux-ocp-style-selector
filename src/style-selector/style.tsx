@@ -56,6 +56,10 @@ const Style = () => {
   };
 
   const onModelClick = (model: Model) => {
+    //Custom model
+    if (model.recipeId) {
+      return window.open(model?.pageUrl, '_blank');
+    }
     const { inspirations } = phase1Data;
     const ins = inspirations?.filter((inspiration) => inspiration.vendorId === model.vendorId);
     if (!ins || !ins.length) {

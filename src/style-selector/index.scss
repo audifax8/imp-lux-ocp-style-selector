@@ -174,10 +174,12 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
       flex-flow: wrap;
       justify-content: center;
       margin-bottom: 1rem;
+      //padding: 0 16rem 0.5rem;
       padding: 0 16rem;
 
       @media (max-width: $bp-tablet-p) {
-        padding: 0;
+        //padding: 0 0 0.5rem;
+        padding: 0 0;
       }
     }
   }
