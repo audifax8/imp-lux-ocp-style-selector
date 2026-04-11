@@ -80,6 +80,7 @@
   font-weight: 700;
   line-height: var(--typography-h5-line-height);
   letter-spacing: var(--typography-h5-letter-spacing);
+  text-transform: capitalize;
 
   &__skeleton {
     margin: 0.5rem;

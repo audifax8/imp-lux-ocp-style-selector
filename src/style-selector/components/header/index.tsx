@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
                       'aria-label': step.name,
                     })}
                   >
-                    <a role="menuitem">{step?.name}</a>
+                    <a role="menuitem">{(step.id + 1)}. {step?.name}</a>
                   </StepComponent>
               </li>) : (<Skeleton key={i} className="header-nav-item__skeleton yr-skeleton" variant={SkeletonVariant.text} />)
           }

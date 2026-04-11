@@ -129,7 +129,9 @@ export function getInitQueryParams(): MergedParams {
     rtrVersion,
     endpoint,
     lang,
-    store
+    store,
+    mockInspirations,
+    mockMyDesigns
   } = queryParams;
   //const e2eParam = getQueryParam('e2e')?.toLowerCase();
 
@@ -169,7 +171,9 @@ export function getInitQueryParams(): MergedParams {
     rtrVersion: rtrVersion,
     endpoint: endpoint ?? '//one-configurator-services-mockup.luxdeepblue.com',
     lang: lang ?? 'en',
-    store: store ?? '10151'
+    store: store ?? '10151',
+    mockInspirations: parseBoolParam(mockInspirations),
+    mockMyDesigns: parseBoolParam(mockMyDesigns)
   };
   const mergedParams = {
     ...params,

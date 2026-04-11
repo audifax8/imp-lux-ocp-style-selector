@@ -56,9 +56,12 @@ const Style = () => {
   };
 
   const onModelClick = (model: Model) => {
-    setSelectedStep(steps[2]);
     const { inspirations } = phase1Data;
     const ins = inspirations?.filter((inspiration) => inspiration.vendorId === model.vendorId);
+    if (!ins || !ins.length) {
+       return window.open(selectedModel?.pageUrl, '_blank');
+    }
+    setSelectedStep(steps[2]);
     setFilteredInspirations(ins);
     setSelectedModel(model);
   };
@@ -73,7 +76,7 @@ const Style = () => {
       <Header steps={phase1Data?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       <SubNav steps={phase1Data?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       {/* Step 0: Type */}
-      {selectedStep.id === 0 && (
+      {selectedStep?.id === 0 && (
         <main className='style-selector__elements'>
           {phase1Data?.typesTranslated
             ? phase1Data.typesTranslated.map((type) =>
@@ -92,7 +95,7 @@ const Style = () => {
       )}
 
       {/* Step 1: Model */}
-      {selectedStep.id === 1 && (
+      {selectedStep?.id === 1 && (
         <main className='style-selector__models'>
           <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
           <ul className="style-selector__models-list"
@@ -119,7 +122,7 @@ const Style = () => {
       )}
 
       {/* Step 2: Inspiration */}
-      {selectedStep.id === 2 && (
+      {selectedStep?.id === 2 && (
         <main className='style-selector__inspiration'>
           <div className='style-selector__inspiration__container'>
             <p className='style-selector__inspiration__container__label'>Select trending styles or

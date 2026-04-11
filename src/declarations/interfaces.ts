@@ -69,6 +69,8 @@ export interface ConfigureInitParams {
   brand: Brand;
   lang: string;
   store: string;
+  mockMyDesigns?: boolean;
+  mockInspirations?: boolean;
 }
 
 export interface SkeletonProps {

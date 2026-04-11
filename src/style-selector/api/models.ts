@@ -183,6 +183,14 @@ export class Models {
     }
   }
 
+  /**
+   * function to map the Lux models API and translate labels
+   * @param models 
+   * @param l10n 
+   * @param myDesigns 
+   * @param inspirations 
+   * @returns Output
+   */
   private mapModels(models: InputData, l10n: i18n,  myDesigns?: ApiModel[], inspirations?: ApiModel[]): Output {
     const types: string[] = Object.keys(models);
     let typesTranslated: Translated[] = [];
@@ -335,6 +343,10 @@ export class Models {
   }
 
   private getMyDesigns(): Promise<ApiModel[]> {
+    const { mockMyDesigns } = this.params;
+    if (!mockMyDesigns) {
+      return new Promise((resolve) => resolve([]))
+    } 
     //TODO
     const myDesignsModels: ApiModel[] =  [
       {
@@ -370,6 +382,10 @@ export class Models {
   }
 
   private getInspirationsDesigns(): Promise<ApiModel[]> {
+    const { mockInspirations } = this.params;
+    if (!mockInspirations) {
+      return new Promise((resolve) => resolve([]))
+    } 
     //TODO
     const myDesignsModels: ApiModel[] =  [
       {
