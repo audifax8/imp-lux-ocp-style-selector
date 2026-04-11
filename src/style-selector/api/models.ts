@@ -57,7 +57,11 @@ export type Output = {
   categories?: Category[];
   inspirations?: ApiModel[];
   l10n?: i18n;
-  steps?: Step[]
+  steps?: Step[],
+  preselectedStep?: Step | undefined;
+  preselectedCategory?: Category | undefined;
+  preselectedModels?: Model[] | ApiModel[];
+  preselectedCategories?: Category[];
 };
 
 export type Category = {
@@ -155,9 +159,31 @@ export class Models {
 
   constructor(params: MergedParams, originator?: Originator) {
     this.params = params;
+    console.log(params);
     const state = originator?.getState();
     this.logger = state?.getLogger();
     this.performance = state?.getPerformance();
+    this.parseParam();
+  }
+
+  private parseParam(): { preselectedStep: string, preselectedCategory: string } {
+    try {
+      const { startWithStyleSelector } = this.params;
+      const query = startWithStyleSelector.split(',');
+      const preselectedStep = query && query[0]?.toLowerCase();
+      const preselectedCategory = query && query[1]?.toLowerCase();
+      return {
+        preselectedCategory,
+        preselectedStep
+      }
+    } catch (e) {
+      this.logger?.error('[style selector] Error parsing param');
+      this.logger?.object(e);
+      return {
+        preselectedCategory: '',
+        preselectedStep: ''
+      }
+    }
   }
 
   public async init(): Promise<Output> {
@@ -272,7 +298,7 @@ export class Models {
       }*/
     ];
 
-    const steps = DEFAULT_STEPS.map(({ id, name }) => {
+    const steps: Step[] = DEFAULT_STEPS.map(({ id, name }) => {
       const studioLabel = 'style_selector_category_label_';
       const merged = studioLabel + name;
       const translation = l10n.getLang(merged, name);
@@ -295,13 +321,28 @@ export class Models {
       );
     }
 
+    const param = this.parseParam();
+    console.log({ param });
+    
+    //TODO FIx
+    const preselectedCategory: Category | undefined = categories.find((category) => category.type === param.preselectedStep && category.category?.toLowerCase() === param.preselectedCategory);
+    //TODO hardcoded model
+    const preselectedStep: Step | undefined = steps.find((step) => step.name === 'model' && param.preselectedStep);
+    const preselectedCategories: Category[] = categories.filter((category) => category.type?.toLocaleLowerCase() === param.preselectedStep);
+    const preselectedModels: Model[] | ApiModel[] = preselectedCategory?.models ?? [];
+    console.log({ preselectedCategory, preselectedStep, preselectedModels, preselectedCategories });
+
     return {
       l10n,
       types,
       categories,
       inspirations,
       typesTranslated,
-      steps
+      steps,
+      preselectedCategory,
+      preselectedStep,
+      preselectedModels,
+      preselectedCategories
     };
   }
 

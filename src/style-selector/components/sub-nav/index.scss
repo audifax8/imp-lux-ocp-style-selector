@@ -57,6 +57,7 @@
 
   @include typography-body-lg;
   font-weight: 700;
+  text-transform: capitalize;
 
   &.yr-skeleton {
     display: block;

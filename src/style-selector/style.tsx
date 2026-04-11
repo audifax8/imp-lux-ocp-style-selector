@@ -12,19 +12,22 @@ import { useData } from '@/style-selector/context/context';
 
 const Style = () => {
   const phase1Data = useData();
-  const [, setSelectedType] = useState<string>('');
-  const [filteredModels, setFilteredModels] = useState<Model[]>();
+  console.log(phase1Data);
+
+  const [filteredModels, setFilteredModels] = useState<Model[]>(phase1Data?.preselectedModels ?? []);
   const [selectedModel, setSelectedModel] = useState<Model>();
+
   const [filteredInspirations, setFilteredInspirations] = useState<ApiModel[]>();
-  const [subCategories, setSubCategories] = useState<Category[]>();
-  const [selectedCategory, setSelectedCategory] = useState<Category>();
+
+  const [subCategories, setSubCategories] = useState<Category[]>(phase1Data?.preselectedCategories ?? []);
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(phase1Data?.preselectedCategory);
+
   const [steps] = useState<Step[]>(phase1Data?.steps ?? []);
-  const [selectedStep, setSelectedStep] = useState<Step>(steps[0]);
+  const [selectedStep, setSelectedStep] = useState<Step>(phase1Data?.preselectedStep ?? steps[0]);
 
   const onClick = (type: string) => {
-    setSelectedType(type);
     const filtered = phase1Data?.categories?.filter(category => category.type === type);
-    setSubCategories(filtered);
+    setSubCategories(filtered ?? []);
     if (filtered && filtered[0].models) {
       setSelectedCategory(filtered[0]);
       setFilteredModels(filtered[0].models);
@@ -52,7 +55,7 @@ const Style = () => {
   const onCategoryClick = (category: Category) => {
     setSelectedCategory(category);
     const models = phase1Data?.categories?.find(cat => cat.category === category.category && cat.type === category.type);
-    setFilteredModels(models?.models);
+    setFilteredModels(models?.models ?? []);
   };
 
   const onModelClick = (model: Model) => {

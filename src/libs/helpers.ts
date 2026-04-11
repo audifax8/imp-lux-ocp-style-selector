@@ -131,7 +131,8 @@ export function getInitQueryParams(): MergedParams {
     lang,
     store,
     mockInspirations,
-    mockMyDesigns
+    mockMyDesigns,
+    startWithStyleSelector
   } = queryParams;
   //const e2eParam = getQueryParam('e2e')?.toLowerCase();
 
@@ -173,7 +174,8 @@ export function getInitQueryParams(): MergedParams {
     lang: lang ?? 'en',
     store: store ?? '10151',
     mockInspirations: parseBoolParam(mockInspirations),
-    mockMyDesigns: parseBoolParam(mockMyDesigns)
+    mockMyDesigns: parseBoolParam(mockMyDesigns),
+    startWithStyleSelector: startWithStyleSelector
   };
   const mergedParams = {
     ...params,
