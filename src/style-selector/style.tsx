@@ -6,23 +6,21 @@ import { Header } from '@/style-selector/components/header'
 import { SubNav } from '@/style-selector/components/sub-nav'
 import { activeBrand } from '@/white-label/detect'
 import { getSVGURLByType } from '@/shared/assets';
-import type { Category } from '@/style-selector/api/models'
 import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
 import { useData } from '@/style-selector/context/context';
-import type { LuxApiModel, Step } from '@/declarations/interfaces';
+import type { LuxApiModel, Step, ModelsCategory } from '@/declarations/interfaces';
 import { StepType } from '@/declarations/enums';
 
 const Style = () => {
   const phase1Data = useData();
-  console.log(phase1Data);
 
   const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(phase1Data?.preselectedModels ?? []);
   const [selectedModel, setSelectedModel] = useState<LuxApiModel>();
 
   const [filteredInspirations, setFilteredInspirations] = useState<LuxApiModel[]>();
 
-  const [subCategories, setSubCategories] = useState<Category[]>(phase1Data?.preselectedCategories ?? []);
-  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(phase1Data?.preselectedCategory);
+  const [subCategories, setSubCategories] = useState<ModelsCategory[]>(phase1Data?.preselectedCategories ?? []);
+  const [selectedCategory, setSelectedCategory] = useState<ModelsCategory | undefined>(phase1Data?.preselectedCategory);
 
   const [steps] = useState<Step[]>(phase1Data?.steps ?? []);
   const [selectedStep, setSelectedStep] = useState<Step>(phase1Data?.preselectedStep ?? steps[0]);
@@ -54,7 +52,7 @@ const Style = () => {
     }
   };
 
-  const onCategoryClick = (category: Category) => {
+  const onCategoryClick = (category: ModelsCategory) => {
     setSelectedCategory(category);
     const models = phase1Data?.categories?.find(cat => cat.category === category.category && cat.type === category.type);
     setFilteredModels(models?.models ?? []);
@@ -87,8 +85,8 @@ const Style = () => {
       {/* Step 0: Type */}
       {selectedStep?.type === StepType.TYPE && (
         <main className='style-selector__elements'>
-          {phase1Data?.estepTypesTranslated
-            ? phase1Data.estepTypesTranslated.map((step) =>
+          {phase1Data?.stepTypesTranslated
+            ? phase1Data.stepTypesTranslated.map((step) =>
                 <Card
                   length={step.length}
                   key={step.type}

@@ -1,38 +1,11 @@
-import type { LuxApiModelsResponse, MergedParams } from '@/declarations/types'
 import { i18n } from '@/models/i18n';
+import { StepType } from '@/declarations/enums';
+
 import type { Originator } from '@/configurator/model/strategy/configurator-init';
 import type { Logger } from '@/models/logger';
 import type { Performance } from '@/models/performance';
-import type { LuxApiModel, UiSettings, Step } from '@/declarations/interfaces';
-import { StepType } from '@/declarations/enums';
-
-// ── Tipos del response de la API ────────────────────────────────────────────
-
-export type Output = {
-  stepsTypes?: string[];
-  estepTypesTranslated?: Translated[];
-  categories?: Category[];
-  inspirations?: LuxApiModel[];
-  l10n?: i18n;
-  steps?: Step[],
-  preselectedStep?: Step | undefined;
-  preselectedCategory?: Category | undefined;
-  preselectedModels?: LuxApiModel[];
-  preselectedCategories?: Category[];
-};
-
-export type Category = {
-  type: string;
-  category: string;
-  models: LuxApiModel[];
-  length?: number;
-};
-
-interface Translated {
-  type: string;
-  translation: string;
-  length?: number;
-}
+import type { LuxApiModel, UiSettings, Step, ModelsCategory, StepWithTranslation, StyleSelectorInitData } from '@/declarations/interfaces';
+import type { LuxApiModelsResponse, MergedParams } from '@/declarations/types'
 
 export class Models {
   private params: MergedParams = undefined!;
@@ -44,7 +17,6 @@ export class Models {
 
   constructor(params: MergedParams, originator?: Originator) {
     this.params = params;
-    console.log(params);
     const state = originator?.getState();
     this.logger = state?.getLogger();
     this.performance = state?.getPerformance();
@@ -71,7 +43,7 @@ export class Models {
     }
   }
 
-  public async init(): Promise<Output> {
+  public async init(): Promise<StyleSelectorInitData> {
     try {
       this.performance?.processStart('parseModels');
       const [ models, uiSetting, myDesigns, inspirations ] = await Promise.all([
@@ -102,11 +74,11 @@ export class Models {
    * @param inspirations 
    * @returns Output
    */
-  private mapModels(models: LuxApiModelsResponse, l10n: i18n,  myDesigns?: LuxApiModel[], inspirations?: LuxApiModel[]): Output {
+  private mapModels(models: LuxApiModelsResponse, l10n: i18n,  myDesigns?: LuxApiModel[], inspirations?: LuxApiModel[]): StyleSelectorInitData {
     const stepsTypes: string[] = Object.keys(models);
-    const estepTypesTranslated: Translated[] = [];
+    const stepTypesTranslated: StepWithTranslation[] = [];
 
-    const categories: Category[] = stepsTypes.flatMap((type) => {
+    const categories: ModelsCategory[] = stepsTypes.flatMap((type) => {
       const groups = models[type];
       const uniqueMap = new Map<string, LuxApiModel>();
       groups.forEach((group) => {
@@ -136,7 +108,6 @@ export class Models {
 
     const MY_DESIGN = 'myDesign';
     if (myDesigns && myDesigns.length) {
-      //types.push(MY_DESIGN);
       const myDesignName = l10n.getLang(MY_DESIGN, MY_DESIGN);
       categories.push({
         type: MY_DESIGN,      
@@ -145,14 +116,14 @@ export class Models {
         length: myDesigns.length
       });
 
-      const translated: Translated = {
+      const translated: StepWithTranslation = {
         type: MY_DESIGN,
         translation: myDesignName
       };
       if (myDesigns?.length) {
         translated.length = myDesigns?.length;
       }
-      estepTypesTranslated.push(translated);
+      stepTypesTranslated.push(translated);
     }
 
     stepsTypes.forEach((type: string) => {
@@ -161,11 +132,11 @@ export class Models {
       const merged = studioLabel + type;
       const translation = l10n.getLang(merged, type);
 
-      const translated: Translated = {
+      const translated: StepWithTranslation = {
         type,
         translation
       };
-      estepTypesTranslated.push(translated);
+      stepTypesTranslated.push(translated);
     });
 
     const DEFAULT_STEPS: Step[] = [
@@ -210,24 +181,36 @@ export class Models {
       );
     }
 
-    const param = this.parseParam();
-    console.log({ param });
-    
-    //TODO FIx
-    const preselectedCategory: Category | undefined = categories.find((category) => category.type === param.preselectedStep && category.category?.toLowerCase() === param.preselectedCategory);
-    //TODO hardcoded model
-    const preselectedStep: Step | undefined = steps.find((step) => step.name === 'model' && param.preselectedStep);
-    const preselectedCategories: Category[] = categories.filter((category) => category.type?.toLocaleLowerCase() === param.preselectedStep);
-    const preselectedModels: LuxApiModel[] = preselectedCategory?.models ?? [];
-    console.log({ preselectedCategory, preselectedStep, preselectedModels, preselectedCategories });
+    const styleSelectorFilter = this.parseParam();
+    const preselectedCategory: ModelsCategory | undefined
+      = categories.find(
+        (category) => {
+          const sanitized = category.category.replace(' ', '').toLowerCase();
+          if (sanitized === styleSelectorFilter.preselectedStep || sanitized === styleSelectorFilter.preselectedCategory) {
+            return category;
+          }
+        }
+      );
+    const preselectedStep: Step | undefined
+      = steps.find((step) => step.name === StepType.MODEL && styleSelectorFilter.preselectedStep);
+    const preselectedCategories: ModelsCategory[]
+      = categories.filter((category) => category.type?.toLowerCase() === styleSelectorFilter.preselectedStep);
+
+    const preselectedModels: LuxApiModel[]
+      = preselectedCategories?.find((category) => {
+        const sanitized = category.category.replace(' ', '').toLowerCase();
+        if (sanitized === styleSelectorFilter.preselectedStep || sanitized === styleSelectorFilter.preselectedCategory) {
+          return category;
+        }
+      })?.models || [];
 
     return {
       l10n,
+      steps,
       stepsTypes,
+      stepTypesTranslated,
       categories,
       inspirations,
-      estepTypesTranslated,
-      steps,
       preselectedCategory,
       preselectedStep,
       preselectedModels,
@@ -346,7 +329,7 @@ export class Models {
     if (!mockInspirations) {
       return new Promise((resolve) => resolve([]))
     } 
-    //TODO
+    //TO be defined
     const myDesignsModels: LuxApiModel[] =  [
       {
         "vendorId": "0RB3025CP",

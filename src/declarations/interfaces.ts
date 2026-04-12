@@ -3,6 +3,7 @@ import type { AttributeValue } from '@fluid.inc/yr-configure-wrapper/core';
 import type { FetchPriority, ResolutionType, SkeletonVariant, StepType } from '@/declarations/enums';
 import type { KeyString } from '@/declarations/types';
 import type { Brand } from '@/white-label/types';
+import type { i18n } from '@/models/i18n';
 
 export interface ImageData {
   resolution: ResolutionType;
@@ -382,3 +383,30 @@ export interface Step {
   name: string;
   type: StepType;
 }
+
+export type ModelsCategory = {
+  type: string;
+  category: string;
+  models: LuxApiModel[];
+  length?: number;
+};
+
+export interface StepWithTranslation {
+  type: string;
+  translation: string;
+  length?: number;
+};
+
+export type StyleSelectorInitData = {
+  stepsTypes?: string[];
+  stepTypesTranslated?: StepWithTranslation[];
+  categories?: ModelsCategory[];
+  inspirations?: LuxApiModel[];
+  l10n?: i18n;
+  steps?: Step[],
+  preselectedStep?: Step | undefined;
+  preselectedCategory?: ModelsCategory | undefined;
+  preselectedModels?: LuxApiModel[];
+  preselectedCategories?: ModelsCategory[];
+};
+
