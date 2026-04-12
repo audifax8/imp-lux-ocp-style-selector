@@ -1,73 +1,30 @@
-import type { Brand } from '@/white-label/types'
-import type { GlassType } from '@/style-selector/types'
-import { API_LANGUAGE, BRAND_URLS } from '@/style-selector/api/config'
-import type { MergedParams } from '@/declarations/types'
+import type { LuxApiModelsResponse, MergedParams } from '@/declarations/types'
 import { i18n } from '@/models/i18n';
 import type { Originator } from '@/configurator/model/strategy/configurator-init';
 import type { Logger } from '@/models/logger';
 import type { Performance } from '@/models/performance';
+import type { LuxApiModel, UiSettings, Step } from '@/declarations/interfaces';
+import { StepType } from '@/declarations/enums';
 
 // ── Tipos del response de la API ────────────────────────────────────────────
 
-export interface ApiModel {
-  modelCode: string
-  vendorId: string
-  pageUrl: string
-  promoBadge?: string
-  label: string
-  thumbnailUrl?: string
-  recipeId?: number;
-}
-
-interface ApiCategory {
-  models: ApiModel[]
-  category: string
-}
-
-export interface Step {
-  id: number;
-  name: string;
-}
-
-export interface ApiModelsResponse {
-  sunglasses?: ApiCategory[]
-  eyeglasses?: ApiCategory[]
-}
-
-export type Model = {
-  modelCode: string;
-  vendorId: string;
-  pageUrl: string;
-  promoBadge?: string;
-  label: string;
-  thumbnailUrl?: string;
-  recipeId?: number;
-};
-
-export type CategoryGroup = {
-  category: string;
-  models: Model[];
-};
-
-export type InputData = Record<string, CategoryGroup[]>;
-
 export type Output = {
-  types?: string[];
-  typesTranslated?: Translated[];
+  stepsTypes?: string[];
+  estepTypesTranslated?: Translated[];
   categories?: Category[];
-  inspirations?: ApiModel[];
+  inspirations?: LuxApiModel[];
   l10n?: i18n;
   steps?: Step[],
   preselectedStep?: Step | undefined;
   preselectedCategory?: Category | undefined;
-  preselectedModels?: Model[] | ApiModel[];
+  preselectedModels?: LuxApiModel[];
   preselectedCategories?: Category[];
 };
 
 export type Category = {
   type: string;
   category: string;
-  models: Model[] |  ApiModel[];
+  models: LuxApiModel[];
   length?: number;
 };
 
@@ -76,78 +33,6 @@ interface Translated {
   translation: string;
   length?: number;
 }
-
-
-// ── Fetch ───────────────────────────────────────────────────────────────────
-
-export const fetchModels = async (brand: Brand): Promise<InputData> => {
-  const brand_url = BRAND_URLS[brand]
-  const url = `${brand_url + API_LANGUAGE}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
-  return res.json() as Promise<InputData>
-}
-
-export const fetchUiSetting = async (url: string): Promise<InputData> => {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
-  return res.json() as Promise<InputData>
-}
-
-// ── Tipos de salida ──────────────────────────────────────────────────────────
-
-export interface ModelCategory {
-  name: string
-  models: ApiModel[]
-}
-
-// ── Helpers internos ─────────────────────────────────────────────────────────
-
-const deduplicateByCode = (models: ApiModel[]): ApiModel[] => {
-  const seen = new Set<string>()
-  return models.filter(m => {
-    if (seen.has(m.modelCode)) return false
-    seen.add(m.modelCode)
-    return true
-  })
-}
-
-// Selecciona las ApiCategory relevantes para cada GlassType.
-// kids-sunglasses → sunglasses donde category === "KIDS"
-// sunglasses      → sunglasses donde category !== "KIDS"
-// eyeglasses      → toda la clave eyeglasses
-const rawCategoriesForType = (
-  data: ApiModelsResponse,
-  type: GlassType,
-): { models: ApiModel[]; category: string }[] => {
-  switch (type) {
-    case 'sunglasses':
-      return (data.sunglasses ?? []).filter(c => c.category !== 'KIDS')
-    case 'eyeglasses':
-      return data.eyeglasses ?? []
-    case 'kids-sunglasses':
-      return (data.sunglasses ?? []).filter(c => c.category === 'KIDS')
-  }
-}
-
-// ── API pública ───────────────────────────────────────────────────────────────
-
-// Devuelve las categorías dinámicas de la API para el tipo seleccionado,
-// excluyendo las que lleguen vacías. Los nombres vienen tal cual del response.
-export const getCategoriesByType = (
-  data: ApiModelsResponse,
-  type: GlassType,
-): ModelCategory[] =>
-  rawCategoriesForType(data, type)
-    .filter(c => c.models.length > 0)
-    .map(c => ({ name: c.category, models: c.models }))
-
-// Todos los modelos del tipo, deduplicados por modelCode (vista "All").
-export const getModelsByType = (
-  data: ApiModelsResponse,
-  type: GlassType,
-): ApiModel[] =>
-  deduplicateByCode(rawCategoriesForType(data, type).flatMap(c => c.models))
 
 export class Models {
   private params: MergedParams = undefined!;
@@ -217,13 +102,13 @@ export class Models {
    * @param inspirations 
    * @returns Output
    */
-  private mapModels(models: InputData, l10n: i18n,  myDesigns?: ApiModel[], inspirations?: ApiModel[]): Output {
-    const types: string[] = Object.keys(models);
-    const typesTranslated: Translated[] = [];
+  private mapModels(models: LuxApiModelsResponse, l10n: i18n,  myDesigns?: LuxApiModel[], inspirations?: LuxApiModel[]): Output {
+    const stepsTypes: string[] = Object.keys(models);
+    const estepTypesTranslated: Translated[] = [];
 
-    const categories: Category[] = types.flatMap((type) => {
+    const categories: Category[] = stepsTypes.flatMap((type) => {
       const groups = models[type];
-      const uniqueMap = new Map<string, Model>();
+      const uniqueMap = new Map<string, LuxApiModel>();
       groups.forEach((group) => {
         group.models.forEach((model) => {
           if (!uniqueMap.has(model.modelCode)) {
@@ -267,10 +152,10 @@ export class Models {
       if (myDesigns?.length) {
         translated.length = myDesigns?.length;
       }
-      typesTranslated.push(translated);
+      estepTypesTranslated.push(translated);
     }
 
-    types.forEach((type: string) => {
+    stepsTypes.forEach((type: string) => {
       //const studioLabel = 'styleSelectorCategoryLabel';
       const studioLabel = 'style_selector_category_label_';
       const merged = studioLabel + type;
@@ -280,17 +165,19 @@ export class Models {
         type,
         translation
       };
-      typesTranslated.push(translated);
+      estepTypesTranslated.push(translated);
     });
 
     const DEFAULT_STEPS: Step[] = [
       {
         id: 0,
-        name: 'type'
+        name: 'type',
+        type: StepType.TYPE
       },
       {
         id: 1,
-        name: 'model'
+        name: 'model',
+        type: StepType.MODEL
       },
       /*{
         id: 2,
@@ -298,13 +185,14 @@ export class Models {
       }*/
     ];
 
-    const steps: Step[] = DEFAULT_STEPS.map(({ id, name }) => {
+    const steps: Step[] = DEFAULT_STEPS.map(({ id, name, type }) => {
       const studioLabel = 'style_selector_category_label_';
       const merged = studioLabel + name;
       const translation = l10n.getLang(merged, name);
       return {
         id,
-        name: translation
+        name: translation,
+        type
       };
     });
 
@@ -316,7 +204,8 @@ export class Models {
       steps.push(
         {
           id: steps.length,
-          name: translation
+          name: translation,
+          type: StepType.INSPIRATIONS
         }
       );
     }
@@ -329,15 +218,15 @@ export class Models {
     //TODO hardcoded model
     const preselectedStep: Step | undefined = steps.find((step) => step.name === 'model' && param.preselectedStep);
     const preselectedCategories: Category[] = categories.filter((category) => category.type?.toLocaleLowerCase() === param.preselectedStep);
-    const preselectedModels: Model[] | ApiModel[] = preselectedCategory?.models ?? [];
+    const preselectedModels: LuxApiModel[] = preselectedCategory?.models ?? [];
     console.log({ preselectedCategory, preselectedStep, preselectedModels, preselectedCategories });
 
     return {
       l10n,
-      types,
+      stepsTypes,
       categories,
       inspirations,
-      typesTranslated,
+      estepTypesTranslated,
       steps,
       preselectedCategory,
       preselectedStep,
@@ -356,14 +245,14 @@ export class Models {
     return url;
   }
 
-  private async getUiSettings(): Promise<unknown> {
+  private async getUiSettings(): Promise<UiSettings> {
     this.performance?.processStart('getUiSettings');
     const url = this.getUiSettingsUrl();
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`);
     this.performance?.processEnd('getUiSettings');
     this.performance?.logMeasure('getUiSettings');
-    return res.json() as Promise<unknown>
+    return res.json() as Promise<UiSettings>
   }
 
   private getModelsUrl(): string {
@@ -379,20 +268,20 @@ export class Models {
     return url + lang;
   }
 
-  private async getModels(): Promise<InputData> {
+  private async getModels(): Promise<LuxApiModelsResponse> {
     this.performance?.processStart('getModels');
     const url = this.getModelsUrl();
     const res = await fetch(url)
     if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
     this.performance?.processEnd('getModels');
     this.performance?.logMeasure('getModels');
-    return res.json() as Promise<InputData>
+    return res.json() as Promise<LuxApiModelsResponse>
   }
 
-  private async getMyDesigns(): Promise<ApiModel[]> {
+  private async getMyDesigns(): Promise<LuxApiModel[]> {
     const { mockMyDesigns, getMyDesign } = this.params;
 
-    const myDesignsModels: ApiModel[] =  [
+    const myDesignsModels: LuxApiModel[] =  [
       {
         "vendorId": "0RB3025CP",
         "modelCode": "0RB3025CP",
@@ -452,13 +341,13 @@ export class Models {
    * this method has not been defined yet by Lux
    * @returns 
    */
-  private getInspirationsDesigns(): Promise<ApiModel[]> {
+  private getInspirationsDesigns(): Promise<LuxApiModel[]> {
     const { mockInspirations } = this.params;
     if (!mockInspirations) {
       return new Promise((resolve) => resolve([]))
     } 
     //TODO
-    const myDesignsModels: ApiModel[] =  [
+    const myDesignsModels: LuxApiModel[] =  [
       {
         "vendorId": "0RB3025CP",
         "modelCode": "0RB3025CP",

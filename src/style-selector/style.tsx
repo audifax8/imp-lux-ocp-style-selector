@@ -6,18 +6,20 @@ import { Header } from '@/style-selector/components/header'
 import { SubNav } from '@/style-selector/components/sub-nav'
 import { activeBrand } from '@/white-label/detect'
 import { getSVGURLByType } from '@/shared/assets';
-import type { ApiModel, Category, Model, Step } from '@/style-selector/api/models'
+import type { Category } from '@/style-selector/api/models'
 import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
 import { useData } from '@/style-selector/context/context';
+import type { LuxApiModel, Step } from '@/declarations/interfaces';
+import { StepType } from '@/declarations/enums';
 
 const Style = () => {
   const phase1Data = useData();
   console.log(phase1Data);
 
-  const [filteredModels, setFilteredModels] = useState<Model[]>(phase1Data?.preselectedModels ?? []);
-  const [selectedModel, setSelectedModel] = useState<Model>();
+  const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(phase1Data?.preselectedModels ?? []);
+  const [selectedModel, setSelectedModel] = useState<LuxApiModel>();
 
-  const [filteredInspirations, setFilteredInspirations] = useState<ApiModel[]>();
+  const [filteredInspirations, setFilteredInspirations] = useState<LuxApiModel[]>();
 
   const [subCategories, setSubCategories] = useState<Category[]>(phase1Data?.preselectedCategories ?? []);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(phase1Data?.preselectedCategory);
@@ -58,7 +60,7 @@ const Style = () => {
     setFilteredModels(models?.models ?? []);
   };
 
-  const onModelClick = (model: Model) => {
+  const onModelClick = (model: LuxApiModel) => {
     //Custom model
     if (model.recipeId) {
       return window.open(model?.pageUrl, '_blank');
@@ -83,17 +85,17 @@ const Style = () => {
       <Header steps={phase1Data?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       <SubNav steps={phase1Data?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       {/* Step 0: Type */}
-      {selectedStep?.id === 0 && (
+      {selectedStep?.type === StepType.TYPE && (
         <main className='style-selector__elements'>
-          {phase1Data?.typesTranslated
-            ? phase1Data.typesTranslated.map((type) =>
+          {phase1Data?.estepTypesTranslated
+            ? phase1Data.estepTypesTranslated.map((step) =>
                 <Card
-                  length={type.length}
-                  key={type.type}
-                  title={type.translation}
-                  imageSrc={getSVGURLByType(type.type, activeBrand, 'img')}
-                  imageAlt={type.type}
-                  onClick={() => onClick(type.type)}
+                  length={step.length}
+                  key={step.type}
+                  title={step.translation}
+                  imageSrc={getSVGURLByType(step.type, activeBrand, 'img')}
+                  imageAlt={step.type}
+                  onClick={() => onClick(step.type)}
                 />
               )
             : [0, 1, 2].map(i => <Card key={i} skeleton />)
@@ -102,7 +104,7 @@ const Style = () => {
       )}
 
       {/* Step 1: Model */}
-      {selectedStep?.id === 1 && (
+      {selectedStep?.type === StepType.MODEL && (
         <main className='style-selector__models'>
           <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
           <ul className="style-selector__models-list"
@@ -129,7 +131,7 @@ const Style = () => {
       )}
 
       {/* Step 2: Inspiration */}
-      {selectedStep?.id === 2 && (
+      {selectedStep?.type === StepType.INSPIRATIONS && (
         <main className='style-selector__inspiration'>
           <div className='style-selector__inspiration__container'>
             <p className='style-selector__inspiration__container__label'>Select trending styles or

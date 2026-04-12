@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import type { ConfigureInitParams, ConfigureParams, ScriptResult } from '@/declarations/interfaces';
+import type { ConfigureInitParams, ConfigureParams, LuxApiCategory, ScriptResult } from '@/declarations/interfaces';
 
 export type GraphSettings = {
   edgeGroups: unknown;
@@ -49,3 +49,5 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   onResourceResult?: (result: ScriptResult) => void;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
+
+export type LuxApiModelsResponse = Record<string, LuxApiCategory[]>;

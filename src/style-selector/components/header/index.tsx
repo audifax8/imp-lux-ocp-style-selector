@@ -1,9 +1,9 @@
 import React from 'react';
 
-import type { Step } from '@/style-selector/api/models';
 
 import { SkeletonVariant } from '@/declarations/enums';
 
+import type { Step } from '@/declarations/interfaces';
 import { Skeleton } from '@/shared/components/skeleton';
 //import { getCurrentTheme, type Theme } from '@/shared/theme/darkMode'
 //import DarkModeSwitch from '@/shared/components/dark-mode-switch';

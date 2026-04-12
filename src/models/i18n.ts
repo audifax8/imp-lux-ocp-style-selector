@@ -1,4 +1,5 @@
 /* eslint-disable */
+//import type { UiSettings } from '@/declarations/interfaces';
 import type { KeyString } from '@/declarations/types';
 
 export class i18n {

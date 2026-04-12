@@ -1,6 +1,6 @@
 import type { AttributeValue } from '@fluid.inc/yr-configure-wrapper/core';
 
-import type { FetchPriority, ResolutionType, SkeletonVariant } from '@/declarations/enums';
+import type { FetchPriority, ResolutionType, SkeletonVariant, StepType } from '@/declarations/enums';
 import type { KeyString } from '@/declarations/types';
 import type { Brand } from '@/white-label/types';
 
@@ -354,4 +354,31 @@ export interface HeadlessProduct {
     attributes: ConfigurableAttribute[];
     facets: HeadlessFacet[];
   };
+}
+
+export interface LuxApiModel {
+  modelCode: string
+  vendorId: string
+  pageUrl: string
+  promoBadge?: string
+  label: string
+  thumbnailUrl?: string
+  recipeId?: number;
+}
+
+export type LuxApiCategory = {
+  category: string;
+  models: LuxApiModel[];
+};
+
+export interface UiSettings {
+  globals: {
+    i18n: Record<string, string>;
+  };
+}
+
+export interface Step {
+  id: number;
+  name: string;
+  type: StepType;
 }

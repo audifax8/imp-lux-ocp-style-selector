@@ -47,3 +47,10 @@ export enum CheckPointType {
   VM = 'VM',
   MENU = 'MENU'
 }
+
+export enum StepType {
+  TYPE = 'TYPE',
+  MODEL = 'MODEL',
+  MY_DESIGN = 'MY_DESIGN',
+  INSPIRATIONS = 'INSPIRATIONS'
+}
