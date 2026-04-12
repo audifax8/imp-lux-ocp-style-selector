@@ -2,22 +2,23 @@
 // ConfiguratorInitStrategy — implementación concreta del contrato IInitStrategy
 // =============================================================================
 
-import type { IInitStrategy } from '@/configurator/model/strategy/types'
-import type { Caretaker } from '@/configurator/bootstrap/state/caretaker'
-import type { Originator } from '@/configurator/bootstrap/state/originator'
+import type { IInitStrategy } from '@/configurator/model/strategy/types';
+import type { Caretaker } from '@/configurator/bootstrap/state/caretaker';
+import type { Originator } from '@/configurator/bootstrap/state/originator';
 
-import { Logger } from '@/models/logger'
-import { Performance } from '@/models/performance'
+import { Logger } from '@/models/logger';
+import { Performance } from '@/models/performance';
 
-import { Models, type Output } from '@/style-selector/api/models';
+import { Models } from '@/style-selector/api/models';
+import type { StyleSelectorInitData } from '@/declarations/interfaces';
 
 export class StyleSelectorInitStrategy
-  implements IInitStrategy<Output, Output>
+  implements IInitStrategy<StyleSelectorInitData, StyleSelectorInitData>
 {
   private caretaker: Caretaker | undefined
   private originator: Originator | undefined
 
-  async executePhase1(): Promise<Output> {
+  async executePhase1(): Promise<StyleSelectorInitData> {
     try {
       const { getInitQueryParams, Caretaker, Originator, LoadingState } = await import('./configurator-init');
       const params = getInitQueryParams();
@@ -34,16 +35,16 @@ export class StyleSelectorInitStrategy
       return await models.init();
     } catch (e) {
       console.log(e);
-      return {} as Output
+      return {} as StyleSelectorInitData
     }
   }
 
-  async executePhase2(phase1Result: Output): Promise<Output> {
+  async executePhase2(styleSelectorInitData: StyleSelectorInitData): Promise<StyleSelectorInitData> {
     try {
-      console.log(phase1Result);
+      console.log(styleSelectorInitData);
     } catch (e) {
       console.log(e);
     }
-    return {} as Output
+    return {} as StyleSelectorInitData
   }
 }

@@ -72,7 +72,7 @@ export class Models {
    * @param l10n 
    * @param myDesigns 
    * @param inspirations 
-   * @returns Output
+   * @returns styleSelectorInitData
    */
   private mapModels(models: LuxApiModelsResponse, l10n: i18n,  myDesigns?: LuxApiModel[], inspirations?: LuxApiModel[]): StyleSelectorInitData {
     const stepsTypes: string[] = Object.keys(models);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Skeleton } from '@/shared/components/skeleton';
 import { SkeletonVariant } from '@/declarations/enums';
-import type { Step } from '@/style-selector/api/models';
+import type { Step } from '@/declarations/interfaces';
 
 import './index.scss';
 interface SubNavProps {

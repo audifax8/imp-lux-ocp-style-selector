@@ -11,13 +11,13 @@
 //
 // El flag `cancelled` evita setState sobre un componente desmontado.
 
-import { useState, useEffect } from 'react'
-import type { IInitStrategy } from './strategy/types'
-import type { Output } from '@/style-selector/api/models'
+import { useState, useEffect } from 'react';
+import type { IInitStrategy } from './strategy/types';
+import type { StyleSelectorInitData } from '@/declarations/interfaces';
 
 export interface InitState {
-  phase1Data: Output;
-  phase2Data: Output;
+  phase1Data: StyleSelectorInitData;
+  phase2Data: StyleSelectorInitData;
   phase1Error: Error | null
   phase2Error: Error | null
 }
@@ -30,7 +30,7 @@ const INITIAL_STATE: InitState = {
 }
 
 export const useInitStyleSelectorStrategy = (
-  strategy: IInitStrategy<Output, Output>,
+  strategy: IInitStrategy<StyleSelectorInitData, StyleSelectorInitData>,
 ): InitState => {
   const [state, setState] = useState<InitState>(INITIAL_STATE)
 

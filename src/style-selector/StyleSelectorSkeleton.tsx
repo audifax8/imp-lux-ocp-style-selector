@@ -1,22 +1,27 @@
-import { Card } from '@/style-selector/components/card'
-import { Header } from '@/style-selector/components/header'
-import { SubNav } from '@/style-selector/components/sub-nav'
-import { activeBrand } from '@/white-label/detect'
-import type { Step } from './api/models'
+import { StepType } from '@/declarations/enums';
+import type { Step } from '@/declarations/interfaces';
+import { Card } from '@/style-selector/components/card';
+import { Header } from '@/style-selector/components/header';
+import { SubNav } from '@/style-selector/components/sub-nav';
+import { activeBrand } from '@/white-label/detect';
+
 
 const StyleSelectorSkeleton = () => {
   const steps: Step[] = [
     {
       id: 0,
-      name: '1. Type'
+      name: '1. Type',
+      type: StepType.TYPE
     },
     {
       id: 1,
-      name: '2. Model'
+      name: '2. Model',
+      type: StepType.MODEL
     },
     {
       id: 2,
-      name: '3. Inspiration'
+      name: '3. Inspiration',
+      type: StepType.INSPIRATIONS
     }
   ];
 

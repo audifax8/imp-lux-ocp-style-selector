@@ -1,15 +1,14 @@
 import React from 'react';
 
-import type { Category } from '@/style-selector/api/models';
 import { Button } from '@/style-selector/components/category-button';
-
+import type { ModelsCategory } from '@/declarations/interfaces';
 
 import './index.scss';
 
 interface CategoryFilterProps {
-  subCategories?: Category[],
-  selectedCategory?: Category,
-  onClick?: (category: Category) => void;
+  subCategories?: ModelsCategory[],
+  selectedCategory?: ModelsCategory,
+  onClick?: (category: ModelsCategory) => void;
 }
 
 export const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
