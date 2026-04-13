@@ -29,7 +29,13 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
 }) => {
   return (
-    <button className={`${className} yr-button ${selected ? 'yr-button__selected' : ''}`} type="button" aria-label={label} onClick={onClick}>
+    <button
+      className={`${className}
+      yr-button ${selected ? 'yr-button__selected' : ''}`}
+      type="button"
+      aria-label={label}
+      aria-current={`${selected ? true : false}`}
+      onClick={onClick}>
       {!skeleton ?
         <span className={'yr-button__label'}>{label}</span> :
         <Skeleton className='yr-button__label yr-skeleton' variant={SkeletonVariant.text} />

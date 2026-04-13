@@ -26,6 +26,7 @@ export const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
               (<li
                 role="none"
                 className="category-filter-nav-item"
+                aria-current={`${category?.type === selectedCategory?.type ? true : false}`}
                 key={i}>
                   <Button selected={category.category === selectedCategory?.category} label={category.category} onClick={() => onClick?.(category)}/>
               </li>))}

@@ -12,21 +12,21 @@ import type { LuxApiModel, Step, ModelsCategory } from '@/declarations/interface
 import { StepType } from '@/declarations/enums';
 
 const Style = () => {
-  const StyleSelectorInitData = useData();
+  const styleSelectorInitData = useData();
 
-  const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(StyleSelectorInitData?.preselectedModels ?? []);
+  const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(styleSelectorInitData?.preselectedModels ?? []);
   const [selectedModel, setSelectedModel] = useState<LuxApiModel>();
 
   const [filteredInspirations, setFilteredInspirations] = useState<LuxApiModel[]>();
 
-  const [subCategories, setSubCategories] = useState<ModelsCategory[]>(StyleSelectorInitData?.preselectedCategories ?? []);
-  const [selectedCategory, setSelectedCategory] = useState<ModelsCategory | undefined>(StyleSelectorInitData?.preselectedCategory);
+  const [subCategories, setSubCategories] = useState<ModelsCategory[]>(styleSelectorInitData?.preselectedCategories ?? []);
+  const [selectedCategory, setSelectedCategory] = useState<ModelsCategory | undefined>(styleSelectorInitData?.preselectedCategory);
 
-  const [steps] = useState<Step[]>(StyleSelectorInitData?.steps ?? []);
-  const [selectedStep, setSelectedStep] = useState<Step>(StyleSelectorInitData?.preselectedStep ?? steps[0]);
+  const [steps] = useState<Step[]>(styleSelectorInitData?.steps ?? []);
+  const [selectedStep, setSelectedStep] = useState<Step>(styleSelectorInitData?.preselectedStep ?? steps[0]);
 
   const onClick = (type: string) => {
-    const filtered = StyleSelectorInitData?.categories?.filter(category => category.type === type);
+    const filtered = styleSelectorInitData?.categories?.filter(category => category.type === type);
     setSubCategories(filtered ?? []);
     if (filtered && filtered[0].models) {
       setSelectedCategory(filtered[0]);
@@ -54,7 +54,7 @@ const Style = () => {
 
   const onCategoryClick = (category: ModelsCategory) => {
     setSelectedCategory(category);
-    const models = StyleSelectorInitData?.categories?.find(cat => cat.category === category.category && cat.type === category.type);
+    const models = styleSelectorInitData?.categories?.find(cat => cat.category === category.category && cat.type === category.type);
     setFilteredModels(models?.models ?? []);
   };
 
@@ -63,7 +63,7 @@ const Style = () => {
     if (model.recipeId) {
       return window.open(model?.pageUrl, '_blank');
     }
-    const { inspirations } = StyleSelectorInitData;
+    const { inspirations } = styleSelectorInitData;
     const ins = inspirations?.filter((inspiration) => inspiration.vendorId === model.vendorId);
     if (!ins || !ins.length) {
        return window.open(selectedModel?.pageUrl, '_blank');
@@ -78,15 +78,18 @@ const Style = () => {
     window.open(selectedModel?.pageUrl, '_blank');
   };
 
+  const trendingLabel = styleSelectorInitData?.l10n?.getLabel('', 'Select trending styles or');
+  const skipLabel = styleSelectorInitData?.l10n?.getLabel('', 'skip to customization');
+
   return (
     <div className={`style-selector style-selector-${activeBrand}`}>
-      <Header steps={StyleSelectorInitData?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
-      <SubNav steps={StyleSelectorInitData?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
+      <Header steps={styleSelectorInitData?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
+      <SubNav steps={styleSelectorInitData?.steps} selectedStep={selectedStep} onClick={onHeaderClick} />
       {/* Step 0: Type */}
       {selectedStep?.type === StepType.TYPE && (
         <main className='style-selector__elements'>
-          {StyleSelectorInitData?.stepTypesTranslated
-            ? StyleSelectorInitData.stepTypesTranslated.map((step) =>
+          {styleSelectorInitData?.stepTypesTranslated
+            ? styleSelectorInitData.stepTypesTranslated.map((step) =>
                 <Card
                   length={step.length}
                   key={step.type}
@@ -132,11 +135,13 @@ const Style = () => {
       {selectedStep?.type === StepType.INSPIRATIONS && (
         <main className='style-selector__inspiration'>
           <div className='style-selector__inspiration__container'>
-            <p className='style-selector__inspiration__container__label'>Select trending styles or
+            <p className='style-selector__inspiration__container__label'>{trendingLabel}
               <a
+                href='#'
                 tabIndex={0}
                 className='style-selector__inspiration__container__link'
-                onClick={() => onSkipToCustomizationClick()}> skip to customization
+                aria-label={`${trendingLabel} ${skipLabel}`}
+                onClick={() => onSkipToCustomizationClick()}>{skipLabel}
               </a>
             </p>
           </div>

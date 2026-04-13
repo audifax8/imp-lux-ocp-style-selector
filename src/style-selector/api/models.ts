@@ -26,7 +26,7 @@ export class Models {
   private parseParam(): { preselectedStep: string, preselectedCategory: string } {
     try {
       const { startWithStyleSelector } = this.params;
-      const query = startWithStyleSelector.split(',');
+      const query = startWithStyleSelector?.split(',');
       const preselectedStep = query && query[0]?.toLowerCase();
       const preselectedCategory = query && query[1]?.toLowerCase();
       return {

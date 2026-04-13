@@ -28,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   onClick
 }) => {
   const isClickable = typeof onClick === 'function';
+  console.log({steps, selectedStep});
 
   //const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   
@@ -54,13 +55,15 @@ export const Header: React.FC<HeaderProps> = ({
                 (<li
                   className='header-nav-items'
                   role="none"
+                  aria-current={`${step.id === selectedStep?.id ? true : false}`}
                   key={i}>
                     <StepComponent
                       className={`header-nav-item ${step.id === selectedStep?.id ? 'header-nav-item__selected' : ''} ${isDisabled ? 'header-nav-item__disabled' : ''}`}
                       onClick={!isDisabled ? () => onClick?.(step) : undefined}
                       {...(isClickable && !isDisabled && {
                         type: 'button',
-                        'aria-label': step.name,
+                        'aria-label': `${step.name}`,
+                        'aria-current': `${step.id === selectedStep?.id ? true : false}`
                       })}
                     >
                       <a role="menuitem">{(step.id + 1)}. {step?.name}</a>
