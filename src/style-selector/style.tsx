@@ -17,8 +17,6 @@ const Style = () => {
   const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(styleSelectorInitData?.preselectedModels ?? []);
   const [selectedModel, setSelectedModel] = useState<LuxApiModel>();
 
-  const [filteredInspirations, setFilteredInspirations] = useState<LuxApiModel[]>();
-
   const [subCategories, setSubCategories] = useState<ModelsCategory[]>(styleSelectorInitData?.preselectedCategories ?? []);
   const [selectedCategory, setSelectedCategory] = useState<ModelsCategory | undefined>(styleSelectorInitData?.preselectedCategory);
 
@@ -44,11 +42,13 @@ const Style = () => {
   //     el botón back retrocede a Type (cubre "step 3 → step 1" directamente).
   const onHeaderClick = (step?: Step) => {
     if (!step || step.id >= selectedStep.id) return;
-    if (step.id === 0) {
+    if (step.type === StepType.TYPE) {
       setSelectedStep(steps[0]);
       setSelectedCategory(undefined);
-    } else if (step.id === 1) {
-      setSelectedStep(steps[1]);
+    } else if (step.type === StepType.MODEL) {
+      setSelectedStep(step);
+      const newModels = styleSelectorInitData.categories?.find(cate => cate.type === selectedCategory?.type);
+      setFilteredModels(newModels?.models ?? []);
     }
   };
 
@@ -69,7 +69,7 @@ const Style = () => {
        return window.open(selectedModel?.pageUrl, '_blank');
     }
     setSelectedStep(steps[2]);
-    setFilteredInspirations(ins);
+    setFilteredModels(ins ?? []);
     setSelectedModel(model);
   };
 
@@ -78,8 +78,8 @@ const Style = () => {
     window.open(selectedModel?.pageUrl, '_blank');
   };
 
-  const trendingLabel = styleSelectorInitData?.l10n?.getLabel('', 'Select trending styles or');
-  const skipLabel = styleSelectorInitData?.l10n?.getLabel('', 'skip to customization');
+  const trendingLabel = styleSelectorInitData?.l10n?.getLabel(`style_selector_category_label_trending`, 'Select trending styles or');
+  const skipLabel = styleSelectorInitData?.l10n?.getLabel('style_selector_category_label_skip', ' skip to customization');
 
   return (
     <div className={`style-selector style-selector-${activeBrand}`}>
@@ -104,51 +104,28 @@ const Style = () => {
         </main>
       )}
 
-      {/* Step 1: Model */}
-      {selectedStep?.type === StepType.MODEL && (
-        <main className='style-selector__models'>
-          <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
-          <ul className="style-selector__models-list"
-            role="list"
-            aria-label="">
-              {filteredModels?.map(
-                (model, i) =>
-                  (<li
-                    role="none"
-                    className='style-selector__models-list-item'
-                    key={i}>
-                      <ModelCard
-                        key={model.modelCode}
-                        title={model.label}
-                        imageSrc={model.thumbnailUrl}
-                        imageAlt={model.label}
-                        onClick={() => onModelClick(model)}
-                      />
-                  </li>
-                )
-              )}
-          </ul>
-        </main>
-      )}
-
-      {/* Step 2: Inspiration */}
-      {selectedStep?.type === StepType.INSPIRATIONS && (
+      {(selectedStep?.type === StepType.MODEL || selectedStep?.type === StepType.INSPIRATIONS) && (
         <main className='style-selector__inspiration'>
-          <div className='style-selector__inspiration__container'>
-            <p className='style-selector__inspiration__container__label'>{trendingLabel}
-              <a
-                href='#'
-                tabIndex={0}
-                className='style-selector__inspiration__container__link'
-                aria-label={`${trendingLabel} ${skipLabel}`}
-                onClick={() => onSkipToCustomizationClick()}>{skipLabel}
-              </a>
-            </p>
-          </div>
+          {selectedStep?.type === StepType.MODEL && (
+            <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
+          )}
+            {selectedStep?.type === StepType.INSPIRATIONS && (
+              <div className='style-selector__inspiration__container'>
+                <p className='style-selector__inspiration__container__label'>{trendingLabel}
+                  <a
+                    href='#'
+                    tabIndex={0}
+                    className='style-selector__inspiration__container__link'
+                    aria-label={`${trendingLabel} ${skipLabel}`}
+                    onClick={() => onSkipToCustomizationClick()}>{skipLabel}
+                  </a>
+                </p>
+              </div>
+            )}
           <ul className="style-selector__inspiration-list"
             role="list"
             aria-label="">
-              {filteredInspirations?.map(
+              {filteredModels?.map(
                 (model, i) =>
                   (<li
                     role="none"

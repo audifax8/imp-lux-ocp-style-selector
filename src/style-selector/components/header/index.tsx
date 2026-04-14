@@ -28,7 +28,6 @@ export const Header: React.FC<HeaderProps> = ({
   onClick
 }) => {
   const isClickable = typeof onClick === 'function';
-  console.log({steps, selectedStep});
 
   //const [theme, setTheme] = useState<Theme>(getCurrentTheme)
   
