@@ -4,7 +4,7 @@ import { StepType } from '@/declarations/enums';
 import type { Originator } from '@/configurator/model/strategy/configurator-init';
 import type { Logger } from '@/models/logger';
 import type { Performance } from '@/models/performance';
-import type { LuxApiModel, UiSettings, ModelsCategory, StepWithTranslation, StyleSelectorInitData, ModelsTranslated } from '@/declarations/interfaces';
+import type { LuxApiModel, UiSettings, FlatModel, StepWithTranslation, StyleSelectorMapped, ModelsTranslated, StyleSelectorFilter, StyleSelectorInitData } from '@/declarations/interfaces';
 import type { LuxApiModelsResponse, MergedParams } from '@/declarations/types'
 
 export class Models {
@@ -53,16 +53,66 @@ export class Models {
         this.getInspirationsDesigns()
       ]);
       const l10n = new i18n(uiSetting);
-      const mappedModels =  this.mapModels(models, l10n, myDesigns, inspirations);
+      const mappedModels = this.mapModels(models, l10n, myDesigns, inspirations);
+      const mapPreselections = this.mapPreselections(mappedModels.flatModels, mappedModels.stepsTranslated);
       this.performance?.processEnd('parseModels');
       this.performance?.logMeasure('parseModels');
-      return mappedModels;
+      return {
+        i18n: l10n,
+        ...mappedModels,
+        ...mapPreselections
+      };
     } catch(e) {
       this.performance?.processEnd('parseModels');
       this.performance?.logMeasure('parseModels');
       this.logger?.error('[MODELS] Error');
       this.logger?.object(e);
-      return {};
+      return undefined!;
+    }
+  }
+
+  /**
+   * 
+   * @param flatModels 
+   * @param stepsTranslated 
+   * @returns 
+   */
+  private mapPreselections(flatModels?: FlatModel[], stepsTranslated?: StepWithTranslation[]): StyleSelectorFilter {
+    try {
+      const styleSelectorFilter = this.parseParam();
+      const preselectedCategories = flatModels?.filter(model => model.type === styleSelectorFilter.preselectedType);
+      //If the filter is sent
+      const preselectedStep: StepWithTranslation | undefined
+        = stepsTranslated?.find((step) => step.type === StepType.MODEL && preselectedCategories && preselectedCategories.length)
+
+      const preselectedModel: FlatModel | undefined
+        = preselectedCategories?.find(
+          (model) => {
+            const sanitized = model.category.replace(' ', '').toLowerCase();
+            if (sanitized === styleSelectorFilter.preselectedType || sanitized === styleSelectorFilter.preselectedCategory) {
+              return model;
+            }
+          }
+        );
+
+      const preselectedModels: LuxApiModel[] = preselectedModel?.models || [];
+
+      return {
+        /* when the filter is sent E.G: &startWithStyleSelector=sunglasses,adulti */
+        preselectedModel,
+        preselectedStep,
+        preselectedModels,
+        preselectedCategories
+      };
+    } catch (e) {
+      this.logger?.error('[MODELS] Error parsing Param');
+      this.logger?.object(e);
+      return {
+        preselectedModel: undefined,
+        preselectedStep: undefined,
+        preselectedModels: [],
+        preselectedCategories: []
+      };
     }
   }
 
@@ -74,8 +124,14 @@ export class Models {
    * @param inspirations 
    * @returns styleSelectorInitData
    */
-  private mapModels(models: LuxApiModelsResponse, l10n: i18n,  myDesigns?: LuxApiModel[], inspirations?: LuxApiModel[]): StyleSelectorInitData {
-    const modelsTypes: string[] = Object.keys(models);
+  private mapModels(luxModelsResponse: LuxApiModelsResponse, l10n: i18n,  myDesigns?: LuxApiModel[], inspirations?: LuxApiModel[]): StyleSelectorMapped {
+    let modelsTypesKeys: string[] = [];
+    const MY_DESIGN = 'my_design';
+    if (myDesigns && myDesigns.length) {
+      modelsTypesKeys.push(MY_DESIGN);
+    }
+
+    modelsTypesKeys = modelsTypesKeys.concat(Object.keys(luxModelsResponse));
     let stepsTranslated: StepWithTranslation[] = [];
     
     const DEFAULT_STEPS: StepWithTranslation[] = [
@@ -99,10 +155,10 @@ export class Models {
       );
     }
 
-    const modelsMapped: ModelsCategory[] = modelsTypes.flatMap((type) => {
-      const groups = models[type];
+    const flatModels: FlatModel[] = modelsTypesKeys.flatMap((type) => {
+      const groups = luxModelsResponse[type];
       const uniqueMap = new Map<string, LuxApiModel>();
-      groups.forEach((group) => {
+      groups?.forEach((group) => {
         group.models.forEach((model) => {
           if (!uniqueMap.has(model.modelCode)) {
             uniqueMap.set(model.modelCode, model);
@@ -112,43 +168,30 @@ export class Models {
 
       const allModels = Array.from(uniqueMap.values());
       const allCategoryName = l10n.getLang('allLabel', 'All');
-      const allCategory = {
+      let allCategory: FlatModel = {
+        modelKey: type,
         type,
         category: allCategoryName,
         models: allModels,
       };
 
-      const normalCategories = groups.map((group) => ({
+      if (type === MY_DESIGN && myDesigns && myDesigns.length) {
+        allCategory = {
+          modelKey: type,
+          type,
+          category: type,
+          models: myDesigns,
+        };
+      }
+
+      const normalCategories = groups?.map((group) => ({
+        modelKey: type,
         type,
         category: group.category,
         models: group.models,
-      }));
-
+      })) ?? [];
       return [allCategory, ...normalCategories];
     });
-    const MY_DESIGN = 'my_design';
-    if (myDesigns && myDesigns.length) {
-      const STUDIO_BASE_LABEL = 'style_selector_category_label_';
-      const merged = STUDIO_BASE_LABEL + MY_DESIGN;
-      const translation = l10n.getLang(merged, 'my desing');
-      modelsMapped.push({
-        type: 'my design',      
-        category: translation,
-        models: myDesigns,
-        length: myDesigns.length
-      });
-
-      const translated: StepWithTranslation = {
-        name: MY_DESIGN,
-        translation,
-        id: 0
-      };
-      if (myDesigns?.length) {
-        translated.length = myDesigns?.length;
-      }
-      modelsTypes.push('myDesign');
-      stepsTranslated.push(translated);
-    }
 
     stepsTranslated = DEFAULT_STEPS.map(({ name, type }, id: number) => {
       const STUDIO_BASE_LABEL = 'style_selector_category_label_';
@@ -161,26 +204,7 @@ export class Models {
       };
     });
 
-    console.log({ modelsMapped });
-    const styleSelectorFilter = this.parseParam();
-    console.log(styleSelectorFilter);
-
-    const preselectedCategories = modelsMapped.filter(model => model.type === styleSelectorFilter.preselectedType);
-    //If the filter is sent and 
-    const preselectedStep: StepWithTranslation | undefined
-      = stepsTranslated?.find((step) => step.type === StepType.MODEL && preselectedCategories && preselectedCategories.length)
-
-    const preselectedModel: ModelsCategory | undefined
-      = preselectedCategories?.find(
-        (model) => {
-          const sanitized = model.category.replace(' ', '').toLowerCase();
-          if (sanitized === styleSelectorFilter.preselectedType || sanitized === styleSelectorFilter.preselectedCategory) {
-            return model;
-          }
-        }
-      );
-
-    const modelsTypesTranslated: ModelsTranslated[] = modelsTypes.map((name) => {
+    const modelsTypesTranslated: ModelsTranslated[] = modelsTypesKeys.map((name) => {
       const STUDIO_BASE_LABEL = 'style_selector_category_label_';
       const merged = STUDIO_BASE_LABEL + name;
       const translation = l10n.getLang(merged, name);
@@ -190,45 +214,11 @@ export class Models {
       }
     });
 
-    const preselectedModels: LuxApiModel[]
-      = preselectedModel?.models || [];
-
-    console.log({ preselectedCategories, preselectedStep, preselectedModel, preselectedModels, modelsTypes, modelsTypesTranslated });
-    /*const preselectedCategory: ModelsCategory | undefined
-      = categories.find(
-        (category) => {
-          const sanitized = category.category.replace(' ', '').toLowerCase();
-          if (sanitized === styleSelectorFilter.preselectedStep || sanitized === styleSelectorFilter.preselectedCategory) {
-            return category;
-          }
-        }
-      );
-    const preselectedStep: Step | undefined
-      = steps.find((step) => step.name === StepType.MODEL && styleSelectorFilter.preselectedStep);
-    const preselectedCategories: ModelsCategory[]
-      = categories.filter((category) => category.type?.toLowerCase() === styleSelectorFilter.preselectedStep);
-
-    const preselectedModels: LuxApiModel[]
-      = preselectedCategories?.find((category) => {
-        const sanitized = category.category.replace(' ', '').toLowerCase();
-        if (sanitized === styleSelectorFilter.preselectedStep || sanitized === styleSelectorFilter.preselectedCategory) {
-          return category;
-        }
-      })?.models || [];
-      */
-
     return {
-      l10n,
       modelsTypesTranslated,
-      //steps,
-      //stepsTypes,
       stepsTranslated,
-      categories: modelsMapped,
-      inspirations,
-      preselectedCategory: preselectedModel,
-      preselectedStep,
-      preselectedModels,
-      preselectedCategories
+      flatModels,
+      inspirations
     };
   }
 

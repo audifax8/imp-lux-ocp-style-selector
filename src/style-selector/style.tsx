@@ -8,30 +8,28 @@ import { activeBrand } from '@/white-label/detect';
 import { getSVGURLByType } from '@/shared/assets';
 import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
 import { useData } from '@/style-selector/context/context';
-import type { LuxApiModel, ModelsCategory, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
+import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
 import { StepType } from '@/declarations/enums';
 
 const Style = () => {
   const styleSelectorInitData = useData();
-  console.log(styleSelectorInitData);
 
   const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(styleSelectorInitData?.preselectedModels ?? []);
   const [selectedModel, setSelectedModel] = useState<LuxApiModel>();
 
-  const [subCategories, setSubCategories] = useState<ModelsCategory[]>(styleSelectorInitData?.preselectedCategories ?? []);
-  const [selectedCategory, setSelectedCategory] = useState<ModelsCategory | undefined>(styleSelectorInitData?.preselectedCategory);
+  const [subCategories, setSubCategories] = useState<FlatModel[]>(styleSelectorInitData?.preselectedCategories ?? []);
+  const [selectedCategory, setSelectedCategory] = useState<FlatModel | undefined>(styleSelectorInitData?.preselectedModel);
 
   const [steps] = useState<StepWithTranslation[]>(styleSelectorInitData?.stepsTranslated ?? []);
   const [selectedStep, setSelectedStep] = useState<StepWithTranslation>(styleSelectorInitData?.preselectedStep ?? steps[0]);
 
   const [modelsTypesTranslated] = useState<ModelsTranslated[]>(styleSelectorInitData?.modelsTypesTranslated ?? []);
-  console.log({ selectedStep });
 
   const onClick = (type: string) => {
-    const filtered = styleSelectorInitData?.categories?.filter(category => category.type === type);
+    const filtered = styleSelectorInitData?.flatModels?.filter(model => model.type === type);
     setSubCategories(filtered ?? []);
     if (filtered && filtered[0].models) {
-      setSelectedCategory(filtered[0]);
+      //setSelectedCategory(filtered[0]);
       setFilteredModels(filtered[0].models);
       setSelectedStep(steps[1]);
     }
@@ -50,14 +48,14 @@ const Style = () => {
       setSelectedCategory(undefined);
     } else if (step?.type === StepType.MODEL) {
       setSelectedStep(step);
-      const newModels = styleSelectorInitData.categories?.find(cate => cate.type === selectedCategory?.type);
-      setFilteredModels(newModels?.models ?? []);
+      //const newModels = styleSelectorInitData.flatModels?.find(cate => cate.type === selectedCategory?.type);
+      //setFilteredModels(newModels?.models ?? []);
     }
   };
 
-  const onCategoryClick = (category: ModelsCategory) => {
-    setSelectedCategory(category);
-    const models = styleSelectorInitData?.categories?.find(cat => cat.category === category.category && cat.type === category.type);
+  const onCategoryClick = (category: FlatModel) => {
+    //setSelectedCategory(category);
+    const models = styleSelectorInitData?.flatModels?.find(cat => cat.category === category.category && cat.type === category.type);
     setFilteredModels(models?.models ?? []);
   };
 
@@ -81,8 +79,8 @@ const Style = () => {
     window.open(selectedModel?.pageUrl, '_blank');
   };
 
-  const trendingLabel = styleSelectorInitData?.l10n?.getLabel(`style_selector_category_label_trending`, 'Select trending styles or');
-  const skipLabel = styleSelectorInitData?.l10n?.getLabel('style_selector_category_label_skip', ' skip to customization');
+  const trendingLabel = styleSelectorInitData?.i18n?.getLabel(`style_selector_category_label_trending`, 'Select trending styles or');
+  const skipLabel = styleSelectorInitData?.i18n?.getLabel('style_selector_category_label_skip', ' skip to customization');
 
   return (
     <div className={`style-selector style-selector-${activeBrand}`}>

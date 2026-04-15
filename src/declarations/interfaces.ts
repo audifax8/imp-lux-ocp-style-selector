@@ -384,7 +384,8 @@ export interface Step {
   type: StepType;
 }
 
-export type ModelsCategory = {
+export type FlatModel = {
+  modelKey: string;
   type: string;
   category: string;
   models: LuxApiModel[];
@@ -405,16 +406,28 @@ export interface StepWithTranslation {
 };
 
 export type StyleSelectorInitData = {
-  stepsTypes?: string[];
-  modelsTypesTranslated?: ModelsTranslated[];
+  i18n: i18n;
   stepsTranslated?: StepWithTranslation[];
-  categories?: ModelsCategory[];
+  modelsTypesTranslated?: ModelsTranslated[];
+  flatModels?: FlatModel[];
   inspirations?: LuxApiModel[];
-  l10n?: i18n;
-  steps?: Step[],
   preselectedStep?: StepWithTranslation | undefined;
-  preselectedCategory?: ModelsCategory | undefined;
+  preselectedModel?: FlatModel | undefined;
   preselectedModels?: LuxApiModel[];
-  preselectedCategories?: ModelsCategory[];
+  preselectedCategories?: FlatModel[];
+};
+
+export type StyleSelectorMapped = {
+  stepsTranslated?: StepWithTranslation[];
+  modelsTypesTranslated?: ModelsTranslated[];
+  flatModels?: FlatModel[];
+  inspirations?: LuxApiModel[];
+};
+
+export type StyleSelectorFilter = {
+  preselectedStep?: StepWithTranslation | undefined;
+  preselectedModel?: FlatModel | undefined;
+  preselectedModels?: LuxApiModel[];
+  preselectedCategories?: FlatModel[];
 };
 

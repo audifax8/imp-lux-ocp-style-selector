@@ -35,7 +35,7 @@ export class StyleSelectorInitStrategy
       return await models.init();
     } catch (e) {
       console.log(e);
-      return {} as StyleSelectorInitData
+      return undefined!;
     }
   }
 
@@ -45,6 +45,6 @@ export class StyleSelectorInitStrategy
     } catch (e) {
       console.log(e);
     }
-    return {} as StyleSelectorInitData
+    return undefined!;
   }
 }
