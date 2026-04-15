@@ -1,14 +1,14 @@
 import React from 'react';
 import { Skeleton } from '@/shared/components/skeleton';
 import { SkeletonVariant } from '@/declarations/enums';
-import type { Step } from '@/declarations/interfaces';
+import type { StepWithTranslation } from '@/declarations/interfaces';
 
 import './index.scss';
 interface SubNavProps {
   skeleton?: boolean;
-  steps?: Step[];
-  selectedStep?: Step;
-  onClick?: (step?: Step) => void;
+  steps?: StepWithTranslation[];
+  selectedStep?: StepWithTranslation;
+  onClick?: (step?: StepWithTranslation) => void;
 }
 
 export const SubNav: React.FC<SubNavProps> = ({

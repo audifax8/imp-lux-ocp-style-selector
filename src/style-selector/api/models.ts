@@ -4,7 +4,7 @@ import { StepType } from '@/declarations/enums';
 import type { Originator } from '@/configurator/model/strategy/configurator-init';
 import type { Logger } from '@/models/logger';
 import type { Performance } from '@/models/performance';
-import type { LuxApiModel, UiSettings, Step, ModelsCategory, StepWithTranslation, StyleSelectorInitData } from '@/declarations/interfaces';
+import type { LuxApiModel, UiSettings, ModelsCategory, StepWithTranslation, StyleSelectorInitData, ModelsTranslated } from '@/declarations/interfaces';
 import type { LuxApiModelsResponse, MergedParams } from '@/declarations/types'
 
 export class Models {
@@ -23,22 +23,22 @@ export class Models {
     this.parseParam();
   }
 
-  private parseParam(): { preselectedStep: string, preselectedCategory: string } {
+  private parseParam(): { preselectedType: string, preselectedCategory: string } {
     try {
       const { startWithStyleSelector } = this.params;
       const query = startWithStyleSelector?.split(',');
-      const preselectedStep = query && query[0]?.toLowerCase();
+      const preselectedType = query && query[0]?.toLowerCase();
       const preselectedCategory = query && query[1]?.toLowerCase();
       return {
-        preselectedCategory,
-        preselectedStep
+        preselectedType,
+        preselectedCategory
       }
     } catch (e) {
       this.logger?.error('[style selector] Error parsing param');
       this.logger?.object(e);
       return {
-        preselectedCategory: '',
-        preselectedStep: ''
+        preselectedType: '',
+        preselectedCategory: ''
       }
     }
   }
@@ -75,10 +75,31 @@ export class Models {
    * @returns styleSelectorInitData
    */
   private mapModels(models: LuxApiModelsResponse, l10n: i18n,  myDesigns?: LuxApiModel[], inspirations?: LuxApiModel[]): StyleSelectorInitData {
-    const stepsTypes: string[] = Object.keys(models);
-    const stepTypesTranslated: StepWithTranslation[] = [];
+    const modelsTypes: string[] = Object.keys(models);
+    let stepsTranslated: StepWithTranslation[] = [];
+    
+    const DEFAULT_STEPS: StepWithTranslation[] = [
+      {
+        name: 'type',
+        type: StepType.TYPE
+      },
+      {
+        name: 'model',
+        type: StepType.MODEL
+      }
+    ];
 
-    const categories: ModelsCategory[] = stepsTypes.flatMap((type) => {
+    if (inspirations && inspirations.length) {
+      const name = 'inspirations';
+      DEFAULT_STEPS.push(
+        {
+          name,
+          type: StepType.INSPIRATIONS
+        }
+      );
+    }
+
+    const modelsMapped: ModelsCategory[] = modelsTypes.flatMap((type) => {
       const groups = models[type];
       const uniqueMap = new Map<string, LuxApiModel>();
       groups.forEach((group) => {
@@ -105,60 +126,33 @@ export class Models {
 
       return [allCategory, ...normalCategories];
     });
-
-    const MY_DESIGN = 'myDesign';
+    const MY_DESIGN = 'my_design';
     if (myDesigns && myDesigns.length) {
-      const myDesignName = l10n.getLang(MY_DESIGN, MY_DESIGN);
-      categories.push({
-        type: MY_DESIGN,      
-        category: myDesignName,
+      const STUDIO_BASE_LABEL = 'style_selector_category_label_';
+      const merged = STUDIO_BASE_LABEL + MY_DESIGN;
+      const translation = l10n.getLang(merged, 'my desing');
+      modelsMapped.push({
+        type: 'my design',      
+        category: translation,
         models: myDesigns,
         length: myDesigns.length
       });
 
       const translated: StepWithTranslation = {
-        type: MY_DESIGN,
-        translation: myDesignName
+        name: MY_DESIGN,
+        translation,
+        id: 0
       };
       if (myDesigns?.length) {
         translated.length = myDesigns?.length;
       }
-      stepTypesTranslated.push(translated);
+      modelsTypes.push('myDesign');
+      stepsTranslated.push(translated);
     }
 
-    stepsTypes.forEach((type: string) => {
-      //const studioLabel = 'styleSelectorCategoryLabel';
-      const studioLabel = 'style_selector_category_label_';
-      const merged = studioLabel + type;
-      const translation = l10n.getLang(merged, type);
-
-      const translated: StepWithTranslation = {
-        type,
-        translation
-      };
-      stepTypesTranslated.push(translated);
-    });
-
-    const DEFAULT_STEPS: Step[] = [
-      {
-        id: 0,
-        name: 'type',
-        type: StepType.TYPE
-      },
-      {
-        id: 1,
-        name: 'model',
-        type: StepType.MODEL
-      },
-      /*{
-        id: 2,
-        name: 'inspiration'
-      }*/
-    ];
-
-    const steps: Step[] = DEFAULT_STEPS.map(({ id, name, type }) => {
-      const studioLabel = 'style_selector_category_label_';
-      const merged = studioLabel + name;
+    stepsTranslated = DEFAULT_STEPS.map(({ name, type }, id: number) => {
+      const STUDIO_BASE_LABEL = 'style_selector_category_label_';
+      const merged = STUDIO_BASE_LABEL + name;
       const translation = l10n.getLang(merged, name);
       return {
         id,
@@ -167,22 +161,40 @@ export class Models {
       };
     });
 
-    if (inspirations && inspirations.length) {
-      const name = 'inspirations';
-      const studioLabel = 'style_selector_category_label_';
-      const merged = studioLabel + name;
-      const translation = l10n.getLang(merged, name);
-      steps.push(
-        {
-          id: steps.length,
-          name: translation,
-          type: StepType.INSPIRATIONS
+    console.log({ modelsMapped });
+    const styleSelectorFilter = this.parseParam();
+    console.log(styleSelectorFilter);
+
+    const preselectedCategories = modelsMapped.filter(model => model.type === styleSelectorFilter.preselectedType);
+    //If the filter is sent and 
+    const preselectedStep: StepWithTranslation | undefined
+      = stepsTranslated?.find((step) => step.type === StepType.MODEL && preselectedCategories && preselectedCategories.length)
+
+    const preselectedModel: ModelsCategory | undefined
+      = preselectedCategories?.find(
+        (model) => {
+          const sanitized = model.category.replace(' ', '').toLowerCase();
+          if (sanitized === styleSelectorFilter.preselectedType || sanitized === styleSelectorFilter.preselectedCategory) {
+            return model;
+          }
         }
       );
-    }
 
-    const styleSelectorFilter = this.parseParam();
-    const preselectedCategory: ModelsCategory | undefined
+    const modelsTypesTranslated: ModelsTranslated[] = modelsTypes.map((name) => {
+      const STUDIO_BASE_LABEL = 'style_selector_category_label_';
+      const merged = STUDIO_BASE_LABEL + name;
+      const translation = l10n.getLang(merged, name);
+      return {
+        translation,
+        name
+      }
+    });
+
+    const preselectedModels: LuxApiModel[]
+      = preselectedModel?.models || [];
+
+    console.log({ preselectedCategories, preselectedStep, preselectedModel, preselectedModels, modelsTypes, modelsTypesTranslated });
+    /*const preselectedCategory: ModelsCategory | undefined
       = categories.find(
         (category) => {
           const sanitized = category.category.replace(' ', '').toLowerCase();
@@ -203,15 +215,17 @@ export class Models {
           return category;
         }
       })?.models || [];
+      */
 
     return {
       l10n,
-      steps,
-      stepsTypes,
-      stepTypesTranslated,
-      categories,
+      modelsTypesTranslated,
+      //steps,
+      //stepsTypes,
+      stepsTranslated,
+      categories: modelsMapped,
       inspirations,
-      preselectedCategory,
+      preselectedCategory: preselectedModel,
       preselectedStep,
       preselectedModels,
       preselectedCategories

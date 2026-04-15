@@ -379,7 +379,7 @@ export interface UiSettings {
 }
 
 export interface Step {
-  id: number;
+  id?: number;
   name: string;
   type: StepType;
 }
@@ -391,20 +391,28 @@ export type ModelsCategory = {
   length?: number;
 };
 
+export type ModelsTranslated = {
+  name: string;
+  translation?: string;
+};
+
 export interface StepWithTranslation {
-  type: string;
-  translation: string;
+  id?: number;
+  name: string;
+  translation?: string;
+  type?: StepType;
   length?: number;
 };
 
 export type StyleSelectorInitData = {
   stepsTypes?: string[];
-  stepTypesTranslated?: StepWithTranslation[];
+  modelsTypesTranslated?: ModelsTranslated[];
+  stepsTranslated?: StepWithTranslation[];
   categories?: ModelsCategory[];
   inspirations?: LuxApiModel[];
   l10n?: i18n;
   steps?: Step[],
-  preselectedStep?: Step | undefined;
+  preselectedStep?: StepWithTranslation | undefined;
   preselectedCategory?: ModelsCategory | undefined;
   preselectedModels?: LuxApiModel[];
   preselectedCategories?: ModelsCategory[];

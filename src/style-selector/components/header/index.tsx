@@ -1,10 +1,8 @@
 import React from 'react';
 
-
 import { SkeletonVariant } from '@/declarations/enums';
-
-import type { Step } from '@/declarations/interfaces';
 import { Skeleton } from '@/shared/components/skeleton';
+import type { StepWithTranslation } from '@/declarations/interfaces';
 //import { getCurrentTheme, type Theme } from '@/shared/theme/darkMode'
 //import DarkModeSwitch from '@/shared/components/dark-mode-switch';
 
@@ -15,10 +13,10 @@ import { Skeleton } from '@/shared/components/skeleton';
 
 import './index.scss';
 interface HeaderProps {
-  steps?: Step[];
-  selectedStep?: Step;
+  steps?: StepWithTranslation[];
+  selectedStep?: StepWithTranslation;
   skeleton?: boolean;
-  onClick?: (step: Step) => void;
+  onClick?: (step: StepWithTranslation) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -48,7 +46,8 @@ export const Header: React.FC<HeaderProps> = ({
         >
           {steps?.map(
             (step, i) => {
-              const isDisabled = step.id > (selectedStep?.id ?? 0);
+              //const isDisabled = step.id > (selectedStep?.id ?? 0);
+              const isDisabled = false;
               const StepComponent = (isClickable && !isDisabled) ? 'button' : 'div';
               return !skeleton ?
                 (<li
@@ -65,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
                         'aria-current': `${step.id === selectedStep?.id ? true : false}`
                       })}
                     >
-                      <a role="menuitem">{(step.id + 1)}. {step?.name}</a>
+                      <a role="menuitem">{((step.id ?? 0) + 1)}. {step?.name}</a>
                     </StepComponent>
                 </li>) :
                 (<Skeleton
