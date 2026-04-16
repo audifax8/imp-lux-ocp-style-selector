@@ -196,7 +196,7 @@ Orquesta toda la carga de datos del modo style-selector:
 - `init()` — lanza en paralelo: `getModels()` + `getUiSettings()` + `getMyDesigns()` + `getInspirationsDesigns()`
 - `mapModels()` — construye `Output`: tipos, categorías con "All" deduplicado, `typesTranslated` (via `i18n`), `steps` dinámicos, `inspirations`
 - `getUiSettings()` — CDN URL construida desde params: `workflow/customer/product/locale`
-- `getModels()` — endpoint dinámico; reemplaza store ID si `params.store` presente
+- `getModels()` — endpoint dinámico; reemplaza store ID si `params.store` presente; headers de auth comentados temporalmente (en pruebas con endpoint real)
 - `getMyDesigns()` — retorna mock data solo si `?mockMyDesigns=true`; si no, array vacío (TODO: API real)
 - `getInspirationsDesigns()` — retorna mock data solo si `?mockInspirations=true`; si no, array vacío (TODO: API real)
 - **Steps dinámicos**: `DEFAULT_STEPS` = [type, model]; step "inspiration" se añade solo si `inspirations.length > 0`
@@ -221,7 +221,7 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, l10n)
-- `context/data.tsx` — `DataProvider`; usa `StyleSelectorInitStrategy` + `useInitStyleSelectorStrategy` internamente; llama `completeStyleSelectorPromise()` via `useEffect` cuando `phase1Data` llega; provee datos via `DataContext`
+- `context/data.tsx` — `DataProvider`; importa `StyleSelectorInitStrategy` desde `@/style-selector/bootstrap/strategy` y `useInitStyleSelectorStrategy` desde `@/style-selector/bootstrap/strategy/useInitStyleSelectorStrategy`; llama `completeStyleSelectorPromise()` via `useEffect` cuando `phase1Data` llega; provee datos via `DataContext`
 - _(typography moved to `src/shared/styles/_typography.scss` — ver sección Shared)_
 - `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
 
@@ -309,13 +309,10 @@ Regla "no saltar": steps con `id > selectedStep.id` en el Header reciben clase `
 - `model/model.scss` — ?inline CSS del skeleton (keyframe + shapes shimmer)
 - `model/model-content.scss` — ?inline CSS del contenido (gafas, info modelo, badge, recomendaciones, animación `mc-fade-in`)
 - `model/useInitStrategy.ts` — hook que orquesta la cadena Fase 1 → Fase 2 con flag `cancelled` para cleanup en desmontaje
-- `model/useInitStyleSelectorStrategy.ts` — hook que orquesta la inicialización del modo style-selector via `StyleSelectorInitStrategy`
-- `model/strategy/types.ts` — interfaces `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data`
 - `model/strategy/mocks.ts` — `fetchPhase1Mock` (~900ms, datos de modelo) + `fetchPhase2Mock` (~600ms, recomendaciones + sessionId)
 - `model/strategy/core.ts` — lógica de core compartida entre strategies
 - `model/strategy/configurator-init.ts` — chunk preloadeable (nombre fijo); re-exporta `getInitQueryParams`, `RTRSkeleton`, `Caretaker`, `Originator`, `LoadingState`; consolida las deps de init en un único dynamic import
 - `model/strategy/ConfiguratorInitStrategy.ts` — implementación concreta de `IInitStrategy` para el configurator; executePhase1: `import('./configurator-init')` (un solo import, resuelve de caché), Logger+Performance desde params, LoadingState+Originator+Caretaker, RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
-- `model/strategy/StyleSelectorInitStrategy.ts` — implementación concreta de `IInitStrategy` para style-selector; fetchea modelos y mapea types/categories a `phase1Data`
 - `model/strategy/base.ts` — `BaseStrategy` abstract class; provee `runMicrotask/runIdle/runAnimation` via `@/libs/helpers.schedule`
 - `model/strategy/rtr-skeleton.ts` — `RTRSkeleton extends BaseStrategy`; descarga script (`downloadScript`), carga assets en idle (`loadRTRAssets`), inicia viewer en `requestAnimationFrame` (`initRTR`); errores propagan via `runAnimation`
 
@@ -325,11 +322,14 @@ Regla "no saltar": steps con `id > selectedStep.id` en el Header reciben clase `
 3. Fase 2 arranca SOLO tras Fase 1 (~600ms) — no bloquea → al resolver: recomendaciones aparecen con animación `mc-fade-in`
 
 ## Bootstrap state machine (Memento pattern)
-`src/configurator/bootstrap/state/` — infraestructura de estado para las estrategias de inicialización:
+Ambos modos tienen su propia infraestructura de estado en `bootstrap/state/`:
 - `loading-state.ts` — `LoadingState`: estado que viaja entre estrategias (params, logger, performance, configureJsons, checkPoint); `clone(updates)` para versiones inmutables
 - `originator.ts` — `Originator`: holder del estado actual; guarda/restaura via `Memento`
 - `caretaker.ts` — `Caretaker`: almacén de `Memento[]` (historial de estados)
 - `memento.ts` — `Memento`: snapshot de un `LoadingState`
+
+`src/configurator/bootstrap/state/` — state machine del configurator
+`src/style-selector/bootstrap/state/` — state machine del style-selector (mirror del configurator)
 
 ## Libs
 `src/libs/helpers.ts` — utilidades de scheduling y params:
@@ -343,7 +343,7 @@ Regla "no saltar": steps con `id > selectedStep.id` en el Header reciben clase `
 - `enums.ts` — `SkeletonVariant`, `ResolutionType`, `Media`, `Theme`, `RTRBackground`, `FetchPriority`, `ApiType`, `CheckPointType`
 - `types.ts` — `MergedParams`, `ConfigureJsons`, `GraphSettings`, `Preferences`, `ButtonProps`, etc.
 - `constants.ts` — Customer IDs (`RBN_CUSTOMER_ID`, `OAK_CUSTOMER_ID`), API key map, CDN/RTR URLs, skeleton resolution helpers
-- `interfaces.ts` — `ConfigureParams`, `ConfigureInitParams` (incluye `mockMyDesigns?`, `mockInspirations?`), `RtrBaseAPI`, `InitRTRPayload`, `RtrAssetsAPI`, `QuickLink`, etc.
+- `interfaces.ts` — `ConfigureParams`, `ConfigureInitParams` (incluye `mockMyDesigns?`, `mockInspirations?`), `RtrBaseAPI`, `InitRTRPayload`, `RtrAssetsAPI`, `QuickLink`, etc.; también `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data` (compartidos entre configurator y style-selector)
 - `cfg-configure-core.d.ts` — module declaration for `@cfg.plat/configure-core`
 
 ## Models
@@ -403,6 +403,15 @@ src/
     bootstrap/
       index.tsx                    — style-selector bootstrap (CSS inject + brand + React mount)
       AppStyleSelector.tsx         — DataProvider + StyleSelector
+      state/
+        loading-state.ts           — LoadingState; clone(updates) for immutable state transitions
+        originator.ts              — Originator; setState/getState/saveMemento/restore
+        caretaker.ts               — Caretaker; stores Memento[]
+        memento.ts                 — Memento; wraps a LoadingState snapshot
+      strategy/
+        index.ts                   — StyleSelectorInitStrategy; fetchea modelos y mapea types/categories a phase1Data
+        useInitStyleSelectorStrategy.ts — hook; orquesta StyleSelectorInitStrategy; cancelled flag para cleanup
+        configurator-init.ts       — re-exporta getInitQueryParams, schedule, AsyncTask, Caretaker, Originator, LoadingState
     api/
       config.ts                    — runtime API config; BRAND_URLS per-brand URL map + API_LANGUAGE
       models.ts                    — clase Models con init(); fetchModels, fetchUiSetting; tipos: ApiModel, Model, Category, Step, Output, Translated; helpers: deduplicateByCode, rawCategoriesForType, getCategoriesByType, getModelsByType
@@ -451,14 +460,11 @@ src/
       model.scss                   — ?inline CSS del skeleton (keyframe + shapes)
       model-content.scss           — ?inline CSS del contenido (gafas, info, badge, recomendaciones, mc-fade-in)
       useInitStrategy.ts           — hook; Fase 1 → Fase 2 chain; cancelled flag para cleanup
-      useInitStyleSelectorStrategy.ts — hook; orquesta StyleSelectorInitStrategy para el modo style-selector
       strategy/
-        types.ts                   — IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data
         mocks.ts                   — fetchPhase1Mock (~900ms) + fetchPhase2Mock (~600ms)
         core.ts                    — lógica de core compartida entre strategies
         configurator-init.ts       — chunk preloadeable (nombre fijo); re-exporta deps de executePhase1 (9.1 KB / 3.4 KB gz)
         ConfiguratorInitStrategy.ts — implementación para configurator; executePhase1: import('./configurator-init'), RTRSkeleton.init() fire-and-forget + fetchPhase1Mock()
-        StyleSelectorInitStrategy.ts — implementación para style-selector; fetchea modelos y mapea types/categories a phase1Data
         base.ts                    — BaseStrategy abstract; runMicrotask/runIdle/runAnimation
         rtr-skeleton.ts            — RTRSkeleton extends BaseStrategy; downloadScript + loadRTRAssets (idle) + initRTR (rAF)
   libs/helpers.ts                  — schedule, runAsync, runIdle, getInitQueryParams
@@ -467,7 +473,7 @@ src/
     enums.ts                       — SkeletonVariant, RTRBackground, CheckPointType, etc.
     types.ts                       — MergedParams, ConfigureJsons, ButtonProps, etc.
     constants.ts                   — customer IDs, API keys, CDN/RTR URLs
-    interfaces.ts                  — ConfigureParams, RtrBaseAPI, InitRTRPayload, etc.
+    interfaces.ts                  — ConfigureParams, RtrBaseAPI, InitRTRPayload, IInitStrategy<P1,P2>, InitPhase1Data, InitPhase2Data, etc.
     cfg-configure-core.d.ts        — module declaration for @cfg.plat/configure-core
   models/
     logger.ts                      — Logger (debug-mode conditional logging)
