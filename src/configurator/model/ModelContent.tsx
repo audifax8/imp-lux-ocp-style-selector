@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import modelContentStyles from './model-content.scss?inline'
 import { activeBrand } from '@/white-label/detect'
-import type { InitPhase1Data, InitPhase2Data } from '@/configurator/model/strategy/types'
+import type { InitPhase1Data, InitPhase2Data } from '@/declarations/interfaces'
 
 const styleEl = document.createElement('style')
 styleEl.dataset.id = 'configurator-model-content'

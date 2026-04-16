@@ -4,12 +4,15 @@ import { Card } from '@/style-selector/components/card';
 import { ModelCard } from '@/style-selector/components/model';
 import { Header } from '@/style-selector/components/header';
 import { SubNav } from '@/style-selector/components/sub-nav';
+import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
+
 import { activeBrand } from '@/white-label/detect';
 import { getSVGURLByType } from '@/shared/assets';
-import { CategoryFilterComponent } from '@/style-selector/components/category-filter';
+
 import { useData } from '@/style-selector/context/context';
-import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
+
 import { StepType } from '@/declarations/enums';
+import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
 
 const Style = () => {
   const styleSelectorInitData = useData();

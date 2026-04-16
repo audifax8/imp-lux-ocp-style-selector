@@ -2,7 +2,7 @@
 // ConfiguratorInitStrategy — implementación concreta del contrato IInitStrategy
 // =============================================================================
 
-import type { IInitStrategy, InitPhase1Data, InitPhase2Data } from './types'
+import type { IInitStrategy, InitPhase1Data, InitPhase2Data } from '@/declarations/interfaces'
 import type { Caretaker } from '@/configurator/bootstrap/state/caretaker'
 import type { Originator } from '@/configurator/bootstrap/state/originator'
 import { fetchPhase1Mock, fetchPhase2Mock } from './mocks'

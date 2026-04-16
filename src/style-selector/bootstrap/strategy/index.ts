@@ -2,15 +2,15 @@
 // ConfiguratorInitStrategy — implementación concreta del contrato IInitStrategy
 // =============================================================================
 
-import type { IInitStrategy } from '@/configurator/model/strategy/types';
-import type { Caretaker } from '@/configurator/bootstrap/state/caretaker';
-import type { Originator } from '@/configurator/bootstrap/state/originator';
+import type { IInitStrategy } from '@/declarations/interfaces';
+import type { Caretaker } from '@/style-selector/bootstrap/state/caretaker';
+import type { Originator } from '@/style-selector/bootstrap/state/originator';
+import type { StyleSelectorInitData } from '@/declarations/interfaces';
 
 import { Logger } from '@/models/logger';
 import { Performance } from '@/models/performance';
 
 import { Models } from '@/style-selector/api/models';
-import type { StyleSelectorInitData } from '@/declarations/interfaces';
 
 export class StyleSelectorInitStrategy
   implements IInitStrategy<StyleSelectorInitData, StyleSelectorInitData>

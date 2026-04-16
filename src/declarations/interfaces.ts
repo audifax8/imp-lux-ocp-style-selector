@@ -424,3 +424,17 @@ export type StyleSelectorInitData = {
   i18n: i18n;
 } & StyleSelectorMapped & StyleSelectorFilter;
 
+export interface InitPhase1Data {
+  modelId: string
+  modelName: string
+  collection: string
+  price: string
+};
+export interface InitPhase2Data {
+  recommendations: Array<{ id: string; name: string }>
+  sessionId: string
+};
+export interface IInitStrategy<P1, P2> {
+  executePhase1(): Promise<P1>
+  executePhase2(phase1Result: P1): Promise<P2>
+};

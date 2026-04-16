@@ -2,8 +2,8 @@ import { useEffect, useMemo, type ReactNode } from 'react';
 
 import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
 import { DataContext } from '@/style-selector/context/context';
-import { StyleSelectorInitStrategy } from '@/configurator/model/strategy/StyleSelectorInitStrategy';
-import { useInitStyleSelectorStrategy } from '@/configurator/model/useInitStyleSelectorStrategy';
+import { StyleSelectorInitStrategy } from '@/style-selector/bootstrap/strategy';
+import { useInitStyleSelectorStrategy } from '@/style-selector/bootstrap/strategy/useInitStyleSelectorStrategy';
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const strategy = useMemo(() => new StyleSelectorInitStrategy(), []);

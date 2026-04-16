@@ -1,7 +1,7 @@
 import { i18n } from '@/models/i18n';
 import { StepType } from '@/declarations/enums';
 
-import type { Originator } from '@/configurator/model/strategy/configurator-init';
+import type { Originator } from '@/style-selector/bootstrap/strategy/configurator-init';
 import type { Logger } from '@/models/logger';
 import type { Performance } from '@/models/performance';
 import type { LuxApiModel, UiSettings, FlatModel, StepWithTranslation, StyleSelectorMapped, ModelsTranslated, StyleSelectorFilter, StyleSelectorInitData } from '@/declarations/interfaces';
@@ -262,9 +262,9 @@ export class Models {
 
   private async getModels(): Promise<LuxApiModelsResponse> {
     this.performance?.processStart('getModels');
-    const { workflow, subscriptionKey, region, ocId } = this.params;
+    //const { workflow, subscriptionKey, region, ocId } = this.params;
     const url = this.getModelsUrl();
-    const res = await fetch(url, {
+    const res = await fetch(url, /*{
       headers: {
         'Ocp-Apim-Subscription-Key': subscriptionKey ?? '',
         'OC-Environment': workflow,
@@ -272,7 +272,7 @@ export class Models {
         'OC-Id': ocId,
         'Instance': 'ray-ban'
       }
-    });
+    }*/);
     if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
     this.performance?.processEnd('getModels');
     this.performance?.logMeasure('getModels');

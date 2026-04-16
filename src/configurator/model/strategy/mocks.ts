@@ -2,7 +2,7 @@
 // Mocks — simulan las llamadas a APIs externas
 // =============================================================================
 
-import type { InitPhase1Data, InitPhase2Data } from './types'
+import type { InitPhase1Data, InitPhase2Data } from '@/declarations/interfaces'
 
 // ── Fase 1 ────────────────────────────────────────────────────────────────────
 // Datos mínimos para mostrar las gafas: modelo, colección, precio.

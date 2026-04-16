@@ -12,7 +12,7 @@
 // El flag `cancelled` evita setState sobre un componente desmontado.
 
 import { useState, useEffect } from 'react'
-import type { IInitStrategy, InitPhase1Data, InitPhase2Data } from './strategy/types'
+import type { IInitStrategy, InitPhase1Data, InitPhase2Data } from '@/declarations/interfaces'
 
 export interface InitState {
   phase1Data: InitPhase1Data | null
