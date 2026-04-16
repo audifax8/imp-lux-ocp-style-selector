@@ -170,7 +170,7 @@ export function getInitQueryParams(): MergedParams {
     useProdEndpoint: parseBoolParam(useProdEndpoint),
     ocHierarchy: ocHierarchy ?? configureParams?.ocHierarchy,
     rtrVersion: rtrVersion,
-    endpoint: endpoint ?? '//one-configurator-services-mockup.luxdeepblue.com',
+    endpoint: endpoint ?? 'https://one-configurator-services-mockup.luxdeepblue.com/models?language=',
     lang: lang ?? 'en',
     store: store ?? '10151',
     mockInspirations: parseBoolParam(mockInspirations),

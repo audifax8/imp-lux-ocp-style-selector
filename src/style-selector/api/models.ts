@@ -262,8 +262,17 @@ export class Models {
 
   private async getModels(): Promise<LuxApiModelsResponse> {
     this.performance?.processStart('getModels');
+    const { workflow, subscriptionKey, region, ocId } = this.params;
     const url = this.getModelsUrl();
-    const res = await fetch(url)
+    const res = await fetch(url, {
+      headers: {
+        'Ocp-Apim-Subscription-Key': subscriptionKey ?? '',
+        'OC-Environment': workflow,
+        'OC-Country': region ?? '',
+        'OC-Id': ocId,
+        'Instance': 'ray-ban'
+      }
+    });
     if (!res.ok) throw new Error(`Models API ${res.status}: ${url}`)
     this.performance?.processEnd('getModels');
     this.performance?.logMeasure('getModels');
