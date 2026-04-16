@@ -13,23 +13,33 @@ import { StepType } from '@/declarations/enums';
 
 const Style = () => {
   const styleSelectorInitData = useData();
+  const {
+    modelsToRender,
+    preselectedCategoriesFilters,
+    preselectedFlatModel,
+    stepsTranslated,
+    preselectedStep,
+    modelsTypesTranslated,
+    flatModels,
+    i18n
+  } = styleSelectorInitData;
 
-  const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(styleSelectorInitData?.preselectedModels ?? []);
+  const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(modelsToRender ?? []);
   const [selectedModel, setSelectedModel] = useState<LuxApiModel>();
 
-  const [subCategories, setSubCategories] = useState<FlatModel[]>(styleSelectorInitData?.preselectedCategories ?? []);
-  const [selectedCategory, setSelectedCategory] = useState<FlatModel | undefined>(styleSelectorInitData?.preselectedModel);
+  const [subCategories, setSubCategories] = useState<FlatModel[]>(preselectedCategoriesFilters ?? []);
+  const [selectedFlatModel, setSelectedFlatModel] = useState<FlatModel | undefined>(preselectedFlatModel);
 
-  const [steps] = useState<StepWithTranslation[]>(styleSelectorInitData?.stepsTranslated ?? []);
-  const [selectedStep, setSelectedStep] = useState<StepWithTranslation>(styleSelectorInitData?.preselectedStep ?? steps[0]);
+  const [steps] = useState<StepWithTranslation[]>(stepsTranslated ?? []);
+  const [selectedStep, setSelectedStep] = useState<StepWithTranslation>(preselectedStep ?? steps[0]);
 
-  const [modelsTypesTranslated] = useState<ModelsTranslated[]>(styleSelectorInitData?.modelsTypesTranslated ?? []);
+  const [modelsTypes] = useState<ModelsTranslated[]>(modelsTypesTranslated ?? []);
 
   const onClick = (type: string) => {
-    const filtered = styleSelectorInitData?.flatModels?.filter(model => model.type === type);
+    const filtered = flatModels?.filter(model => model.type === type);
     setSubCategories(filtered ?? []);
     if (filtered && filtered[0].models) {
-      //setSelectedCategory(filtered[0]);
+      setSelectedFlatModel(filtered[0]);
       setFilteredModels(filtered[0].models);
       setSelectedStep(steps[1]);
     }
@@ -45,17 +55,17 @@ const Style = () => {
   const onHeaderClick = (step?: StepWithTranslation) => {
     if (step?.type === StepType.TYPE) {
       setSelectedStep(steps[0]);
-      setSelectedCategory(undefined);
+      setSelectedFlatModel(undefined);
     } else if (step?.type === StepType.MODEL) {
       setSelectedStep(step);
-      //const newModels = styleSelectorInitData.flatModels?.find(cate => cate.type === selectedCategory?.type);
-      //setFilteredModels(newModels?.models ?? []);
+      const newModels = flatModels?.find(cate => cate.type === selectedFlatModel?.type);
+      setFilteredModels(newModels?.models ?? []);
     }
   };
 
-  const onCategoryClick = (category: FlatModel) => {
-    //setSelectedCategory(category);
-    const models = styleSelectorInitData?.flatModels?.find(cat => cat.category === category.category && cat.type === category.type);
+  const onCategoryClick = (flatModel: FlatModel) => {
+    setSelectedFlatModel(flatModel);
+    const models = styleSelectorInitData?.flatModels?.find(cat => cat.category === flatModel.category && cat.type === flatModel.type);
     setFilteredModels(models?.models ?? []);
   };
 
@@ -79,18 +89,19 @@ const Style = () => {
     window.open(selectedModel?.pageUrl, '_blank');
   };
 
-  const trendingLabel = styleSelectorInitData?.i18n?.getLabel(`style_selector_category_label_trending`, 'Select trending styles or');
-  const skipLabel = styleSelectorInitData?.i18n?.getLabel('style_selector_category_label_skip', ' skip to customization');
+  const trendingLabel = i18n?.getLabel(`style_selector_category_label_trending`, 'Select trending styles or');
+  const skipLabel = i18n?.getLabel('style_selector_category_label_skip', ' skip to customization');
 
   return (
     <div className={`style-selector style-selector-${activeBrand}`}>
-      <Header steps={styleSelectorInitData?.stepsTranslated} selectedStep={selectedStep} onClick={onHeaderClick} />
-      <SubNav steps={styleSelectorInitData?.stepsTranslated} selectedStep={selectedStep} onClick={onHeaderClick} />
+      <Header steps={stepsTranslated} selectedStep={selectedStep} onClick={onHeaderClick} />
+      <SubNav steps={stepsTranslated} selectedStep={selectedStep} onClick={onHeaderClick} />
       {selectedStep?.type === StepType.TYPE && (
         <main className='style-selector__elements'>
-          {modelsTypesTranslated
-            ? modelsTypesTranslated.map((model, index) =>
+          {modelsTypes
+            ? modelsTypes.map((model, index) =>
                 <Card
+                  length={model.length}
                   key={index}
                   title={model.translation}
                   imageSrc={getSVGURLByType(model.name, activeBrand, 'img')}
@@ -105,7 +116,7 @@ const Style = () => {
       {(selectedStep?.type === StepType.MODEL || selectedStep?.type === StepType.INSPIRATIONS) && (
         <main className='style-selector__inspiration'>
           {selectedStep?.type === StepType.MODEL && (
-            <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedCategory} onClick={onCategoryClick}/>
+            <CategoryFilterComponent subCategories={subCategories} selectedCategory={selectedFlatModel} onClick={onCategoryClick}/>
           )}
             {selectedStep?.type === StepType.INSPIRATIONS && (
               <div className='style-selector__inspiration__container'>

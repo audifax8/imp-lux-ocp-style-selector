@@ -23,22 +23,22 @@ export class Models {
     this.parseParam();
   }
 
-  private parseParam(): { preselectedType: string, preselectedCategory: string } {
+  private parseParam(): { preselectedModelType: string, preselectedModelCategory: string } {
     try {
       const { startWithStyleSelector } = this.params;
       const query = startWithStyleSelector?.split(',');
-      const preselectedType = query && query[0]?.toLowerCase();
-      const preselectedCategory = query && query[1]?.toLowerCase();
+      const preselectedModelType = query && query[0]?.toLowerCase();
+      const preselectedModelCategory = query && query[1]?.toLowerCase();
       return {
-        preselectedType,
-        preselectedCategory
+        preselectedModelType,
+        preselectedModelCategory
       }
     } catch (e) {
       this.logger?.error('[style selector] Error parsing param');
       this.logger?.object(e);
       return {
-        preselectedType: '',
-        preselectedCategory: ''
+        preselectedModelType: '',
+        preselectedModelCategory: ''
       }
     }
   }
@@ -72,7 +72,7 @@ export class Models {
   }
 
   /**
-   * 
+   * when the filter is sent E.G: &startWithStyleSelector=sunglasses,adulti
    * @param flatModels 
    * @param stepsTranslated 
    * @returns 
@@ -80,38 +80,42 @@ export class Models {
   private mapPreselections(flatModels?: FlatModel[], stepsTranslated?: StepWithTranslation[]): StyleSelectorFilter {
     try {
       const styleSelectorFilter = this.parseParam();
-      const preselectedCategories = flatModels?.filter(model => model.type === styleSelectorFilter.preselectedType);
-      //If the filter is sent
-      const preselectedStep: StepWithTranslation | undefined
-        = stepsTranslated?.find((step) => step.type === StepType.MODEL && preselectedCategories && preselectedCategories.length)
+      const preselectedCategoriesFilters = flatModels?.filter(model => model.type === styleSelectorFilter.preselectedModelType);
 
-      const preselectedModel: FlatModel | undefined
-        = preselectedCategories?.find(
+      //It means that the filter is sent and valid, so the step is MODEL.
+      const preselectedStep: StepWithTranslation | undefined
+        = stepsTranslated?.find((step) => step.type === StepType.MODEL && preselectedCategoriesFilters && preselectedCategoriesFilters.length)
+
+      const preselectedFlatModel: FlatModel | undefined
+        = preselectedCategoriesFilters?.find(
           (model) => {
             const sanitized = model.category.replace(' ', '').toLowerCase();
-            if (sanitized === styleSelectorFilter.preselectedType || sanitized === styleSelectorFilter.preselectedCategory) {
+            if (sanitized === styleSelectorFilter.preselectedModelType || sanitized === styleSelectorFilter.preselectedModelCategory) {
               return model;
             }
           }
         );
 
-      const preselectedModels: LuxApiModel[] = preselectedModel?.models || [];
+      const modelsToRender: LuxApiModel[] = preselectedFlatModel?.models || [];
 
       return {
-        /* when the filter is sent E.G: &startWithStyleSelector=sunglasses,adulti */
-        preselectedModel,
+        //usually is Model step
         preselectedStep,
-        preselectedModels,
-        preselectedCategories
+        // Models to rendes
+        modelsToRender,
+        // First type 
+        preselectedFlatModel,
+        // Filters categories to show
+        preselectedCategoriesFilters
       };
     } catch (e) {
       this.logger?.error('[MODELS] Error parsing Param');
       this.logger?.object(e);
       return {
-        preselectedModel: undefined,
+        modelsToRender: [],
         preselectedStep: undefined,
-        preselectedModels: [],
-        preselectedCategories: []
+        preselectedFlatModel: undefined,
+        preselectedCategoriesFilters: []
       };
     }
   }
@@ -210,7 +214,8 @@ export class Models {
       const translation = l10n.getLang(merged, name);
       return {
         translation,
-        name
+        name,
+        length: name === MY_DESIGN ? myDesigns?.length : undefined
       }
     });
 
