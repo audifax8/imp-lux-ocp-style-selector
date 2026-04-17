@@ -17,6 +17,13 @@
     background: var(--color-generic-neutral-ultra-light-background);
   }
 
+  /*
+  &:focus-visible {
+    outline: 3px solid var(--color-generic-focus-border);
+    outline-offset: 3px;
+  }
+  */
+
   &__icon {
     display: flex;
     flex-direction: column;

@@ -217,7 +217,7 @@ Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 Single-page component. Internal state manages type selection vs. model grid view.
 
 - `StyleSelector.tsx` — wrapper; monta `StyleSelectorComponent` (lazy via deferred promise) o `StyleSelectorSkeleton` (si `?skeleton` param activo); soporta `?skeletonLoader=true` (shared skeleton alternativo) y `?skeleton=true` (muestra skeleton directamente sin cargar el componente real)
-- `style.tsx` — componente principal (`Style`); usa `useData()` del context (DataProvider); `steps` vienen de `phase1Data?.steps` (dinámicos, construidos por `Models.mapModels`); gestiona estado: tipo, categoría, modelo seleccionado, inspiraciones filtradas; renderiza 3 steps según `selectedStep?.id`
+- `style.tsx` — componente principal (`Style`); usa `useData()` del context (DataProvider); `steps` vienen de `phase1Data?.steps` (dinámicos, construidos por `Models.mapModels`); gestiona estado: tipo, categoría, modelo seleccionado, inspiraciones filtradas; renderiza 3 steps según `selectedStep?.id`; usa `<section aria-label>` (no `<main>`) para los steps — el widget es embebible y no debe crear landmarks `main` que conflicten con la página huésped; **focus management**: `mainRef` + `useEffect([selectedStep])` — cuando el step cambia a MODEL o INSPIRATIONS, hace `querySelector('button, a[href]')` en el `<section>` y mueve el foco al primer elemento interactivo; `hasMounted` ref evita el foco en el render inicial
 - `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, l10n)
@@ -271,19 +271,20 @@ Archivos disponibles:
 - `public/imgs/background/dark/` — mismas 6 variantes en dark
 
 ### Componentes (`style-selector/components/`)
-- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step: Step) => void`; logo via CSS `--ss-logo`, menu icon via `--menu` CSS var; skeleton via `Skeleton` component; steps con `id > selectedStep.id` reciben clase `header-nav-item__disabled` (opacity 0.35, cursor default, pointer-events none) y se renderizan como `div` sin onClick
-- `sub-nav/` — `SubNav`; acepta `steps?`, `selectedStep?: Step`, `onClick?: (step?: Step) => void`; visible solo en mobile; muestra back arrow (izquierda) + step title + progress counter e.g. "1/2" (centro); solo visible cuando `onClick` y `selectedStep?.id` son truthy; arrow via `--arrow-left` CSS var
-- `category-filter/` — `CategoryFilterComponent`; acepta `subCategories?: Category[]`, `selectedCategory?: Category`, `onClick?: (category: Category) => void`
-- `category-button/` — `Button`; acepta `label?`, `skeleton?`, `selected?`, `onClick?: (e: React.MouseEvent) => void`; selected state via `.yr-button__selected`
-- `card/` — `Card`; tarjeta de tipo de gafa (step 0); se renderiza como `<button>` o `<div>` según si `onClick` está presente
+- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step: Step) => void`; logo via CSS `--ss-logo`, menu icon via `--menu` CSS var; skeleton via `Skeleton` component; patrón ARIA stepper: `<nav aria-label="Steps">` + `<ol role="tablist">` + `<button role="tab" aria-selected aria-disabled tabIndex>`; roving tabindex (selected=0, otros=-1); navegación teclado: ArrowLeft/ArrowRight/Home/End mueven foco entre tabs, Enter/Space activan; steps con `id > selectedStep.id` reciben `aria-disabled` + clase `header-nav-item__disabled`; logo con `aria-hidden`; menu icon como `<button>` nativo (no div)
+- `sub-nav/` — `SubNav`; acepta `steps?`, `selectedStep?: Step`, `onClick?: (step?: Step) => void`; visible solo en mobile; semántica: `<nav aria-label="Step navigation">`; back button siempre `<button type="button">` con `aria-label="Back to {step0.name}"` e icono `aria-hidden="true"`; title como `<p className="subnav-title">`; counter como `<p aria-label="Step N of M">` (texto visual "N/M" → evita que AT lea "1 dividido 2"); arrow via `--arrow-left` CSS var
+- `category-filter/` — `CategoryFilterComponent`; acepta `subCategories?`, `selectedCategory?`, `onClick?`, `label?`; patrón ARIA filtro: `<ul role="radiogroup" aria-label>` + `<li role="presentation">` + `<Button role="radio">`; roving tabindex (selected=0, otros=-1); navegación teclado: ArrowRight/Left/Down/Up/Home/End mueven foco Y seleccionan (selection-follows-focus, estándar radiogroup); sin categoría seleccionada → primer item tiene tabIndex=0
+- `category-button/` — `Button`; acepta `label?`, `skeleton?`, `selected?`, `tabIndex?`, `onClick?`; `role="radio"` + `aria-checked` (no `aria-current`); `aria-label` en el button, `aria-hidden` en el `<span>` interior; `:focus-visible` con `--color-generic-focus-border`
+- `card/` — `Card`; tarjeta de tipo de gafa (step 0); se renderiza como `<button>` o `<div>` según si `onClick` está presente; hijos con `aria-hidden="true"` — VoiceOver solo lee el `aria-label` del botón
 - `model/` — `ModelCard`; tarjeta de modelo (step 1); imagen con `loading='eager'`
 - `logo/` — `Logo`; renderiza SVG via URL
 - `img/` — componente de imagen
 
 ### Steps internos (gestionados por state en `style.tsx`)
-- **Step 0 (Type)**: grid de `Card` usando `phase1Data?.typesTranslated`; skeleton cards (×3) mientras datos son null; click → filtra categorías → avanza a step 1
-- **Step 1 (Model)**: `CategoryFilterComponent` + grid de `ModelCard`; click en modelo → si tiene inspiraciones → avanza a step 2 (`filteredInspirations` + `selectedModel`); si no → abre `model.pageUrl` en nueva pestaña
-- **Step 2 (Inspiration)**: label "Select trending styles or [skip to customization]" + grid de `ModelCard` con `filteredInspirations`; "skip to customization" → `window.open(selectedModel.pageUrl)`; step 2 solo aparece si la API devuelve inspirations (step dinámico)
+- **Step 0 (Type)**: `<section aria-label="Select glasses type">` + `<ul role="list" aria-label="Glasses types">` + `<li>` por cada tipo; `Card` dentro de cada `<li>`; skeleton cards (×3) con `aria-hidden="true"` mientras datos son null; click → filtra categorías → avanza a step 1; navegación por teclado: Tab entre botones
+- **Step 1 (Model)**: `<section aria-label="Select a model" ref={mainRef}>` + `CategoryFilterComponent` + `<ul role="list" aria-label="Models">` con `<li>` por cada modelo; click → si tiene inspiraciones avanza a step 2; si no → abre `model.pageUrl` en nueva pestaña
+- **Step 2 (Inspiration)**: `<section aria-label="Trending styles" ref={mainRef}>` + `<p>` con `<a href={pageUrl} target="_blank" rel="noopener noreferrer">` + `<span class="sr-only">, opens in new tab</span>`; `<ul role="list" aria-label="Trending styles">` con `<li>` por cada inspiración; step dinámico (solo si API devuelve inspirations)
+- **Por qué `<section>` y no `<main>`**: el widget es embebible — la página huésped ya tiene su `<main>`; usar `<main>` dentro crea múltiples landmarks "principal" que confunden AT; `<section aria-label>` crea un landmark `region` correcto y anidable
 
 ### Navegación del stepper
 `onHeaderClick(step?)` — compartido por `Header` y `SubNav`:
@@ -292,7 +293,7 @@ Archivos disponibles:
 - `step.id === 1` → vuelve a step 1 conservando categoría (solo accesible desde step 2)
 - `SubNav` siempre pasa `steps[0]` → el botón back siempre retrocede a Type desde cualquier step
 
-Regla "no saltar": steps con `id > selectedStep.id` en el Header reciben clase `header-nav-item__disabled` (opacity 0.35, pointer-events none) y se renderizan como `div`.
+Regla "no saltar": steps con `id > selectedStep.id` en el Header reciben `aria-disabled="true"` + clase `header-nav-item__disabled` (opacity 0.35, pointer-events none). Siempre se renderizan como `<button role="tab">` — la accesibilidad los anuncia como desactivados pero siguen siendo focusables con flechas para que el usuario pueda saber qué hay en pasos futuros.
 
 ## Products-index
 - `Index.tsx` — main chunk; theme toggle + lazy `IndexContent`
@@ -357,7 +358,7 @@ Ambos modos tienen su propia infraestructura de estado en `bootstrap/state/`:
 `src/shared/` — código compartido entre todos los modos:
 - `mode/detect.ts` — mode singleton (`startWithStyleSelector | configurator | index`)
 - `theme/darkMode.ts` — `applyTheme(getInitialTheme())` called sync in `main.tsx` before React. `html[data-theme="light|dark"]` set by JS; CSS also has `@media prefers-color-scheme` fallback.
-- `styles/theme.scss` — CSS bundle (skeleton vars light/dark, shimmer animation). Dark mode: `@media prefers-color-scheme` + `[data-theme='dark']` fuera del media query para que el toggle JS funcione independientemente del sistema
+- `styles/theme.scss` — CSS bundle (skeleton vars light/dark, shimmer animation, `.sr-only`). Dark mode: `@media prefers-color-scheme` + `[data-theme='dark']` fuera del media query para que el toggle JS funcione independientemente del sistema
 - `styles/critical.scss` — design tokens compartidos: tipografía (`--typography-*`), spacing (`--spacing-*`), radii (`--radius-*`), strokes (`--stroke-*` en px), colores semánticos, variables de iconos/logos (`--ss-logo`, `--arrow-left`, `--menu`, `--ss-loader`, etc.) por brand y tema; todos los tamaños en `rem` (base 18px); strokes en `px`
 - `styles/_typography.scss` — mixins de tipografía compartidos: `typography-h3/h4/h5`, `typography-body-2xl/lg/base/sm/xs`; usan CSS vars de `critical.scss`; NO incluyen `font-weight` (varía por uso); importado via `@use '../../../shared/styles/typography' as *` en los SCSS de style-selector
 - `styles/_variables.scss` — partial de variables CSS; importado por `critical.scss`
@@ -370,7 +371,7 @@ Ambos modos tienen su propia infraestructura de estado en `bootstrap/state/`:
 - Root font: `112.5%` (respects browser font-size preference)
 - All sizes in `rem`; borders/outlines in `px`
 - `--text` light: `#4e4b58` (7.6:1 on white)
-- `.sr-only` utility, `prefers-reduced-motion` reset
+- `.sr-only` utility definida en `shared/styles/theme.scss` (CSS bundle, siempre cargado); `prefers-reduced-motion` reset
 - `role=switch` on dark mode toggle, `role=alert` on errors, `role=status` on skeletons
 - `focus-visible` on all interactive elements
 
@@ -423,14 +424,14 @@ src/
     types.ts                       — GlassType, etc.
     style.tsx                      — componente principal Style; gestiona step state (type → model); usa StyleSelectorInitStrategy + useInitStyleSelectorStrategy
     StyleSelector.tsx              — wrapper; lazy StyleSelectorComponent o StyleSelectorSkeleton; soporta ?skeleton / ?skeletonLoader
-    StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true)
+    StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true); section[aria-label="Loading" aria-busy="true"] (no main)
     index.scss                     — ?inline CSS (layout, breakpoints, var --ss-bg para background images; scroll: style-selector=height:100vh+flex+overflow:hidden, __elements=overflow-y:auto, __models=flex:1+overflow:hidden, __models-list=flex:1+overflow-y:auto+padding:0 16rem)
     components/
-      header/                      — Header; steps nav + logo CSS (--ss-logo) + menu icon (--menu); onClick?: (step?) => void
-      sub-nav/                     — SubNav; mobile only; back arrow (--arrow-left) + step title + progress "1/2"; todos los props opcionales
-      category-filter/             — CategoryFilterComponent; subCategories?, selectedCategory?, onClick?: (category) => void
-      category-button/             — Button; label?, skeleton?, selected?, onClick opcional
-      card/                        — Card; tarjeta de tipo de gafa (step 0); button o div según onClick
+      header/                      — Header; stepper ARIA: ol[role=tablist] + button[role=tab]; roving tabindex; ArrowLeft/Right/Home/End; logo aria-hidden; menu icon como button nativo
+      sub-nav/                     — SubNav; nav[aria-label="Step navigation"]; button[aria-label="Back to {step}"] + icon[aria-hidden]; p.subnav-title; p[aria-label="Step N of M"] con texto "N/M"
+      category-filter/             — CategoryFilterComponent; ul role="radiogroup"; roving tabindex; selection-follows-focus
+      category-button/             — Button; aria-label en button, aria-hidden en span interior
+      card/                        — Card; button o div según onClick; hijos con aria-hidden (VoiceOver lee solo aria-label)
       model/                       — ModelCard; tarjeta de modelo (step 1); loading='eager'
       logo/                        — Logo SVG via URL
       img/                         — componente de imagen

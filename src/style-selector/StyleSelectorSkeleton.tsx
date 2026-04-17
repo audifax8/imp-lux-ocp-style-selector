@@ -1,5 +1,5 @@
 import { StepType } from '@/declarations/enums';
-import type { Step } from '@/declarations/interfaces';
+import type { StepWithTranslation } from '@/declarations/interfaces';
 import { Card } from '@/style-selector/components/card';
 import { Header } from '@/style-selector/components/header';
 import { SubNav } from '@/style-selector/components/sub-nav';
@@ -7,7 +7,7 @@ import { activeBrand } from '@/white-label/detect';
 
 
 const StyleSelectorSkeleton = () => {
-  const steps: Step[] = [
+  const steps: StepWithTranslation[] = [
     {
       id: 0,
       name: '1. Type',
@@ -29,11 +29,15 @@ const StyleSelectorSkeleton = () => {
     <div className={`style-selector-skeleton style-selector-skeleton-${activeBrand}`}>
       <Header skeleton={true} steps={steps}/>
       <SubNav skeleton={true} />
-      <main className='style-selector-skeleton__elements'>
+      <section
+        className='style-selector-skeleton__elements'
+        aria-label="Loading"
+        aria-busy="true"
+      >
         <Card title='Test' skeleton={true} />
         <Card title='Test' skeleton={true} />
         <Card title='Test' skeleton={true} />
-      </main>
+      </section>
     </div>
   )
 }

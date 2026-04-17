@@ -34,13 +34,13 @@ export const Card: React.FC<CardProps> = ({
         'aria-label': title,
       })}
     >
-      <div className='card-content'>
+      <div className='card-content' aria-hidden="true">
         {!skeleton ?
           <h2 className='card-title'>{title} {length && `(${length})`}</h2> :
           <Skeleton className='card-title' variant={SkeletonVariant.text} />}
       </div>
 
-      <div className='card-image-wrapper'>
+      <div className='card-image-wrapper' aria-hidden="true">
         {!skeleton ?
           <img
             src={imageSrc}

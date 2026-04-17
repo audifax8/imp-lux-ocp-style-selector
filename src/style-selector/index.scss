@@ -130,6 +130,21 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
     }
   }
 
+  &__types-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+
+    li {
+      width: 100%;
+    }
+  }
+
   &__inspiration {
     flex: 1;
     overflow: hidden;
@@ -173,11 +188,9 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
       flex-flow: wrap;
       justify-content: center;
       margin-bottom: 1rem;
-      //padding: 0 16rem 0.5rem;
       padding: 0 16rem;
 
       @media (max-width: $bp-tablet-p) {
-        //padding: 0 0 0.5rem;
         padding: 0 0;
       }
     }

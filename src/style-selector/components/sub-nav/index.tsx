@@ -17,57 +17,43 @@ export const SubNav: React.FC<SubNavProps> = ({
   steps,
   selectedStep
 }) => {
-  const isClickable = typeof onClick === 'function';
-  const Component = isClickable ? 'button' : 'div';
+  const stepNumber = (selectedStep?.id ?? 0) + 1;
+  const totalSteps = steps?.length ?? 0;
+  const backLabel = `Back to ${steps?.[0]?.name ?? 'previous step'}`;
 
   return (
-    <div className="subnav">
+    <nav className="subnav" aria-label="Step navigation">
       <div className='subnav-back'>
         {skeleton && <Skeleton className='subnav-back' variant={SkeletonVariant.rectangular} />}
         {!skeleton && onClick && selectedStep?.id ?
-          <Component
+          <button
             className='subnav-back-button'
+            type="button"
+            aria-label={backLabel}
             onClick={() => onClick?.(steps && steps[0])}
-            {...(isClickable && {
-              type: 'button',
-              'aria-label': '',
-            })}
           >
-            <div className='subnav-back-button__icon'></div>
-          </Component> : <></>
+            <div className='subnav-back-button__icon' aria-hidden="true"></div>
+          </button> : <></>
         }
       </div>
       <div className="subnav-center">
-        <div className="subnav-title">
-          {!skeleton ?
-            <span className="subnav-title">{selectedStep?.name}</span> :
-            <Skeleton className='subnav-title' variant={SkeletonVariant.text} />
-          }
-        </div>
-        <div className="subnav-count">
-          {!skeleton ? 
-            <span className="subnav-count">{((selectedStep?.id || 0) + 1 ) + '/' + (steps?.length)}</span> :
-            <Skeleton className='subnav-count' variant={SkeletonVariant.text} />
-          }
-        </div>
+        {!skeleton ?
+          <p className="subnav-title">{selectedStep?.name}</p> :
+          <Skeleton className='subnav-title' variant={SkeletonVariant.text} />
+        }
+        {!skeleton ?
+          <p
+            className="subnav-count"
+            aria-label={`Step ${stepNumber} of ${totalSteps}`}
+          >
+            {stepNumber + '/' + totalSteps}
+          </p> :
+          <Skeleton className='subnav-count' variant={SkeletonVariant.text} />
+        }
       </div>
       <div className='subnav-close'>
         {skeleton && <Skeleton className='subnav-close' variant={SkeletonVariant.rectangular} />}
-        {/*!skeleton && onClick && selectedStep?.id ?
-          <Component
-            className='header-nav-items'
-            onClick={() => onClick?.(steps && steps[0])}
-            {...(isClickable && {
-              type: 'button',
-              'aria-label': '',
-            })}
-          >
-            {skeleton && <div className='yr-button__icon'></div>}
-            {/*<Logo className={'yr-button__icon'} url={getSVGURL('CloseBlack', 'wl')} height={16} width={16} />}
-          </Component> :
-          <></>
-        */}
       </div>
-    </div>
+    </nav>
   );
 };

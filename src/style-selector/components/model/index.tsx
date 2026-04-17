@@ -30,7 +30,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
         'aria-label': title,
       })}
     >
-      <div className='model-card__image-wrapper'>
+      <div className='model-card__image-wrapper' aria-hidden="true">
         {!imageSrc ?
           <Skeleton className="model-card__image__skeleton yr-skeleton" variant={SkeletonVariant.text} /> :
           (<img
@@ -41,7 +41,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
           />)
         }
       </div>
-      <div className='model-card__content'>
+      <div className='model-card__content' aria-hidden="true">
         <h2 className='model-card__title'>{title}</h2>
       </div>
     </Component>

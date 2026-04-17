@@ -140,10 +140,12 @@ export class Models {
     
     const DEFAULT_STEPS: StepWithTranslation[] = [
       {
+        id: 0,
         name: 'type',
         type: StepType.TYPE
       },
       {
+        id: 1,
         name: 'model',
         type: StepType.MODEL
       }
@@ -153,6 +155,7 @@ export class Models {
       const name = 'inspirations';
       DEFAULT_STEPS.push(
         {
+          id: 2,
           name,
           type: StepType.INSPIRATIONS
         }

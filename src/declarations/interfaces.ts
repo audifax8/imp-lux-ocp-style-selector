@@ -399,7 +399,7 @@ export type ModelsTranslated = {
 };
 
 export interface StepWithTranslation {
-  id?: number;
+  id: number;
   name: string;
   translation?: string;
   type?: StepType;
