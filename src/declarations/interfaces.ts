@@ -438,3 +438,8 @@ export interface IInitStrategy<P1, P2> {
   executePhase1(): Promise<P1>
   executePhase2(phase1Result: P1): Promise<P2>
 };
+
+export interface IStyleSelectorInitStrategy<P1, P2> {
+  loadAppData(): Promise<P1>
+  preloadConfiguratorData(phase1Result: P1): Promise<P2>
+};

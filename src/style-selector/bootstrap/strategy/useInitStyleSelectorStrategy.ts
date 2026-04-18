@@ -12,25 +12,25 @@
 // El flag `cancelled` evita setState sobre un componente desmontado.
 
 import { useState, useEffect } from 'react';
-import type { IInitStrategy } from '@/declarations/interfaces';
+import type { IStyleSelectorInitStrategy } from '@/declarations/interfaces';
 import type { StyleSelectorInitData } from '@/declarations/interfaces';
 
 export interface InitState {
-  phase1Data: StyleSelectorInitData;
-  phase2Data: StyleSelectorInitData;
+  styleSelectorInitData: StyleSelectorInitData;
+  configuratorData: StyleSelectorInitData;
   phase1Error: Error | null
   phase2Error: Error | null
 }
 
 const INITIAL_STATE: InitState = {
-  phase1Data: undefined!,
-  phase2Data: undefined!,
+  styleSelectorInitData: undefined!,
+  configuratorData: undefined!,
   phase1Error: null,
   phase2Error: null,
 }
 
 export const useInitStyleSelectorStrategy = (
-  strategy: IInitStrategy<StyleSelectorInitData, StyleSelectorInitData>,
+  strategy: IStyleSelectorInitStrategy<StyleSelectorInitData, StyleSelectorInitData>,
 ): InitState => {
   const [state, setState] = useState<InitState>(INITIAL_STATE)
 
@@ -38,14 +38,14 @@ export const useInitStyleSelectorStrategy = (
     let cancelled = false
 
     strategy
-      .executePhase1()
+      .loadAppData()
       .then(phase1Data => {
         if (cancelled) return
         setState(prev => ({ ...prev, phase1Data }))
 
         // Fase 2 arranca inmediatamente tras Fase 1 — sin bloquear
         strategy
-          .executePhase2(phase1Data)
+          .preloadConfiguratorData(phase1Data)
           .then(phase2Data => {
             if (cancelled) return
             setState(prev => ({ ...prev, phase2Data }))

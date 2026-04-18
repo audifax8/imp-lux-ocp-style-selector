@@ -8,15 +8,15 @@ import { useInitStyleSelectorStrategy } from '@/style-selector/bootstrap/strateg
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const strategy = useMemo(() => new StyleSelectorInitStrategy(), []);
-  const { phase1Data } = useInitStyleSelectorStrategy(strategy);
+  const { styleSelectorInitData } = useInitStyleSelectorStrategy(strategy);
 
   useEffect(() => {
-    if (phase1Data) { completeStyleSelectorPromise(); }
-  }, [phase1Data])
+    if (styleSelectorInitData) { completeStyleSelectorPromise(); }
+  }, [styleSelectorInitData])
 
   return (
-    <DataContext.Provider value={phase1Data}>
-      <I18nContext.Provider value={phase1Data?.i18n}>
+    <DataContext.Provider value={styleSelectorInitData}>
+      <I18nContext.Provider value={styleSelectorInitData?.i18n}>
         {children}
       </I18nContext.Provider>
     </DataContext.Provider>

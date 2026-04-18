@@ -2,7 +2,7 @@
 // ConfiguratorInitStrategy — implementación concreta del contrato IInitStrategy
 // =============================================================================
 
-import type { IInitStrategy } from '@/declarations/interfaces';
+import type { IStyleSelectorInitStrategy } from '@/declarations/interfaces';
 import type { Caretaker } from '@/style-selector/bootstrap/state/caretaker';
 import type { Originator } from '@/style-selector/bootstrap/state/originator';
 import type { StyleSelectorInitData } from '@/declarations/interfaces';
@@ -13,37 +13,43 @@ import { Performance } from '@/models/performance';
 import { Models } from '@/style-selector/api/models';
 
 export class StyleSelectorInitStrategy
-  implements IInitStrategy<StyleSelectorInitData, StyleSelectorInitData>
+  implements IStyleSelectorInitStrategy<StyleSelectorInitData, StyleSelectorInitData>
 {
-  private caretaker: Caretaker | undefined
-  private originator: Originator | undefined
+  private caretaker: Caretaker | undefined;
+  private originator: Originator | undefined;
+  private logger: Logger | undefined;
+  private performance: Performance | undefined;
 
-  async executePhase1(): Promise<StyleSelectorInitData> {
+  async loadAppData(): Promise<StyleSelectorInitData> {
+    const { getInitQueryParams, Caretaker, Originator, LoadingState } = await import('./configurator-init');
+    const params = getInitQueryParams();
+    const { showPerformance, showLogs } = params;
+    const state = new LoadingState();
+    this.logger = new Logger(showLogs ?? false);
+    this.performance = new Performance(showPerformance ?? false);
+    state.setParams(params);
+    state.setLogger(this.logger);
+    state.setPerformance(this.performance);
+    this.originator = new Originator();
+    this.caretaker = new Caretaker();
+    this.originator.setState(state);
+    this.caretaker.addMemento(this.originator.saveMemento());
     try {
-      const { getInitQueryParams, Caretaker, Originator, LoadingState } = await import('./configurator-init');
-      const params = getInitQueryParams();
-      const { showPerformance, showLogs } = params;
-      const state = new LoadingState();
-      state.setParams(params);
-      state.setLogger(new Logger(showLogs ?? false));
-      state.setPerformance(new Performance(showPerformance ?? false));
-      this.originator = new Originator();
-      this.caretaker = new Caretaker();
-      this.originator.setState(state);
-      this.caretaker.addMemento(this.originator.saveMemento());
       const models = new Models(params, this.originator);
       return await models.init();
     } catch (e) {
-      console.log(e);
+      this.logger?.error('');
+      this.logger?.object(e);
       return undefined!;
     }
   }
 
-  async executePhase2(styleSelectorInitData: StyleSelectorInitData): Promise<StyleSelectorInitData> {
+  async preloadConfiguratorData(styleSelectorInitData: StyleSelectorInitData): Promise<StyleSelectorInitData> {
     try {
-      console.log(styleSelectorInitData);
+      this.logger?.object(styleSelectorInitData);
     } catch (e) {
-      console.log(e);
+      this.logger?.error('');
+      this.logger?.object(e);
     }
     return undefined!;
   }
