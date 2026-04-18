@@ -125,10 +125,11 @@ All mode-specific CSS (including white-label CSS) is `?inline` — injected by t
    - `import('@/products-index/bootstrap')` → index
    - `import('@/configurator/bootstrap')` → configurator (default)
 
-**Style-selector bootstrap** (`style-selector/bootstrap/index.tsx`):
-- Injects `style-selector/index.scss?inline` (container + typography + skeleton + style-selector styles)
+**Style-selector bootstrap** (`style-selector/index.tsx`):
+- Injects `style-selector/bootstrap/index.scss?inline` (container + typography + skeleton + style-selector styles)
 - Injects active white-label CSS via `white-label/loader-wizard`
-- `createRoot` + `<AppStyleSelector />` (DataProvider + StyleSelector)
+- `createRoot` + `<DataProvider><StyleSelector /></DataProvider>` (no AppStyleSelector intermediate)
+- `bootstrap/index.tsx` — Suspense wrapper; selects skeleton (SharedSkeleton vs `components/skeleton/`) and renders `StyleSelectorComponent` (deferred lazy)
 
 **Configurator bootstrap** (`configurator/bootstrap/index.tsx`):
 - Injects `configurator/configurator.scss?inline` (container + typography + skeleton + configurator styles)
@@ -167,8 +168,8 @@ imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (
                                                 NOTA: critical.scss ya NO está en el bundle CSS —
                                                 sus vars se inyectan como parte de cada mode ?inline
 
-style-selector/bootstrap/index.tsx           ← style-selector/index.scss?inline + white-label/loader-wizard
-                                                index.scss incluye breakpoints de background + var --ss-bg
+style-selector/index.tsx                     ← style-selector/bootstrap/index.scss?inline + white-label/loader-wizard
+                                                bootstrap/index.scss incluye breakpoints de background + var --ss-bg
 configurator/bootstrap/index.tsx             ← configurator/configurator.scss?inline + white-label/loader-configurator
 products-index/bootstrap/index.tsx           ← products-index/index.scss?inline + white-label/loader-index
 configurator/model/Model.tsx                 ← model/model.scss?inline (skeleton de gafas)
@@ -216,13 +217,13 @@ Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 ## Style-selector
 Single-page component. Internal state manages type selection vs. model grid view.
 
-- `StyleSelector.tsx` — wrapper; monta `StyleSelectorComponent` (lazy via deferred promise) o `StyleSelectorSkeleton` (si `?skeleton` param activo); soporta `?skeletonLoader=true` (shared skeleton alternativo) y `?skeleton=true` (muestra skeleton directamente sin cargar el componente real)
-- `style.tsx` — componente principal (`Style`); usa `useData()` del context (DataProvider); `steps` vienen de `phase1Data?.steps` (dinámicos, construidos por `Models.mapModels`); gestiona estado: tipo, categoría, modelo seleccionado, inspiraciones filtradas; renderiza 3 steps según `selectedStep?.id`; usa `<section aria-label>` (no `<main>`) para los steps — el widget es embebible y no debe crear landmarks `main` que conflicten con la página huésped; **focus management**: `mainRef` + `useEffect([selectedStep])` — cuando el step cambia a MODEL o INSPIRATIONS, hace `querySelector('button, a[href]')` en el `<section>` y mueve el foco al primer elemento interactivo; `hasMounted` ref evita el foco en el render inicial
-- `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
-- `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
+- `bootstrap/index.tsx` — wrapper de Suspense; monta `StyleSelectorComponent` (lazy via deferred promise) o skeleton (si `?skeleton` param activo); selecciona entre `SharedSkeleton` (`?skeletonLoader=true`) y `components/skeleton/` (default)
+- `bootstrap/App.tsx` — componente principal (`Style`); usa `useData()` del context; `steps` vienen de `phase1Data?.steps` (dinámicos); gestiona estado: tipo, categoría, modelo seleccionado; renderiza `TypeStep` / `ModelStep` según `selectedStep?.id`; usa `<section aria-label>` (no `<main>`) para los steps; **focus management**: `mainRef` (forwardRef a `ModelStep`) + `useEffect([selectedStep])` — cuando step cambia a MODEL o INSPIRATIONS, mueve foco al primer elemento interactivo; `hasMounted` ref evita foco en el render inicial
+- `components/skeleton/index.tsx` — skeleton completo del modo (era `StyleSelectorSkeleton.tsx`); usa `Header`, `SubNav`, y `Card` con `skeleton={true}`; `useI18n()`; `<section aria-label aria-busy="true">` (no main)
+- `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos; importa desde `@/style-selector/bootstrap/App`
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, i18n); `useData()` hook
-- `context/i18n-context.ts` — `I18nContext` con `i18n | undefined`; `useI18n()` hook — para componentes que solo necesitan traducciones sin el `Output` completo; `undefined` mientras los datos cargan (devuelve fallback hardcoded en ese caso); usado en: `Header`, `SubNav`, `CategoryFilterComponent`, `StyleSelectorSkeleton`, `SharedSkeleton`, `style.tsx`
-- `context/data.tsx` — **prefetch de UI chunk**: `useEffect([], [])` dispara `import('@/style-selector/style')` al montar, en paralelo con los fetches de API → cuando los datos llegan el chunk ya está cacheado y `completeStyleSelectorPromise` resuelve sin waterfall; **phase 2 guard**: `setState` de `configuratorData` se omite si el resultado es `undefined` (evita re-render innecesario)
+- `context/i18n-context.ts` — `I18nContext` con `i18n | undefined`; `useI18n()` hook — para componentes que solo necesitan traducciones sin el `Output` completo; `undefined` mientras los datos cargan (devuelve fallback hardcoded en ese caso); usado en: `Header`, `SubNav`, `CategoryFilterComponent`, `components/skeleton/`, `SharedSkeleton`, `bootstrap/App.tsx`
+- `context/data.tsx` — **prefetch de UI chunk**: `useEffect([], [])` dispara `import('@/style-selector/bootstrap/App')` al montar, en paralelo con los fetches de API → cuando los datos llegan el chunk ya está cacheado y `completeStyleSelectorPromise` resuelve sin waterfall; **phase 2 guard**: `setState` de `configuratorData` se omite si el resultado es `undefined` (evita re-render innecesario)
 
 ### i18n keys del modo style-selector
 Todas las keys usan `getLabel(key, fallback)` salvo las indicadas con `getLang` (soportan interpolación `{var}`):
@@ -238,21 +239,21 @@ Todas las keys usan `getLabel(key, fallback)` salvo las indicadas con `getLang` 
 | `style_selector_category_filter_label` | `'Filter by category'` | `CategoryFilterComponent` radiogroup |
 | `style_selector_loading_label` | `'Loading'` | `StyleSelectorSkeleton` + `SharedSkeleton` |
 | `style_selector_loading_title` | `'Starting your experience'` | `SharedSkeleton` título |
-| `style_selector_step_type_title` | `'Select glasses type'` | `style.tsx` section TYPE |
-| `style_selector_step_type_list_label` | `'Glasses types'` | `style.tsx` ul TYPE |
-| `style_selector_step_model_title` | `'Select a model'` | `style.tsx` section MODEL |
-| `style_selector_step_inspirations_title` | `'Trending styles'` | `style.tsx` section INSPIRATIONS |
-| `style_selector_models_list_label` | `'Models'` | `style.tsx` ul MODEL |
-| `style_selector_inspirations_list_label` | `'Trending styles'` | `style.tsx` ul INSPIRATIONS |
-| `style_selector_category_label_trending` | `'Select trending styles or'` | `style.tsx` trending text |
-| `style_selector_category_label_skip` | `' skip to customization'` | `style.tsx` skip link text |
-| `style_selector_opens_new_tab` | `', opens in new tab'` | `style.tsx` sr-only en skip link |
+| `style_selector_step_type_title` | `'Select glasses type'` | `TypeStep` section TYPE |
+| `style_selector_step_type_list_label` | `'Glasses types'` | `TypeStep` ul TYPE |
+| `style_selector_step_model_title` | `'Select a model'` | `ModelStep` section MODEL |
+| `style_selector_step_inspirations_title` | `'Trending styles'` | `ModelStep` section INSPIRATIONS |
+| `style_selector_models_list_label` | `'Models'` | `ModelStep` ul MODEL |
+| `style_selector_inspirations_list_label` | `'Trending styles'` | `ModelStep` ul INSPIRATIONS |
+| `style_selector_category_label_trending` | `'Select trending styles or'` | `ModelStep` trending text |
+| `style_selector_category_label_skip` | `' skip to customization'` | `ModelStep` skip link text |
+| `style_selector_opens_new_tab` | `', opens in new tab'` | `ModelStep` sr-only en skip link |
 - `context/data.tsx` — `DataProvider`; provee `DataContext` + `I18nContext` anidados; destruye `{ styleSelectorInitData }` del hook; `I18nContext.value = styleSelectorInitData?.i18n` (undefined hasta que llegan los datos); llama `completeStyleSelectorPromise()` via `useEffect` cuando `styleSelectorInitData` llega
 - _(typography moved to `src/shared/styles/_typography.scss` — ver sección Shared)_
-- `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
+- `bootstrap/index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
 
 ### Logos (solo modo startWithStyleSelector)
-Variable CSS `--ss-logo` — declarada en `.header-logo__icon` vía `style-selector/index.scss` (?inline, solo este modo). El componente `Header` usa `background-image: var(--ss-logo)` en `.header-logo__icon`; cuando `skeleton={true}` renderiza el skeleton en su lugar.
+Variable CSS `--ss-logo` — declarada en `.header-logo__icon` vía `style-selector/bootstrap/index.scss` (?inline, solo este modo). El componente `Header` usa `background-image: var(--ss-logo)` en `.header-logo__icon`; cuando `skeleton={true}` renderiza el skeleton en su lugar.
 
 SCSS vars de ruta por brand:
 
@@ -303,14 +304,16 @@ Archivos disponibles:
 - `category-button/` — `Button`; acepta `label?`, `skeleton?`, `selected?`, `tabIndex?`, `onClick?`; `role="radio"` + `aria-checked` (no `aria-current`); `aria-label` en el button, `aria-hidden` en el `<span>` interior; `:focus-visible` con `--color-generic-focus-border`
 - `card/` — `Card`; tarjeta de tipo de gafa (step 0); se renderiza como `<button>` o `<div>` según si `onClick` está presente; hijos con `aria-hidden="true"` — VoiceOver solo lee el `aria-label` del botón
 - `model/` — `ModelCard`; tarjeta de modelo (step 1); imagen con `loading='eager'`
+- `type-step/` — `TypeStep`; extrae el step TYPE de `bootstrap/App.tsx`; props: `modelsTypes`, `onClick(type)`; usa `useI18n()` + `Card` + `getSVGURLByType`; importado estáticamente → mismo chunk que `App.tsx`
+- `model-step/` — `ModelStep`; extrae los steps MODEL e INSPIRATIONS de `bootstrap/App.tsx`; props: `selectedStep`, `subCategories`, `selectedFlatModel`, `filteredModels`, `selectedModel`, `onCategoryClick`, `onModelClick`; acepta `ref` via `React.forwardRef` → la sección raíz recibe el ref para focus management; usa `useI18n()` + `CategoryFilterComponent` + `ModelCard`; importado estáticamente → mismo chunk que `App.tsx`
 - `logo/` — `Logo`; renderiza SVG via URL
 - `img/` — componente de imagen
 
-### Steps internos (gestionados por state en `style.tsx`)
-- **Step 0 (Type)**: `<section aria-label="Select glasses type">` + `<ul role="list" aria-label="Glasses types">` + `<li>` por cada tipo; `Card` dentro de cada `<li>`; skeleton cards (×3) con `aria-hidden="true"` mientras datos son null; click → filtra categorías → avanza a step 1; navegación por teclado: Tab entre botones
-- **Step 1 (Model)**: `<section aria-label="Select a model" ref={mainRef}>` + `CategoryFilterComponent` + `<ul role="list" aria-label="Models">` con `<li>` por cada modelo; click → si tiene inspiraciones avanza a step 2; si no → abre `model.pageUrl` en nueva pestaña
-- **Step 2 (Inspiration)**: `<section aria-label="Trending styles" ref={mainRef}>` + `<p>` con `<a href={pageUrl} target="_blank" rel="noopener noreferrer">` + `<span class="sr-only">, opens in new tab</span>`; `<ul role="list" aria-label="Trending styles">` con `<li>` por cada inspiración; step dinámico (solo si API devuelve inspirations)
-- **Por qué `<section>` y no `<main>`**: el widget es embebible — la página huésped ya tiene su `<main>`; usar `<main>` dentro crea múltiples landmarks "principal" que confunden AT; `<section aria-label>` crea un landmark `region` correcto y anidable
+### Steps internos (renderizados por `bootstrap/App.tsx`, implementados en los componentes)
+- **Step 0 (Type)** → `<TypeStep>`; `<section aria-label>` + `<ul role="list">` + `Card`; skeleton cards (×3) con `aria-hidden` mientras datos son null
+- **Step 1 (Model)** → `<ModelStep ref={mainRef}>`; `<section aria-label>` + `CategoryFilterComponent` + `<ul role="list" aria-label="Models">`; click → avanza a step 2 o abre pageUrl
+- **Step 2 (Inspiration)** → `<ModelStep ref={mainRef}>`; misma sección con label distinto + container con link "skip to customization" + `<span class="sr-only">`; step dinámico (solo si API devuelve inspirations)
+- **Por qué `<section>` y no `<main>`**: el widget es embebible — la página huésped ya tiene su `<main>`; `<section aria-label>` crea un landmark `region` correcto y anidable
 
 ### Navegación del stepper
 `onHeaderClick(step?)` — compartido por `Header` y `SubNav`:
@@ -427,9 +430,11 @@ src/
     {brand}/configurator.scss      — brand CSS for configurator mode (placeholders)
     {brand}/index.scss             — brand CSS for products-index mode (placeholders)
   style-selector/
+    index.tsx                      — entry: CSS inject (bootstrap/index.scss?inline) + brand styles + createRoot + DataProvider + StyleSelector
     bootstrap/
-      index.tsx                    — style-selector bootstrap (CSS inject + brand + React mount)
-      AppStyleSelector.tsx         — DataProvider + StyleSelector
+      index.tsx                    — Suspense wrapper; selects skeleton; renders StyleSelectorComponent (deferred lazy)
+      App.tsx                      — componente principal Style; gestiona step state; renderiza TypeStep / ModelStep
+      index.scss                   — ?inline CSS (layout, breakpoints, var --ss-bg; scroll architecture)
       state/
         loading-state.ts           — LoadingState; clone(updates) for immutable state transitions
         originator.ts              — Originator; setState/getState/saveMemento/restore
@@ -445,21 +450,20 @@ src/
     context/
       context.ts                   — DataContext con StyleSelectorInitData completo; useData() hook
       i18n-context.ts              — I18nContext (i18n | undefined); useI18n() hook — acceso directo a traducciones sin el Output completo
-      data.tsx                     — DataProvider; provee DataContext + I18nContext anidados; prefetch de style.tsx en useEffect([], []); phase2 setState omitido si resultado undefined
+      data.tsx                     — DataProvider; provee DataContext + I18nContext anidados; prefetch de bootstrap/App.tsx en useEffect([], []); phase2 setState omitido si resultado undefined
     lazy-imports/
-      index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise()
+      index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise(); importa desde bootstrap/App
     types.ts                       — GlassType, etc.
-    style.tsx                      — componente principal Style; gestiona step state (type → model); usa StyleSelectorInitStrategy + useInitStyleSelectorStrategy
-    StyleSelector.tsx              — wrapper; lazy StyleSelectorComponent o StyleSelectorSkeleton; soporta ?skeleton / ?skeletonLoader
-    StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true); usa useI18n(); section aria-label vía style_selector_loading_label; (no main)
-    index.scss                     — ?inline CSS (layout, breakpoints, var --ss-bg para background images; scroll: style-selector=height:100vh+flex+overflow:hidden, __elements=overflow-y:auto, __models=flex:1+overflow:hidden, __models-list=flex:1+overflow-y:auto+padding:0 16rem)
     components/
+      skeleton/                    — StyleSelectorSkeleton; Header + SubNav + Cards con skeleton=true; useI18n(); section[aria-label aria-busy="true"] (no main)
       header/                      — Header; stepper ARIA: ol[role=tablist] + button[role=tab]; roving tabindex; ArrowLeft/Right/Home/End; logo aria-hidden; menu icon como button nativo
       sub-nav/                     — SubNav; nav[aria-label="Step navigation"]; button[aria-label="Back to {step}"] + icon[aria-hidden]; p.subnav-title; p[aria-label="Step N of M"] con texto "N/M"
       category-filter/             — CategoryFilterComponent; ul role="radiogroup"; roving tabindex; selection-follows-focus
       category-button/             — Button; aria-label en button, aria-hidden en span interior
       card/                        — Card; button o div según onClick; hijos con aria-hidden (VoiceOver lee solo aria-label)
       model/                       — ModelCard; tarjeta de modelo (step 1); loading='eager'
+      type-step/                   — TypeStep; step TYPE extraído de App.tsx; props: modelsTypes, onClick; usa useI18n()+Card+getSVGURLByType; mismo chunk que App.tsx
+      model-step/                  — ModelStep (forwardRef); steps MODEL+INSPIRATIONS extraídos de App.tsx; props: selectedStep, subCategories, selectedFlatModel, filteredModels, selectedModel, onCategoryClick, onModelClick; ref en <section> para focus management; mismo chunk que App.tsx
       logo/                        — Logo SVG via URL
       img/                         — componente de imagen
   products-index/

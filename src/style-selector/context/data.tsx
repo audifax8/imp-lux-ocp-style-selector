@@ -14,7 +14,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   // Cuando los datos llegan, el módulo ya está cacheado → completeStyleSelectorPromise
   // lo resuelve de inmediato sin waterfall adicional.
   useEffect(() => {
-    import('@/style-selector/style').catch(() => {});
+    import('@/style-selector/bootstrap/App').catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

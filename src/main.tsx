@@ -31,7 +31,7 @@ container.setAttribute('aria-label', 'Style Selector')
 //   bootstrap-configurator → configurador (CSS + JS)
 // El modo inactivo nunca se descarga.
 if (activeMode === 'startWithStyleSelector') {
-  import('@/style-selector/bootstrap').then(({ mount }) => mount(container!))
+  import('@/style-selector').then(({ mount }) => mount(container!))
 } else if (activeMode === 'index') {
   import('@/products-index/bootstrap').then(({ mount }) => mount(container!))
 } else if (activeMode === 'demo') {

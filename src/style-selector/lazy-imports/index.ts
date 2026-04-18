@@ -25,11 +25,6 @@ export const styleSelector = createDeferred<{
 export const StyleSelectorComponent = React.lazy(() => styleSelector.promise);
 
 export async function completeStyleSelectorPromise() {
-  /*const [menuModule, loadMenu] = await Promise.all([
-    import('@/components/ui/menu/components'),
-    import('@/state/menu-loader')
-  ]);
-  loadMenu.loadMenuState();*/
-  const styleSelectorModule = await import('@/style-selector/style');
+  const styleSelectorModule = await import('@/style-selector/bootstrap/App');
   styleSelector.resolve({ default: styleSelectorModule.default as React.ComponentType<unknown> });
 }

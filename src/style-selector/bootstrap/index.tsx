@@ -1,24 +1,26 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { lazy, Suspense } from 'react'
 
-import wizardStyles from '@/style-selector/index.scss?inline'
+import { StyleSelectorComponent } from '@/style-selector/lazy-imports'
 
-import { injectBrandStyles } from '@/white-label/loader-wizard'
-import { activeBrand } from '@/white-label/detect'
+// SharedSkeleton: chunk alternativo, se descarga SOLO cuando se renderiza.
+// ?skeletonLoader=true → activo; ausente/false → skeletons originales (sin coste de red).
+const _raw = new URLSearchParams(window.location.search).get('skeletonLoader')
+const skeletonEnabled = _raw !== null && (_raw === '' || _raw === 'true')
 
-import App from '@/style-selector/bootstrap/AppStyleSelector'
+const _skeleton = new URLSearchParams(window.location.search).get('skeleton')
+const skeleton = _skeleton !== null && (_skeleton === '' || _skeleton === 'true')
 
-const styleEl = document.createElement('style')
-styleEl.dataset.mode = 'wizard'
-styleEl.textContent = wizardStyles
-document.head.appendChild(styleEl)
+const sharedSkeletonImport = skeletonEnabled
+  ? import('@/shared/components/skeleton-loader')
+  : import('@/style-selector/components/skeleton')
+const SharedSkeleton = lazy(() => sharedSkeletonImport!)
 
-injectBrandStyles(activeBrand)
-
-export function mount(container: HTMLElement): void {
-  createRoot(container).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
+const StyleSelector = () => {
+  return (
+    <Suspense fallback={<SharedSkeleton />}>
+      {skeleton ? <SharedSkeleton /> : <StyleSelectorComponent />}
+    </Suspense>
   )
 }
+
+export default StyleSelector
