@@ -222,7 +222,7 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, i18n); `useData()` hook
 - `context/i18n-context.ts` — `I18nContext` con `i18n | undefined`; `useI18n()` hook — para componentes que solo necesitan traducciones sin el `Output` completo (incluyendo `SharedSkeleton`); `undefined` mientras los datos cargan
-- `context/data.tsx` — `DataProvider`; provee `DataContext` + `I18nContext` anidados; `I18nContext.value = phase1Data?.i18n` (undefined hasta que llegan los datos); llama `completeStyleSelectorPromise()` via `useEffect` cuando `phase1Data` llega
+- `context/data.tsx` — `DataProvider`; provee `DataContext` + `I18nContext` anidados; destruye `{ styleSelectorInitData }` del hook; `I18nContext.value = styleSelectorInitData?.i18n` (undefined hasta que llegan los datos); llama `completeStyleSelectorPromise()` via `useEffect` cuando `styleSelectorInitData` llega
 - _(typography moved to `src/shared/styles/_typography.scss` — ver sección Shared)_
 - `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
 
@@ -411,8 +411,8 @@ src/
         caretaker.ts               — Caretaker; stores Memento[]
         memento.ts                 — Memento; wraps a LoadingState snapshot
       strategy/
-        index.ts                   — StyleSelectorInitStrategy; fetchea modelos y mapea types/categories a phase1Data
-        useInitStyleSelectorStrategy.ts — hook; orquesta StyleSelectorInitStrategy; cancelled flag para cleanup
+        index.ts                   — StyleSelectorInitStrategy; implementa IStyleSelectorInitStrategy; loadAppData() → StyleSelectorInitData; preloadConfiguratorData() → stub (retorna undefined)
+        useInitStyleSelectorStrategy.ts — hook; devuelve InitState { styleSelectorInitData, configuratorData, phase1Error, phase2Error }; llama loadAppData() → setState({ styleSelectorInitData }); luego preloadConfiguratorData() → setState({ configuratorData }); cancelled flag para cleanup
         configurator-init.ts       — re-exporta getInitQueryParams, schedule, AsyncTask, Caretaker, Originator, LoadingState
     api/
       config.ts                    — runtime API config; BRAND_URLS per-brand URL map + API_LANGUAGE

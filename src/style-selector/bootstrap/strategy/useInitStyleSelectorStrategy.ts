@@ -39,16 +39,16 @@ export const useInitStyleSelectorStrategy = (
 
     strategy
       .loadAppData()
-      .then(phase1Data => {
+      .then(styleSelectorInitData => {
         if (cancelled) return
-        setState(prev => ({ ...prev, phase1Data }))
+        setState(prev => ({ ...prev, styleSelectorInitData }))
 
         // Fase 2 arranca inmediatamente tras Fase 1 — sin bloquear
         strategy
-          .preloadConfiguratorData(phase1Data)
-          .then(phase2Data => {
+          .preloadConfiguratorData(styleSelectorInitData)
+          .then(configuratorData => {
             if (cancelled) return
-            setState(prev => ({ ...prev, phase2Data }))
+            setState(prev => ({ ...prev, configuratorData }))
           })
           .catch(err => {
             if (cancelled) return
