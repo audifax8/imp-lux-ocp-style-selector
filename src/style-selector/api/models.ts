@@ -214,7 +214,7 @@ export class Models {
     const modelsTypesTranslated: ModelsTranslated[] = modelsTypesKeys.map((name) => {
       const STUDIO_BASE_LABEL = 'style_selector_category_label_';
       const merged = STUDIO_BASE_LABEL + name;
-      const translation = l10n.getLang(merged, name);
+      const translation = l10n.getLang(merged, name === MY_DESIGN ? 'your designs' : name);
       return {
         translation,
         name,

@@ -163,6 +163,7 @@ const Style = () => {
                   className='style-selector__inspiration__container__link'
                 >
                   {skipLabel}
+                  <span className="sr-only">{i18n?.getLabel('style_selector_opens_new_tab', ', opens in new tab') ?? ', opens in new tab'}</span>
                 </a>
               </p>
             </div>

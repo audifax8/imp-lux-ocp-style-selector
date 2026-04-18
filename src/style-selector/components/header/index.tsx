@@ -6,6 +6,7 @@ import type { StepWithTranslation } from '@/declarations/interfaces';
 
 import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
 import DarkModeSwitch from '@/shared/components/dark-mode-switch';
+import { useI18n } from '@/style-selector/context/i18n-context';
 
 import './index.scss';
 
@@ -23,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   onClick
 }) => {
   const isClickable = typeof onClick === 'function';
+  const i18n = useI18n();
 
   const [theme, setTheme] = useState<Theme>(getCurrentTheme);
 
@@ -53,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
         }
       </div>
 
-      <nav className="header-nav" aria-label="Steps">
+      <nav className="header-nav" aria-label={i18n?.getLabel('style_selector_header_nav_label', 'Steps') ?? 'Steps'}>
         <ol
           className="header-nav-items"
           role="tablist"
@@ -95,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="header-menu">
         {!skeleton ?
-          <button className="header-menu__icon" aria-label="Menu" type="button"></button> :
+          <button className="header-menu__icon" aria-label={i18n?.getLabel('style_selector_header_menu_label', 'Menu') ?? 'Menu'} type="button"></button> :
           <Skeleton className='header-menu__icon yr-skeleton' variant={SkeletonVariant.text} />
         }
       </div>

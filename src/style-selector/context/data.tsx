@@ -10,6 +10,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const strategy = useMemo(() => new StyleSelectorInitStrategy(), []);
   const { styleSelectorInitData } = useInitStyleSelectorStrategy(strategy);
 
+  // Prefetch del chunk de UI en paralelo con los fetches de la API.
+  // Cuando los datos llegan, el módulo ya está cacheado → completeStyleSelectorPromise
+  // lo resuelve de inmediato sin waterfall adicional.
+  useEffect(() => {
+    import('@/style-selector/style').catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (styleSelectorInitData) { completeStyleSelectorPromise(); }
   }, [styleSelectorInitData])

@@ -2,6 +2,7 @@ import React from 'react';
 import { Skeleton } from '@/shared/components/skeleton';
 import { SkeletonVariant } from '@/declarations/enums';
 import type { StepWithTranslation } from '@/declarations/interfaces';
+import { useI18n } from '@/style-selector/context/i18n-context';
 
 import './index.scss';
 interface SubNavProps {
@@ -17,12 +18,16 @@ export const SubNav: React.FC<SubNavProps> = ({
   steps,
   selectedStep
 }) => {
+  const i18n = useI18n();
   const stepNumber = (selectedStep?.id ?? 0) + 1;
   const totalSteps = steps?.length ?? 0;
-  const backLabel = `Back to ${steps?.[0]?.name ?? 'previous step'}`;
+  const previousStepName = steps?.[0]?.name ?? (i18n?.getLabel('style_selector_subnav_previous_step', 'previous step') ?? 'previous step');
+  const backLabel = i18n?.getLang('style_selector_subnav_back_label', 'Back to {step}', { step: previousStepName }) ?? `Back to ${previousStepName}`;
+  const stepCounterLabel = i18n?.getLang('style_selector_subnav_step_of', 'Step {n} of {m}', { n: stepNumber, m: totalSteps }) ?? `Step ${stepNumber} of ${totalSteps}`;
+  const navLabel = i18n?.getLabel('style_selector_subnav_label', 'Step navigation') ?? 'Step navigation';
 
   return (
-    <nav className="subnav" aria-label="Step navigation">
+    <nav className="subnav" aria-label={navLabel}>
       <div className='subnav-back'>
         {skeleton && <Skeleton className='subnav-back' variant={SkeletonVariant.rectangular} />}
         {!skeleton && onClick && selectedStep?.id ?
@@ -44,7 +49,7 @@ export const SubNav: React.FC<SubNavProps> = ({
         {!skeleton ?
           <p
             className="subnav-count"
-            aria-label={`Step ${stepNumber} of ${totalSteps}`}
+            aria-label={stepCounterLabel}
           >
             {stepNumber + '/' + totalSteps}
           </p> :

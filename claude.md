@@ -221,7 +221,32 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, i18n); `useData()` hook
-- `context/i18n-context.ts` — `I18nContext` con `i18n | undefined`; `useI18n()` hook — para componentes que solo necesitan traducciones sin el `Output` completo (incluyendo `SharedSkeleton`); `undefined` mientras los datos cargan
+- `context/i18n-context.ts` — `I18nContext` con `i18n | undefined`; `useI18n()` hook — para componentes que solo necesitan traducciones sin el `Output` completo; `undefined` mientras los datos cargan (devuelve fallback hardcoded en ese caso); usado en: `Header`, `SubNav`, `CategoryFilterComponent`, `StyleSelectorSkeleton`, `SharedSkeleton`, `style.tsx`
+- `context/data.tsx` — **prefetch de UI chunk**: `useEffect([], [])` dispara `import('@/style-selector/style')` al montar, en paralelo con los fetches de API → cuando los datos llegan el chunk ya está cacheado y `completeStyleSelectorPromise` resuelve sin waterfall; **phase 2 guard**: `setState` de `configuratorData` se omite si el resultado es `undefined` (evita re-render innecesario)
+
+### i18n keys del modo style-selector
+Todas las keys usan `getLabel(key, fallback)` salvo las indicadas con `getLang` (soportan interpolación `{var}`):
+
+| Key | Fallback | Usado en |
+|---|---|---|
+| `style_selector_header_nav_label` | `'Steps'` | `Header` `<nav aria-label>` |
+| `style_selector_header_menu_label` | `'Menu'` | `Header` menu button |
+| `style_selector_subnav_label` | `'Step navigation'` | `SubNav` `<nav aria-label>` |
+| `style_selector_subnav_back_label` *(getLang)* | `'Back to {step}'` | `SubNav` back button |
+| `style_selector_subnav_previous_step` | `'previous step'` | fallback de `{step}` en back label |
+| `style_selector_subnav_step_of` *(getLang)* | `'Step {n} of {m}'` | `SubNav` counter `aria-label` |
+| `style_selector_category_filter_label` | `'Filter by category'` | `CategoryFilterComponent` radiogroup |
+| `style_selector_loading_label` | `'Loading'` | `StyleSelectorSkeleton` + `SharedSkeleton` |
+| `style_selector_loading_title` | `'Starting your experience'` | `SharedSkeleton` título |
+| `style_selector_step_type_title` | `'Select glasses type'` | `style.tsx` section TYPE |
+| `style_selector_step_type_list_label` | `'Glasses types'` | `style.tsx` ul TYPE |
+| `style_selector_step_model_title` | `'Select a model'` | `style.tsx` section MODEL |
+| `style_selector_step_inspirations_title` | `'Trending styles'` | `style.tsx` section INSPIRATIONS |
+| `style_selector_models_list_label` | `'Models'` | `style.tsx` ul MODEL |
+| `style_selector_inspirations_list_label` | `'Trending styles'` | `style.tsx` ul INSPIRATIONS |
+| `style_selector_category_label_trending` | `'Select trending styles or'` | `style.tsx` trending text |
+| `style_selector_category_label_skip` | `' skip to customization'` | `style.tsx` skip link text |
+| `style_selector_opens_new_tab` | `', opens in new tab'` | `style.tsx` sr-only en skip link |
 - `context/data.tsx` — `DataProvider`; provee `DataContext` + `I18nContext` anidados; destruye `{ styleSelectorInitData }` del hook; `I18nContext.value = styleSelectorInitData?.i18n` (undefined hasta que llegan los datos); llama `completeStyleSelectorPromise()` via `useEffect` cuando `styleSelectorInitData` llega
 - _(typography moved to `src/shared/styles/_typography.scss` — ver sección Shared)_
 - `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
@@ -272,9 +297,9 @@ Archivos disponibles:
 - `public/imgs/background/dark/` — mismas 6 variantes en dark
 
 ### Componentes (`style-selector/components/`)
-- `header/` — `Header`; acepta `steps`, `selectedStep: Step`, `onClick?: (step: Step) => void`; logo via CSS `--ss-logo`, menu icon via `--menu` CSS var; skeleton via `Skeleton` component; patrón ARIA stepper: `<nav aria-label="Steps">` + `<ol role="tablist">` + `<button role="tab" aria-selected aria-disabled tabIndex>`; roving tabindex (selected=0, otros=-1); navegación teclado: ArrowLeft/ArrowRight/Home/End mueven foco entre tabs, Enter/Space activan; steps con `id > selectedStep.id` reciben `aria-disabled` + clase `header-nav-item__disabled`; logo con `aria-hidden`; menu icon como `<button>` nativo (no div)
-- `sub-nav/` — `SubNav`; acepta `steps?`, `selectedStep?: Step`, `onClick?: (step?: Step) => void`; visible solo en mobile; semántica: `<nav aria-label="Step navigation">`; back button siempre `<button type="button">` con `aria-label="Back to {step0.name}"` e icono `aria-hidden="true"`; title como `<p className="subnav-title">`; counter como `<p aria-label="Step N of M">` (texto visual "N/M" → evita que AT lea "1 dividido 2"); arrow via `--arrow-left` CSS var
-- `category-filter/` — `CategoryFilterComponent`; acepta `subCategories?`, `selectedCategory?`, `onClick?`, `label?`; patrón ARIA filtro: `<ul role="radiogroup" aria-label>` + `<li role="presentation">` + `<Button role="radio">`; roving tabindex (selected=0, otros=-1); navegación teclado: ArrowRight/Left/Down/Up/Home/End mueven foco Y seleccionan (selection-follows-focus, estándar radiogroup); sin categoría seleccionada → primer item tiene tabIndex=0
+- `header/` — `Header`; usa `useI18n()` internamente; `<nav aria-label>` vía `style_selector_header_nav_label`; menu `<button aria-label>` vía `style_selector_header_menu_label`; skeleton via `Skeleton` component; patrón ARIA stepper: `<ol role="tablist">` + `<button role="tab" aria-selected aria-disabled tabIndex>`; roving tabindex (selected=0, otros=-1); navegación teclado: ArrowLeft/ArrowRight/Home/End mueven foco entre tabs; steps con `id > selectedStep.id` reciben `aria-disabled` + clase `header-nav-item__disabled`; logo con `aria-hidden`; menu icon como `<button>` nativo
+- `sub-nav/` — `SubNav`; usa `useI18n()` internamente; `<nav aria-label>` vía `style_selector_subnav_label`; back button `aria-label` vía `style_selector_subnav_back_label` (con interpolación `{step}`); counter `aria-label` vía `style_selector_subnav_step_of` (con interpolación `{n}` y `{m}`); texto visual "N/M"; arrow via `--arrow-left` CSS var
+- `category-filter/` — `CategoryFilterComponent`; usa `useI18n()` internamente; `aria-label` del radiogroup: prop `label` > `style_selector_category_filter_label` > `'Filter by category'`; patrón ARIA: `<ul role="radiogroup">` + `<li role="presentation">` + `<Button role="radio">`; roving tabindex; selection-follows-focus (ArrowRight/Left/Down/Up/Home/End)
 - `category-button/` — `Button`; acepta `label?`, `skeleton?`, `selected?`, `tabIndex?`, `onClick?`; `role="radio"` + `aria-checked` (no `aria-current`); `aria-label` en el button, `aria-hidden` en el `<span>` interior; `:focus-visible` con `--color-generic-focus-border`
 - `card/` — `Card`; tarjeta de tipo de gafa (step 0); se renderiza como `<button>` o `<div>` según si `onClick` está presente; hijos con `aria-hidden="true"` — VoiceOver solo lee el `aria-label` del botón
 - `model/` — `ModelCard`; tarjeta de modelo (step 1); imagen con `loading='eager'`
@@ -420,13 +445,13 @@ src/
     context/
       context.ts                   — DataContext con StyleSelectorInitData completo; useData() hook
       i18n-context.ts              — I18nContext (i18n | undefined); useI18n() hook — acceso directo a traducciones sin el Output completo
-      data.tsx                     — DataProvider; provee DataContext + I18nContext anidados; I18nContext.value = phase1Data?.i18n
+      data.tsx                     — DataProvider; provee DataContext + I18nContext anidados; prefetch de style.tsx en useEffect([], []); phase2 setState omitido si resultado undefined
     lazy-imports/
       index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise()
     types.ts                       — GlassType, etc.
     style.tsx                      — componente principal Style; gestiona step state (type → model); usa StyleSelectorInitStrategy + useInitStyleSelectorStrategy
     StyleSelector.tsx              — wrapper; lazy StyleSelectorComponent o StyleSelectorSkeleton; soporta ?skeleton / ?skeletonLoader
-    StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true); section[aria-label="Loading" aria-busy="true"] (no main)
+    StyleSelectorSkeleton.tsx      — skeleton completo (Header + SubNav + Cards con skeleton=true); usa useI18n(); section aria-label vía style_selector_loading_label; (no main)
     index.scss                     — ?inline CSS (layout, breakpoints, var --ss-bg para background images; scroll: style-selector=height:100vh+flex+overflow:hidden, __elements=overflow-y:auto, __models=flex:1+overflow:hidden, __models-list=flex:1+overflow-y:auto+padding:0 16rem)
     components/
       header/                      — Header; stepper ARIA: ol[role=tablist] + button[role=tab]; roving tabindex; ArrowLeft/Right/Home/End; logo aria-hidden; menu icon como button nativo

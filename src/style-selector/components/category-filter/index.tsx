@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Button } from '@/style-selector/components/category-button';
 import type { FlatModel } from '@/declarations/interfaces';
+import { useI18n } from '@/style-selector/context/i18n-context';
 
 import './index.scss';
 
@@ -18,6 +19,9 @@ export const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
   onClick,
   label,
 }) => {
+  const i18n = useI18n();
+  const filterLabel = label ?? i18n?.getLabel('style_selector_category_filter_label', 'Filter by category') ?? 'Filter by category';
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
     if (!subCategories?.length) return;
     const radios = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('[role="radio"]'));
@@ -42,7 +46,7 @@ export const CategoryFilterComponent: React.FC<CategoryFilterProps> = ({
       <ul
         className="category-filter-nav"
         role="radiogroup"
-        aria-label={label ?? 'Filter by category'}
+        aria-label={filterLabel}
         onKeyDown={handleKeyDown}
       >
         {subCategories?.map((category, i) => {

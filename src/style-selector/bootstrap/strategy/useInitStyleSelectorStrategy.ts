@@ -48,7 +48,8 @@ export const useInitStyleSelectorStrategy = (
           .preloadConfiguratorData(styleSelectorInitData)
           .then(configuratorData => {
             if (cancelled) return
-            setState(prev => ({ ...prev, configuratorData }))
+            // Solo actualiza el estado si hay datos reales — evita re-render innecesario
+            if (configuratorData) setState(prev => ({ ...prev, configuratorData }))
           })
           .catch(err => {
             if (cancelled) return
