@@ -220,8 +220,9 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `style.tsx` — componente principal (`Style`); usa `useData()` del context (DataProvider); `steps` vienen de `phase1Data?.steps` (dinámicos, construidos por `Models.mapModels`); gestiona estado: tipo, categoría, modelo seleccionado, inspiraciones filtradas; renderiza 3 steps según `selectedStep?.id`; usa `<section aria-label>` (no `<main>`) para los steps — el widget es embebible y no debe crear landmarks `main` que conflicten con la página huésped; **focus management**: `mainRef` + `useEffect([selectedStep])` — cuando el step cambia a MODEL o INSPIRATIONS, hace `querySelector('button, a[href]')` en el `<section>` y mueve el foco al primer elemento interactivo; `hasMounted` ref evita el foco en el render inicial
 - `StyleSelectorSkeleton.tsx` — skeleton completo del modo; usa `Header`, `SubNav`, y `Card` con `skeleton={true}`
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos
-- `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, l10n)
-- `context/data.tsx` — `DataProvider`; importa `StyleSelectorInitStrategy` desde `@/style-selector/bootstrap/strategy` y `useInitStyleSelectorStrategy` desde `@/style-selector/bootstrap/strategy/useInitStyleSelectorStrategy`; llama `completeStyleSelectorPromise()` via `useEffect` cuando `phase1Data` llega; provee datos via `DataContext`
+- `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, i18n); `useData()` hook
+- `context/i18n-context.ts` — `I18nContext` con `i18n | undefined`; `useI18n()` hook — para componentes que solo necesitan traducciones sin el `Output` completo (incluyendo `SharedSkeleton`); `undefined` mientras los datos cargan
+- `context/data.tsx` — `DataProvider`; provee `DataContext` + `I18nContext` anidados; `I18nContext.value = phase1Data?.i18n` (undefined hasta que llegan los datos); llama `completeStyleSelectorPromise()` via `useEffect` cuando `phase1Data` llega
 - _(typography moved to `src/shared/styles/_typography.scss` — ver sección Shared)_
 - `index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
 
@@ -365,7 +366,7 @@ Ambos modos tienen su propia infraestructura de estado en `bootstrap/state/`:
 - `assets/index.ts` — `getSVGURL(name, brand)` + `getSVGURLByType(name, brand, type)` — URLs de assets remotos en CDN Fluid
 - `components/DarkModeSwitch.tsx` — toggle component; usado en todos los modos
 - `components/skeleton/` — `Skeleton` component; shimmer placeholder con `variant?: SkeletonVariant`; usado por Card, SubNav, Header, Button
-- `components/skeleton-loader/` — full-screen loading skeleton con brand logo + animated progress bar; activado con `?skeletonLoader=true`; inyecta `index.scss?inline` + brand override CSS; `--ss-loader` CSS var por tema; rbn override en `white-label/rbn.scss`
+- `components/skeleton-loader/` — full-screen loading skeleton con brand logo + animated progress bar; activado con `?skeletonLoader=true`; inyecta `index.scss?inline` + brand override CSS; `--ss-loader` CSS var por tema; rbn override en `white-label/rbn.scss`; ARIA: root `div[role="status" aria-label aria-busy="true"]`; logo `div[aria-hidden="true"]`; progressbar indeterminado (sin `aria-valuenow`); texto y label vía `useI18n()` con fallback (devuelve `undefined` fuera del contexto style-selector → usa fallback hardcoded)
 
 ## WCAG AAA
 - Root font: `112.5%` (respects browser font-size preference)
@@ -417,8 +418,9 @@ src/
       config.ts                    — runtime API config; BRAND_URLS per-brand URL map + API_LANGUAGE
       models.ts                    — clase Models con init(); fetchModels, fetchUiSetting; tipos: ApiModel, Model, Category, Step, Output, Translated; helpers: deduplicateByCode, rawCategoriesForType, getCategoriesByType, getModelsByType
     context/
-      context.ts                   — DataContext con Output completo (types, typesTranslated, categories, inspirations, steps, l10n)
-      data.tsx                     — DataProvider; usa StyleSelectorInitStrategy internamente; completeStyleSelectorPromise() via useEffect cuando phase1Data llega
+      context.ts                   — DataContext con StyleSelectorInitData completo; useData() hook
+      i18n-context.ts              — I18nContext (i18n | undefined); useI18n() hook — acceso directo a traducciones sin el Output completo
+      data.tsx                     — DataProvider; provee DataContext + I18nContext anidados; I18nContext.value = phase1Data?.i18n
     lazy-imports/
       index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise()
     types.ts                       — GlassType, etc.

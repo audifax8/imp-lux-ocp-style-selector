@@ -10,9 +10,11 @@ import { activeBrand } from '@/white-label/detect';
 import { getSVGURLByType } from '@/shared/assets';
 
 import { useData } from '@/style-selector/context/context';
+import { useI18n } from '@/style-selector/context/i18n-context';
 
 import { StepType } from '@/declarations/enums';
 import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
+
 
 const Style = () => {
   const styleSelectorInitData = useData();
@@ -23,9 +25,10 @@ const Style = () => {
     stepsTranslated,
     preselectedStep,
     modelsTypesTranslated,
-    flatModels,
-    i18n
+    flatModels
   } = styleSelectorInitData;
+
+  const i18n = useI18n();
 
   const [filteredModels, setFilteredModels] = useState<LuxApiModel[]>(modelsToRender ?? []);
   const [selectedModel, setSelectedModel] = useState<LuxApiModel>();
@@ -61,13 +64,6 @@ const Style = () => {
     }
   };
 
-  // Navegación hacia atrás (Header tabs + SubNav back button).
-  // Reglas:
-  //   - No se puede saltar hacia adelante desde el Header.
-  //   - Step 0: reset completo (tipo, categoría).
-  //   - Step 1: vuelve a la vista de modelos conservando la categoría.
-  //   - SubNav siempre llama con steps[0], por lo que desde cualquier step
-  //     el botón back retrocede a Type (cubre "step 3 → step 1" directamente).
   const onHeaderClick = (step?: StepWithTranslation) => {
     if (step?.type === StepType.TYPE) {
       setSelectedStep(steps[0]);
