@@ -8,8 +8,6 @@ import {
 } from '@/declarations/constants';
 import type { MergedParams } from '@/declarations/types';
 import type { ConfigureParams, QuickLink, RxcBaseAPI } from '@/declarations/interfaces';
-import type { Caretaker } from '@/configurator/bootstrap/state/caretaker';
-
 declare global {
   interface Window {
     rtrViewer: unknown;
@@ -22,7 +20,7 @@ declare global {
     RXC: RxcBaseAPI;
     _fluid: unknown;
     quicklink: QuickLink;
-    caretaker: Caretaker;
+    caretaker: unknown;
   }
 }
 

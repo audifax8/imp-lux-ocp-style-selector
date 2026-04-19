@@ -1,5 +1,5 @@
 import type { QuickLink, RtrAssetsAPI } from '@/declarations/interfaces';
-import type { Originator } from '@/configurator/bootstrap/state/originator';
+import type { Originator } from '@/style-selector/bootstrap/state/originator';
 import { AsyncTask } from '@/models/async-task';
 
 export class RTRAssets extends AsyncTask {
@@ -30,14 +30,13 @@ export class RTRAssets extends AsyncTask {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const state = this.originator.getState();
-      const params = state.getParams();
+      //const params = state.getParams();
       const logger = state.getLogger();
       const performance = state.getPerformance();
       //const objectsFactory = state.getObjectsFactory();
       this.runMicrotask(async () => {
         try {
-          
-          const { vendorId, workflow } = params;
+          /*const { vendorId, workflow } = params;
           const miniproductUrl = this.getMiniProductsURL(workflow, vendorId);
           performance?.processStart('loadMiniProduct');
           const miniProductResponse = await fetch(miniproductUrl);
@@ -49,8 +48,11 @@ export class RTRAssets extends AsyncTask {
           const miniProduct = await miniProductResponse.json();
           performance?.processEnd('loadMiniProduct');
           performance?.logMeasure('loadMiniProduct');
-          const { vendorIdSize } = miniProduct;
+          const { vendorIdSize } = miniProduct;*/
+
+          const vendorIdSize = '0RB2140CP50';
           const rtrAssetsURL = this.getAssetsURL(vendorIdSize);
+          console.log({ rtrAssetsURL });
           performance?.processStart('loadRTRAssets');
           const response = await fetch(rtrAssetsURL);
           if (!response.ok) {

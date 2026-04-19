@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import React from 'react'
 import StyleSelectorSkeleton from './index'
 import { I18nContext } from '@/style-selector/context/i18n-context'
 import { i18n } from '@/models/i18n'

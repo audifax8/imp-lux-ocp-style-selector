@@ -84,6 +84,7 @@ export const ModelStep = React.forwardRef<HTMLElement, ModelStepProps>(({
               title={model.label}
               imageSrc={model.thumbnailUrl}
               imageAlt={model.label}
+              vendorId={model.vendorId}
               onClick={() => onModelClick(model)}
             />
           </li>

@@ -59,7 +59,7 @@ const baseParams: MergedParams = {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function mockFetch() {
-  global.fetch = vi.fn().mockImplementation((url: string) => {
+  globalThis.fetch = vi.fn().mockImplementation((url: string) => {
     if (String(url).includes('fluidconfigure')) {
       return Promise.resolve({ ok: true, json: () => Promise.resolve(mockUiSettings) })
     }
@@ -86,13 +86,13 @@ describe('Models', () => {
     })
 
     it('returns undefined when the models fetch fails (non-ok response)', async () => {
-      global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 })
+      globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 })
       const result = await new Models(baseParams).init()
       expect(result).toBeUndefined()
     })
 
     it('returns undefined when fetch throws (network error)', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
+      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
       const result = await new Models(baseParams).init()
       expect(result).toBeUndefined()
     })
@@ -204,7 +204,7 @@ describe('Models', () => {
   describe('getModelsUrl()', () => {
     it('appends lang to the endpoint', async () => {
       await new Models({ ...baseParams, endpoint: 'https://api.test/', lang: 'fr' } as MergedParams).init()
-      const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      const calls = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls
       const modelsCall = calls.find((args: unknown[]) => String(args[0]).includes('api.test'))
       expect(modelsCall?.[0]).toBe('https://api.test/fr')
     })
@@ -212,7 +212,7 @@ describe('Models', () => {
     it('replaces the store segment when a store param is provided', async () => {
       const endpoint = 'https://example.com/store/10151/models?language='
       await new Models({ ...baseParams, endpoint, lang: 'en', store: '99999' } as MergedParams).init()
-      const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls
+      const calls = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls
       const modelsCall = calls.find((args: unknown[]) => String(args[0]).includes('example.com'))
       expect(modelsCall?.[0]).toContain('store/99999')
       expect(modelsCall?.[0]).not.toContain('store/10151')

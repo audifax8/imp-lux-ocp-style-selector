@@ -4,6 +4,8 @@ import type { FetchPriority, ResolutionType, SkeletonVariant, StepType } from '@
 import type { KeyString } from '@/declarations/types';
 import type { Brand } from '@/white-label/types';
 import type { i18n } from '@/models/i18n';
+import type { Core } from '@/style-selector/models/core';
+import type { RTRSkeleton } from '@/style-selector/models/rtr-skeleton';
 
 export interface ImageData {
   resolution: ResolutionType;
@@ -355,7 +357,19 @@ export interface HeadlessProduct {
     attributes: ConfigurableAttribute[];
     facets: HeadlessFacet[];
   };
-}
+};
+
+export interface HProduct {
+  name: string;
+  id: number;
+  vendorId: string;
+  attributes: ConfigurableAttribute[];
+  facets: HeadlessFacet[];
+};
+
+export type HeadlessProductsData = {
+  data: HProduct[];
+};
 
 export interface LuxApiModel {
   modelCode: string
@@ -423,6 +437,12 @@ export type StyleSelectorFilter = {
 export type StyleSelectorInitData = {
   i18n: i18n;
 } & StyleSelectorMapped & StyleSelectorFilter;
+
+export type StyleSelectorConfigurator = {
+  data: HProduct[];
+  core: Core;
+  rtrSkeleton: RTRSkeleton;
+};
 
 export interface InitPhase1Data {
   modelId: string

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useInitStyleSelectorStrategy } from './useInitStyleSelectorStrategy'
-import type { IStyleSelectorInitStrategy } from '@/declarations/interfaces'
-import type { StyleSelectorInitData } from '@/declarations/interfaces'
+import type { IStyleSelectorInitStrategy, StyleSelectorInitData, StyleSelectorConfigurator } from '@/declarations/interfaces'
 
-type Strategy = IStyleSelectorInitStrategy<StyleSelectorInitData, StyleSelectorInitData>
+type Strategy = IStyleSelectorInitStrategy<StyleSelectorInitData, StyleSelectorConfigurator>
 
 const mockData = () => ({ stepsTranslated: [] }) as unknown as StyleSelectorInitData
+const mockConfigurator = () => ({ data: [], core: {}, rtrSkeleton: {} }) as unknown as StyleSelectorConfigurator
 
 const flushPromises = () => act(async () => {
   await new Promise(r => setTimeout(r, 0))
@@ -14,7 +14,7 @@ const flushPromises = () => act(async () => {
 
 function makeStrategy(overrides: Partial<{
   phase1: StyleSelectorInitData
-  phase2: StyleSelectorInitData | null
+  phase2: StyleSelectorConfigurator | null
   phase1Error: Error
   phase2Error: Error
 }> = {}): Strategy {
@@ -24,7 +24,7 @@ function makeStrategy(overrides: Partial<{
       : vi.fn().mockResolvedValue(overrides.phase1 ?? mockData()),
     preloadConfiguratorData: overrides.phase2Error
       ? vi.fn().mockRejectedValue(overrides.phase2Error)
-      : vi.fn().mockResolvedValue(overrides.phase2 ?? null),
+      : vi.fn().mockResolvedValue(overrides.phase2 !== undefined ? overrides.phase2 : mockConfigurator()),
   }
 }
 
@@ -80,7 +80,7 @@ describe('useInitStyleSelectorStrategy', () => {
 
   describe('phase 2 success', () => {
     it('sets configuratorData when phase 2 returns truthy data', async () => {
-      const phase2 = mockData()
+      const phase2 = mockConfigurator()
       const strategy = makeStrategy({ phase2 })
       const { result } = renderHook(() => useInitStyleSelectorStrategy(strategy))
 

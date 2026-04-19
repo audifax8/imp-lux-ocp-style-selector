@@ -223,7 +223,33 @@ Single-page component. Internal state manages type selection vs. model grid view
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos; importa desde `@/style-selector/bootstrap/App`
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, i18n); `useData()` hook
 - `context/i18n-context.ts` — `I18nContext` con `i18n | undefined`; `useI18n()` hook — para componentes que solo necesitan traducciones sin el `Output` completo; `undefined` mientras los datos cargan (devuelve fallback hardcoded en ese caso); usado en: `Header`, `SubNav`, `CategoryFilterComponent`, `components/skeleton/`, `SharedSkeleton`, `bootstrap/App.tsx`
-- `context/data.tsx` — **prefetch de UI chunk**: `useEffect([], [])` dispara `import('@/style-selector/bootstrap/App')` al montar, en paralelo con los fetches de API → cuando los datos llegan el chunk ya está cacheado y `completeStyleSelectorPromise` resuelve sin waterfall; **phase 2 guard**: `setState` de `configuratorData` se omite si el resultado es `undefined` (evita re-render innecesario)
+- `context/data.tsx` — `DataProvider`; `servicesRef` (`useRef`) guarda `{ core, rtrSkeleton }` cuando fase 2 resuelve — nunca en state ni en context; `configuratorActions` creado con `useMemo([], [])` → referencia estable (cero re-renders); provee `ConfiguratorActionsContext` + `ProductsContext` + `DataContext` + `I18nContext` anidados; prefetch de `bootstrap/App` en `useEffect([], [])`
+- `context/products-context.ts` — `ProductsContext` con `HProduct[] | undefined`; `useProducts()` hook — solo datos del catálogo headless; `undefined` hasta fase 2
+- `context/configurator-actions-context.ts` — `ConfiguratorActionsContext` con `ConfiguratorActions | undefined`; `useConfiguratorActions()` hook — expone `onModelHover(product)` + `onModelSelect(product)`; callbacks estables que envuelven `rtrSkeleton.downLoadAssets()` y `core.render2D()` respectivamente; los componentes llaman comportamiento, no instancias de clase
+- `models/base.ts` — `BaseStrategy extends AsyncTask`; clase abstracta base de las estrategias del style-selector; provee `caretaker`, `originator`, `state`; expone `resolveLayoutPromise/resolveMenuPromise/destroy`
+- `models/core.ts` — `Core extends AsyncTask implements InitBaseMethods`; URL constants CDN/headless; `init()` carga los JSONs de configuración + crea `ConfigureCore` + aplica OLA overrides (Lux); `getHeadlessProducts()` fetcha el catálogo headless y retorna `HeadlessProductsData`; `createCore()` wrappea `@cfg.plat/configure-core` en `@fluid.inc/yr-configure-wrapper/core`; `getConfigureJsons/getConfigureJsonsURLs()` cargan productGraph, preferences, uiSettings desde CDN
+- `models/rtr-skeleton.ts` — `RTRSkeleton extends BaseStrategy`; `downLoadAssets()` llama `rtrVersion.downloadScript()` (y opcionalmente `rtrAssets.downloadRTRAssets()`); `initRTR()` inicializa el viewer RTR con token + background; `getBackGround()` devuelve `RTRBackground` según darkMode/system preference; `init()` orquesta todo con performance marks
+- `models/rtr-assets.ts` — `RTRAssets extends AsyncTask`; gestión de assets RTR y prefetch via `quicklink`; `downloadRTRAssets()` carga mini-product JSON → prefetch startup list; `prefetchByKeyName()` prefetch por atributo configurable; URLs via `RTR_ASSETS_URL` + `miniProduct` templates
+
+### Phase 2 — StyleSelectorConfigurator
+`StyleSelectorInitStrategy.preloadConfiguratorData()` arranca DESPUÉS de que fase 1 resuelve, en background (no bloquea render):
+1. Importa dinámicamente `Core` y `RTRSkeleton` en paralelo
+2. Crea instancias con `this.caretaker`/`this.originator` (guardados durante `loadAppData`)
+3. Lanza en paralelo: `rtrSkeleton.downLoadAssets()` + `core.getHeadlessProducts()`
+4. `getHeadlessProducts()` fetcha: `https://prod-ingress.fluidconfigure.com/headless/customers/{customer}/products?workflow={workflow}&apiKey={apiKey}`
+5. Retorna `StyleSelectorConfigurator = { data: HProduct[], core: Core, rtrSkeleton: RTRSkeleton }`
+
+Los servicios se distribuyen en dos contextos separados — los componentes no acceden a instancias de clase directamente:
+- **`ProductsContext`** → `HProduct[]` — datos serializables para lookup en UI
+- **`ConfiguratorActionsContext`** → `{ onModelHover, onModelSelect }` — callbacks estables derivados de los servicios
+
+`ModelCard` consume ambos:
+- **hover** (`onMouseEnter`): `products?.find(p => p.vendorId === vendorId)` → `actions.onModelHover(product)` → `rtrSkeleton.downLoadAssets()`
+- **click** (`onClick`): mismo lookup → `actions.onModelSelect(product)` → `core.render2D()`
+
+`servicesRef` en `DataProvider` guarda `{ core, rtrSkeleton }` en un `useRef` — no en context ni en state. Los callbacks de `ConfiguratorActionsContext` cierran sobre `servicesRef.current` en tiempo de ejecución → referencia estable, cero re-renders adicionales.
+
+Tipos: `HProduct` (flat, sin wrapper `.product`) para lookup UI. `HeadlessProductsData = { data: HProduct[] }` es el shape del response. `StyleSelectorConfigurator = { data, core, rtrSkeleton }` es el retorno interno de `preloadConfiguratorData`.
 
 ### i18n keys del modo style-selector
 Todas las keys usan `getLabel(key, fallback)` salvo las indicadas con `getLang` (soportan interpolación `{var}`):
@@ -248,7 +274,7 @@ Todas las keys usan `getLabel(key, fallback)` salvo las indicadas con `getLang` 
 | `style_selector_category_label_trending` | `'Select trending styles or'` | `ModelStep` trending text |
 | `style_selector_category_label_skip` | `' skip to customization'` | `ModelStep` skip link text |
 | `style_selector_opens_new_tab` | `', opens in new tab'` | `ModelStep` sr-only en skip link |
-- `context/data.tsx` — `DataProvider`; provee `DataContext` + `I18nContext` anidados; destruye `{ styleSelectorInitData }` del hook; `I18nContext.value = styleSelectorInitData?.i18n` (undefined hasta que llegan los datos); llama `completeStyleSelectorPromise()` via `useEffect` cuando `styleSelectorInitData` llega
+- `context/data.tsx` — `DataProvider`; ver descripción completa arriba
 - _(typography moved to `src/shared/styles/_typography.scss` — ver sección Shared)_
 - `bootstrap/index.scss` — ?inline CSS (layout, breakpoints, background images por resolución y tema via `--ss-bg`); scroll architecture: `.style-selector` es `height:100vh; flex-column; overflow:hidden` (background estático); `__elements` tiene `overflow-y:auto`; `__models` y `__inspiration` comparten `flex:1; overflow:hidden; flex-column`; `__models-list` es `flex:1; overflow-y:auto; padding:0 16rem`; `__inspiration` tiene `__container` con label + link "skip to customization"
 
@@ -441,8 +467,8 @@ src/
         caretaker.ts               — Caretaker; stores Memento[]
         memento.ts                 — Memento; wraps a LoadingState snapshot
       strategy/
-        index.ts                   — StyleSelectorInitStrategy; implementa IStyleSelectorInitStrategy; loadAppData() → StyleSelectorInitData; preloadConfiguratorData() → stub (retorna undefined)
-        useInitStyleSelectorStrategy.ts — hook; devuelve InitState { styleSelectorInitData, configuratorData, phase1Error, phase2Error }; llama loadAppData() → setState({ styleSelectorInitData }); luego preloadConfiguratorData() → setState({ configuratorData }); cancelled flag para cleanup
+        index.ts                   — StyleSelectorInitStrategy; implementa IStyleSelectorInitStrategy<StyleSelectorInitData, StyleSelectorConfigurator>; loadAppData() guarda caretaker/originator/mergedParams; preloadConfiguratorData() importa Core+RTRSkeleton, corre downLoadAssets+getHeadlessProducts en paralelo → retorna StyleSelectorConfigurator
+        useInitStyleSelectorStrategy.ts — hook; devuelve InitState { styleSelectorInitData, configuratorData: StyleSelectorConfigurator|undefined, phase1Error, phase2Error }; cancelled flag para cleanup
         configurator-init.ts       — re-exporta getInitQueryParams, schedule, AsyncTask, Caretaker, Originator, LoadingState
     api/
       config.ts                    — runtime API config; BRAND_URLS per-brand URL map + API_LANGUAGE
@@ -450,7 +476,9 @@ src/
     context/
       context.ts                   — DataContext con StyleSelectorInitData completo; useData() hook
       i18n-context.ts              — I18nContext (i18n | undefined); useI18n() hook — acceso directo a traducciones sin el Output completo
-      data.tsx                     — DataProvider; provee DataContext + I18nContext anidados; prefetch de bootstrap/App.tsx en useEffect([], []); phase2 setState omitido si resultado undefined
+      products-context.ts          — ProductsContext con HProduct[] | undefined; useProducts() hook — solo datos UI; undefined hasta fase 2
+      configurator-actions-context.ts — ConfiguratorActionsContext con ConfiguratorActions|undefined; useConfiguratorActions() hook; onModelHover→rtrSkeleton.downLoadAssets(); onModelSelect→core.render2D(); callbacks estables via useMemo+servicesRef
+      data.tsx                     — DataProvider; provee ProductsContext + DataContext + I18nContext anidados; prefetch de bootstrap/App.tsx en useEffect([], []); phase2 setState omitido si resultado undefined
     lazy-imports/
       index.ts                     — deferred promise pattern; StyleSelectorComponent + completeStyleSelectorPromise(); importa desde bootstrap/App
     types.ts                       — GlassType, etc.
@@ -461,11 +489,16 @@ src/
       category-filter/             — CategoryFilterComponent; ul role="radiogroup"; roving tabindex; selection-follows-focus
       category-button/             — Button; aria-label en button, aria-hidden en span interior
       card/                        — Card; button o div según onClick; hijos con aria-hidden (VoiceOver lee solo aria-label)
-      model/                       — ModelCard; tarjeta de modelo (step 1); loading='eager'
+      model/                       — ModelCard; acepta vendorId; consume useProducts() (HProduct[] lookup) + useConfiguratorActions() (callbacks de servicios); hover → onModelHover → rtrSkeleton.downLoadAssets(); click → onModelSelect → core.render2D()
       type-step/                   — TypeStep; step TYPE extraído de App.tsx; props: modelsTypes, onClick; usa useI18n()+Card+getSVGURLByType; mismo chunk que App.tsx
       model-step/                  — ModelStep (forwardRef); steps MODEL+INSPIRATIONS extraídos de App.tsx; props: selectedStep, subCategories, selectedFlatModel, filteredModels, selectedModel, onCategoryClick, onModelClick; ref en <section> para focus management; mismo chunk que App.tsx
       logo/                        — Logo SVG via URL
       img/                         — componente de imagen
+    models/
+      base.ts                      — BaseStrategy abstract; caretaker+originator+state; destroy()
+      core.ts                      — Core extends AsyncTask; getHeadlessProducts() → HeadlessProductsData; init()+render2D() (OLA overrides); createCore() wrappea @cfg.plat/configure-core; getConfigureJsons/URLs()
+      rtr-skeleton.ts              — RTRSkeleton extends BaseStrategy; downLoadAssets() (script+assets); initRTR() (token+background); init() con performance marks
+      rtr-assets.ts                — RTRAssets extends AsyncTask; downloadRTRAssets(); prefetchListStartup(); prefetchByKeyName(keyName)
   products-index/
     bootstrap/
       index.tsx                    — products-index bootstrap (CSS inject + brand + React mount)
@@ -554,6 +587,7 @@ scripts/
 ## Pending
 - `BRAND_URLS` in `style-selector/api/config.ts`: `sgh`, `bliz`, `cdm` still use placeholder rbn URL — update when real URLs available
 - `console.log({ brand })` left in `style-selector/api/models.ts` `fetchModels` — remove before production
+- `ModelCard` hover/click handlers log the found `HeadlessProduct` via `console.log` — replace with actual configurator navigation/prefetch logic when ready
 - Labels API endpoint not live yet — defaults always used until implemented
 - Delete `main` branch on both repos after changing default branch in GitHub Settings
 - `configurator/bootstrap/AppConfigurator.tsx`: re-enable `LabelsProvider` when configurator i18n is needed
