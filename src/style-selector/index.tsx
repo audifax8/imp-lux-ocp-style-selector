@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import wizardStyles from '@/style-selector/bootstrap/index.scss?inline'
 
 import { injectBrandStyles } from '@/white-label/loader-wizard'
+import { injectSkinStyles } from '@/style-selector/bootstrap/skin-loader'
 import { activeBrand } from '@/white-label/detect'
 
 import { DataProvider } from '@/style-selector/context/data'
@@ -15,6 +16,7 @@ styleEl.textContent = wizardStyles
 document.head.appendChild(styleEl)
 
 injectBrandStyles(activeBrand)
+injectSkinStyles(activeBrand)
 
 export function mount(container: HTMLElement): void {
   createRoot(container).render(

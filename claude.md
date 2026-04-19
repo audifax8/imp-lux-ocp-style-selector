@@ -161,6 +161,36 @@ Loaders (`src/white-label/`):
 - `detect.ts` — brand singleton
 - `types.ts` — `Brand` type + `BRANDS` const
 
+## Skin token system (startWithStyleSelector only)
+Versioned CSS custom properties generados desde Figma. Coexisten con otras herramientas en la misma página porque están scoped a un atributo en lugar de `:root`.
+
+**Archivos (auto-generados — no editar manualmente):**
+- `src/shared/styles/skin-whitelabel.scss` — tokens de la brand Whitelabel (light); `@layer skin`
+- `src/shared/styles/skin-whitelabel-inverse.scss` — tokens Whitelabel dark/inverse; `@layer skin` (ver nota)
+- `src/white-label/rbn/skin-ray-ban.scss` — tokens Ray-Ban (light); `@layer skin`
+- `src/white-label/rbn/skin-ray-ban-inverse.scss` — tokens Ray-Ban dark/inverse; `@layer skin` (ver nota)
+
+**CSS cascade layers:** `@layer base, skin, mode;` — orden determinista: base → skin (light theme) → mode (inverse/dark). La capa `mode` garantiza que los tokens inverse siempre ganen sobre el tema light independientemente de la especificidad.
+
+**Nota sobre layer discrepancy:** Los archivos inverse son auto-generados con `@layer skin` en lugar de `@layer mode` (discrepancia con la spec). El `skin-loader.ts` lo corrige en tiempo de inyección con un string replace (`@layer skin {` → `@layer mode {`), sin tocar los archivos generados.
+
+**Loader:** `src/style-selector/bootstrap/skin-loader.ts`
+- Importa los 4 SCSS files con `?inline`
+- `injectSkinStyles(brand)` — inyecta en este orden: 1) `<style data-skin-layers>` con `@layer base, skin, mode;` 2) whitelabel (siempre, todos los brands) 3) ray-ban (solo si `brand === 'rbn'`)
+- Guard `data-skin-layers` evita inyección doble
+- Llamado desde `style-selector/index.tsx` después de `injectBrandStyles`
+
+**Atributos en el root div** (`bootstrap/App.tsx`):
+- `data-token-version="1.0"` — versión del sistema de tokens; los selectores CSS usan este atributo como scope raíz
+- `data-skin` — brand skin activa: `rbn` → `"ray-ban"`, todos los demás → `"whitelabel"`
+- `data-mode` — `"inverse"` en dark mode, omitido en light mode; reactivo via `useDarkMode` hook
+
+**Dark mode reactivo:** `src/style-selector/bootstrap/useDarkMode.ts`
+- `MutationObserver` sobre `html[data-theme]` (el mismo atributo que maneja `shared/theme/darkMode.ts`)
+- Retorna `'inverse' | undefined`; se usa directamente como valor de `data-mode`
+
+**Brand → skin mapping** (en `App.tsx`): `{ rbn: 'ray-ban' }` — si el brand no está en el mapa, usa `'whitelabel'`
+
 ## CSS architecture
 ```
 imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (skeleton vars, shimmer)
@@ -169,6 +199,7 @@ imp-lux-ocp-style-selector.css               ← shared/styles/theme.scss only (
                                                 sus vars se inyectan como parte de cada mode ?inline
 
 style-selector/index.tsx                     ← style-selector/bootstrap/index.scss?inline + white-label/loader-wizard
+                                                + style-selector/bootstrap/skin-loader (skin tokens ?inline)
                                                 bootstrap/index.scss incluye breakpoints de background + var --ss-bg
 configurator/bootstrap/index.tsx             ← configurator/configurator.scss?inline + white-label/loader-configurator
 products-index/bootstrap/index.tsx           ← products-index/index.scss?inline + white-label/loader-index
@@ -218,7 +249,9 @@ Labels has sections for: `widget`, `configurator`, `darkMode`, `step1`, `step2`.
 Single-page component. Internal state manages type selection vs. model grid view.
 
 - `bootstrap/index.tsx` — wrapper de Suspense; monta `StyleSelectorComponent` (lazy via deferred promise) o skeleton (si `?skeleton` param activo); selecciona entre `SharedSkeleton` (`?skeletonLoader=true`) y `components/skeleton/` (default)
-- `bootstrap/App.tsx` — componente principal (`Style`); usa `useData()` del context; `steps` vienen de `phase1Data?.steps` (dinámicos); gestiona estado: tipo, categoría, modelo seleccionado; renderiza `TypeStep` / `ModelStep` según `selectedStep?.id`; usa `<section aria-label>` (no `<main>`) para los steps; **focus management**: `mainRef` (forwardRef a `ModelStep`) + `useEffect([selectedStep])` — cuando step cambia a MODEL o INSPIRATIONS, mueve foco al primer elemento interactivo; `hasMounted` ref evita foco en el render inicial
+- `bootstrap/App.tsx` — componente principal (`Style`); usa `useData()` del context; `steps` vienen de `phase1Data?.steps` (dinámicos); gestiona estado: tipo, categoría, modelo seleccionado; renderiza `TypeStep` / `ModelStep` según `selectedStep?.id`; usa `<section aria-label>` (no `<main>`) para los steps; **focus management**: `mainRef` (forwardRef a `ModelStep`) + `useEffect([selectedStep])` — cuando step cambia a MODEL o INSPIRATIONS, mueve foco al primer elemento interactivo; `hasMounted` ref evita foco en el render inicial; **skin token attributes**: root div lleva `data-token-version="1.0"`, `data-skin` (rbn→"ray-ban", otros→"whitelabel"), `data-mode` reactivo via `useDarkMode()`
+- `bootstrap/skin-loader.ts` — inyecta los 4 skin SCSS files `?inline`; establece `@layer base, skin, mode;`; corrige el `@layer skin` de los archivos inverse a `@layer mode` mediante string replace en tiempo de inyección; ver sección "Skin token system"
+- `bootstrap/useDarkMode.ts` — hook; `MutationObserver` sobre `html[data-theme]`; retorna `'inverse' | undefined` para usar como `data-mode`
 - `components/skeleton/index.tsx` — skeleton completo del modo (era `StyleSelectorSkeleton.tsx`); usa `Header`, `SubNav`, y `Card` con `skeleton={true}`; `useI18n()`; `<section aria-label aria-busy="true">` (no main)
 - `lazy-imports/index.ts` — deferred promise pattern; `StyleSelectorComponent = React.lazy(() => styleSelector.promise)`; `completeStyleSelectorPromise()` resuelve cuando DataProvider recibe datos; importa desde `@/style-selector/bootstrap/App`
 - `context/context.ts` — `DataContext` con `Output` completo (types, typesTranslated, categories, inspirations, steps, i18n); `useData()` hook
@@ -441,6 +474,8 @@ src/
     styles/critical.scss           — design tokens: tipografía, spacing, radii en rem; strokes en px; colores semánticos; icon/logo vars por brand y tema
     styles/_typography.scss        — mixins de tipografía: typography-h3/h4/h5, typography-body-2xl/lg/base/sm/xs; usados en SCSS de style-selector
     styles/_variables.scss         — partial de variables CSS
+    styles/skin-whitelabel.scss    — tokens Figma Whitelabel light; @layer skin; auto-generado
+    styles/skin-whitelabel-inverse.scss — tokens Figma Whitelabel dark/inverse; auto-generado (ver skin-loader para fix de layer)
     assets/index.ts                — getSVGURL + getSVGURLByType (CDN Fluid asset URLs)
     components/DarkModeSwitch.tsx  — shared dark mode toggle component
     components/skeleton/           — Skeleton shimmer component (SkeletonVariant)
@@ -455,12 +490,16 @@ src/
     {brand}/wizard.scss            — brand CSS for style-selector mode
     {brand}/configurator.scss      — brand CSS for configurator mode (placeholders)
     {brand}/index.scss             — brand CSS for products-index mode (placeholders)
+    rbn/skin-ray-ban.scss          — tokens Figma Ray-Ban light; @layer skin; auto-generado
+    rbn/skin-ray-ban-inverse.scss  — tokens Figma Ray-Ban dark/inverse; auto-generado (ver skin-loader para fix de layer)
   style-selector/
-    index.tsx                      — entry: CSS inject (bootstrap/index.scss?inline) + brand styles + createRoot + DataProvider + StyleSelector
+    index.tsx                      — entry: CSS inject (bootstrap/index.scss?inline) + brand styles + skin styles + createRoot + DataProvider + StyleSelector
     bootstrap/
       index.tsx                    — Suspense wrapper; selects skeleton; renders StyleSelectorComponent (deferred lazy)
-      App.tsx                      — componente principal Style; gestiona step state; renderiza TypeStep / ModelStep
+      App.tsx                      — componente principal Style; gestiona step state; renderiza TypeStep / ModelStep; data-token-version + data-skin + data-mode (reactive)
       index.scss                   — ?inline CSS (layout, breakpoints, var --ss-bg; scroll architecture)
+      skin-loader.ts               — inyecta skin token files ?inline; @layer base,skin,mode; corrige inverse layer; injectSkinStyles(brand)
+      useDarkMode.ts               — MutationObserver sobre html[data-theme]; retorna 'inverse' | undefined
       state/
         loading-state.ts           — LoadingState; clone(updates) for immutable state transitions
         originator.ts              — Originator; setState/getState/saveMemento/restore

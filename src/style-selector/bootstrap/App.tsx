@@ -7,13 +7,17 @@ import { ModelStep } from '@/style-selector/components/model-step';
 
 import { activeBrand } from '@/white-label/detect';
 import { useData } from '@/style-selector/context/context';
+import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
 
 import { StepType } from '@/declarations/enums';
 import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
 
 
+const SKIN_NAME: Record<string, string> = { rbn: 'ray-ban' }
+
 const Style = () => {
   const styleSelectorInitData = useData();
+  const darkMode = useDarkMode();
   const {
     modelsToRender,
     preselectedCategoriesFilters,
@@ -94,7 +98,12 @@ const Style = () => {
   };
 
   return (
-    <div className={`style-selector style-selector-${activeBrand}`}>
+    <div
+      className={`style-selector style-selector-${activeBrand}`}
+      data-token-version="1.0"
+      data-skin={SKIN_NAME[activeBrand] ?? 'whitelabel'}
+      data-mode={darkMode}
+    >
       <Header steps={stepsTranslated} selectedStep={selectedStep} onClick={onHeaderClick} />
       <SubNav steps={stepsTranslated} selectedStep={selectedStep} onClick={onHeaderClick} />
       {selectedStep?.type === StepType.TYPE && (
