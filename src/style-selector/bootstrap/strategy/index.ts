@@ -49,18 +49,28 @@ export class StyleSelectorInitStrategy
       console.log(_styleSelectorInitData);
       const [
         { Core },
-        { RTRSkeleton }
+        { RTRSkeleton },
+        { Overrides }
       ] = await Promise.all([
         import('@/style-selector/models/core'),
-        import('@/style-selector/models/rtr-skeleton')
+        import('@/style-selector/models/rtr-skeleton'),
+        import('@/models/overrides')
      ]);
       const state = this.originator.getState();
+      const params = state.getParams();
+      const { vendorId } = params;
+      const logger = state.getLogger();
+      const performance = state.getPerformance();
       const core = new Core(this.caretaker, this.originator);
       const rtrSkeleton = new RTRSkeleton(this.caretaker, this.originator, state);
+      const overrides = new Overrides(params, logger, performance);
+      console.log({ overrides, vendorId });
 
       const [, headlessProduct] = await Promise.all([
         rtrSkeleton.downLoadAssets(),
-        core.getHeadlessProducts()
+        core.getHeadlessProducts(),
+        core.loadConfigureUIScript()
+        //overrides.getLuxComponents(vendorId)
       ]);
       
       return {

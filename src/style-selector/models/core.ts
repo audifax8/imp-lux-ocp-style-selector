@@ -9,6 +9,23 @@ import { CheckPointType } from '@/declarations/enums';
 import { AsyncTask } from '@/models/async-task';
 import type { HeadlessProductsData } from '@/declarations/interfaces';
 
+// Minimal types for the Fluid configure-ui SDK queue pattern.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FluidSDKInstance = { apps: { configure: (params: MergedParams, cb: (error: Error | null, c: any) => void) => void } }
+type FluidQueue = Array<(err: string | null, fluid: FluidSDKInstance) => void>
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+function downloadScript(url: string, onLoadCB: Function, priority?: 'high' | 'low' | 'auto') {
+  const script = document.createElement('script');
+  script.src = url;
+  script.crossOrigin = 'anonymous';
+  script.onload = () => onLoadCB(null, true);
+  script.onerror = () => onLoadCB(`Error loading script ${url}`, null);
+  script.async = true;
+  script.fetchPriority = priority ?? 'auto';
+  document.head.appendChild(script);
+}
+
 export abstract class InitBaseMethods {
   abstract createCore(measureName: string): Promise<ConfigureCore>;
   abstract getConfigureJsons(params: MergedParams, product: number): Promise<ConfigureJsons>;
@@ -20,6 +37,7 @@ export class Core extends AsyncTask implements InitBaseMethods {
   protected FLUID_BASE_URL = 'https://prod.fluidconfigure.com';
   protected HEADLESS_URL = 'https://cdn-prod-ingress.fluidconfigure.com/headless/graphql';
   protected HEADLESS_BASE = 'https://prod-ingress.fluidconfigure.com/headless';
+  protected UI_URL = `${this.CDN_FLUID_BASE_URL}/static/code/configure-ui/stable/js/configure-app.js`;
   protected caretaker: Caretaker = undefined!;
   protected originator: Originator = undefined!;
   protected rtrDisabled: boolean = true;
@@ -33,6 +51,52 @@ export class Core extends AsyncTask implements InitBaseMethods {
     if (params.darkMode) {
       this.updateUIState({ theme: Theme.DARK });
     }*/
+  }
+
+  public loadConfigureUIScript() {
+    const url = this.UI_URL;
+    const state = this.originator.getState();
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const _fluid = (window._fluid = (window._fluid as FluidQueue | undefined) ?? []) as FluidQueue;
+      const params = state.getParams();
+      console.log({ params });
+
+      _fluid.push(function(err, fluid) {
+        console.log({ err, fluid });
+        // Handle loading errors
+        if (err) {
+          return reject(err);
+        }
+
+        // The configure application constructor
+        const configureApp = fluid.apps.configure;
+        configureApp(params, (error, c) => {
+          if (error) {
+            return reject('[CORE] Error creating core');
+          }
+          console.log({ err, c });
+          console.log(c.run('getProduct'));
+          return resolve(true);
+        });
+      });
+
+      
+      const performance = state.getPerformance();
+      performance?.processStart('LoadingUIScript');
+      downloadScript(
+        url,
+        (error: string, success: boolean) => {
+          performance?.processEnd('LoadingUIScript');
+          performance?.logMeasure('LoadingUIScript');
+          if (error || !success) {
+            return reject('[CORE] Error loading UI script');
+          }
+          //return resolve(true);
+        },
+        'high'
+      );
+    });
   }
 
   public async init(): Promise<void> {
@@ -97,6 +161,20 @@ export class Core extends AsyncTask implements InitBaseMethods {
   public destroy() {
     //this.timeOuts.forEach((tOut) => clearTimeout(tOut));
   }
+
+  /*
+  public createUI(measureName: string, overrides?: Overrides): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const state = this.originator.getState();
+      const performance = state.getPerformance();
+      performance?.processStart(measureName);
+      const logger = state.getLogger();
+
+      const { workflow, customer, product, locale } = state.getParams();
+      const { productGraph, preferences } = state.getConfigureJsons();
+    });
+  }
+  */
 
   createCore(measureName: string, overrides?: Overrides): Promise<ConfigureCore> {
     console.log(overrides);
@@ -196,10 +274,6 @@ export class Core extends AsyncTask implements InitBaseMethods {
       performance?.processEnd('JSONs');
       performance?.logMeasure('JSONs');
     }
-  }
-
-  getConfigureIU(params: MergedParams) {
-    console.log(params);
   }
 
   getConfigureJsonsURLs(params: MergedParams, product: number): ConfigureJsonsURLs {
