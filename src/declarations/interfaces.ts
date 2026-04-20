@@ -74,6 +74,7 @@ export interface ConfigureInitParams {
   store: string;
   mockMyDesigns?: boolean;
   mockInspirations?: boolean;
+  mockModels?: boolean;
   getMyDesign?: unknown;
   startWithStyleSelector: string;
 }

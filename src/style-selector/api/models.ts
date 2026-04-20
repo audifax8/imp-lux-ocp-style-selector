@@ -264,8 +264,14 @@ export class Models {
   }
 
   private async getModels(): Promise<LuxApiModelsResponse> {
-    this.performance?.processStart('getModels');
+    const { mockModels, brand } = this.params;
+    if (mockModels) {
+      this.logger?.log('[MODELS] using mocked models');
+      const models = await import(`@/style-selector/api/mocks/${brand}.json`);
+      return models.default;
+    }
     //const { workflow, subscriptionKey, region, ocId } = this.params;
+    this.performance?.processStart('getModels');
     const url = this.getModelsUrl();
     const res = await fetch(url, /*{
       headers: {
