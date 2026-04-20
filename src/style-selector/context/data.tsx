@@ -4,6 +4,8 @@ import type { Core } from '@/style-selector/models/core';
 import type { RTRSkeleton } from '@/style-selector/models/rtr-skeleton';
 
 import { completeStyleSelectorPromise } from '@/style-selector/lazy-imports';
+import { loadBrandFonts } from '@/white-label/font-loader';
+import { activeBrand } from '@/white-label/detect';
 import { DataContext } from '@/style-selector/context/context';
 import { I18nContext } from '@/style-selector/context/i18n-context';
 import { ProductsContext } from '@/style-selector/context/products-context';
@@ -47,7 +49,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (styleSelectorInitData) { completeStyleSelectorPromise(); }
+    if (styleSelectorInitData) {
+      completeStyleSelectorPromise();
+      loadBrandFonts(activeBrand);
+    }
   }, [styleSelectorInitData]);
 
   return (
