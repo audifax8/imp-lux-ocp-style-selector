@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import wizardStyles from '@/style-selector/bootstrap/index.scss?inline'
+import '@/shared/styles/theme.scss'
+import '@/shared/styles/critical.scss'
 
 import { injectBrandStyles } from '@/white-label/loader-wizard'
 import { injectSkinStyles } from '@/style-selector/bootstrap/skin-loader'

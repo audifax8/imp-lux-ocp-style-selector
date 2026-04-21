@@ -69,7 +69,7 @@ export default defineConfig({
         },
       },
     },
-    cssCodeSplit: false,
+    cssCodeSplit: true,
   },
   test: {
     environment: 'happy-dom',
