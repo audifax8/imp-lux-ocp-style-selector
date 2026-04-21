@@ -6,12 +6,12 @@
 // black = logo oscuro para fondos claros (light mode)
 // light = logo claro para fondos oscuros (dark mode)
 // =============================================================================
-$logo-dark: './svg/wl/dark/logo.svg';
-$logo-light: './svg/wl/light/logo.svg';
-$menu-light: './svg/wl/light/menu.svg';
-$menu-dark: './svg/wl/dark/menu.svg';
-$arrow-left-light: './svg/wl/light/arrow-left.svg';
-$arrow-left-dark: './svg/wl/dark/arrow-left.svg';
+$logo-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/logo.svg';
+$logo-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/logo.svg';
+$menu-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/menu.svg';
+$menu-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/menu.svg';
+$arrow-left-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/arrow-left.svg';
+$arrow-left-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/arrow-left.svg';
 
 @mixin dark-vars {
   //TODO

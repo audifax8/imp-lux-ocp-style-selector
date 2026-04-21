@@ -1,12 +1,12 @@
 // Brand: rbn
 
-$loader-wl-dark: './svg/wl/dark/loader.svg';
-$loader-wl-light: './svg/wl/light/loader.svg';
+$loader-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/loader.svg';
+$loader-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/loader.svg';
 
 
 @mixin dark-vars {
   //TODO
-  --ss-loader: url('#{$loader-wl-light}');
+  --ss-loader: url('#{$loader-light}');
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +20,7 @@ $loader-wl-light: './svg/wl/light/loader.svg';
 }
 
 :root {
-  --ss-loader: url('#{$loader-wl-dark}');
+  --ss-loader: url('#{$loader-dark}');
   --radius-default: 6px;
   --color-stepper-light-active-border: #FFF;
   --spacing-2xs: 4px;

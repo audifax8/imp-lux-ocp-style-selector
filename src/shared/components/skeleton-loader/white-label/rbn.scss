@@ -1,6 +1,6 @@
 // Brand: rbn
-$loader-dark: './svg/rbn/dark/loader.svg';
-$loader-light: './svg/rbn/light/loader.svg';
+$loader-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/rbn/assets/svg/dark/loader.svg';
+$loader-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/rbn/assets/svg/light/loader.svg';
 
 @mixin dark-vars {
   --ss-loader: url('#{$loader-light}');

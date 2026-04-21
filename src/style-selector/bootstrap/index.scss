@@ -6,10 +6,10 @@
 // dark = logo oscuro para fondos claros (light mode)
 // light = logo claro para fondos oscuros (dark mode)
 // =============================================================================
-$logo-wl-dark: './svg/wl/dark/logo.svg';
-$logo-wl-light: './svg/wl/light/logo.svg';
-$arrow-left-light: './svg/wl/light/arrow-left.svg';
-$arrow-left-dark: './svg/wl/dark/arrow-left.svg';
+$logo-wl-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/logo.svg';
+$logo-wl-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/logo.svg';
+$arrow-left-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/arrow-left.svg';
+$arrow-left-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/arrow-left.svg';
 
 // Light mode (default)
 .header-logo__icon {
