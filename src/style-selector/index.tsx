@@ -2,10 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import wizardStyles from '@/style-selector/bootstrap/index.scss?inline'
-import '@/shared/styles/theme.scss'
+//import '@/shared/styles/theme.scss'
 import '@/shared/styles/critical.scss'
 
-import { injectBrandStyles } from '@/white-label/loader-wizard'
+//import { injectBrandStyles } from '@/white-label/loader-wizard'
 import { injectSkinStyles } from '@/style-selector/bootstrap/skin-loader'
 import { activeBrand } from '@/white-label/detect'
 
@@ -17,7 +17,7 @@ styleEl.dataset.mode = 'wizard'
 styleEl.textContent = wizardStyles
 document.head.appendChild(styleEl)
 
-injectBrandStyles(activeBrand)
+//injectBrandStyles(activeBrand)
 injectSkinStyles(activeBrand)
 
 export function mount(container: HTMLElement): void {

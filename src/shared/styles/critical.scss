@@ -15,12 +15,18 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
 
 @mixin dark-vars {
   //TODO
+  --skeleton-base: #3a3a3a;
+  --skeleton-highlight: #555;
   --ss-logo: url('#{$logo-light}');
   --ss-menu-icon: url('#{$menu-light}');
   --arrow-left: url('#{$arrow-left-light}');
+  --background-color: #1f1f24;
 }
 
 :root {
+  --skeleton-base: #eee;
+  --skeleton-highlight: #ddd;
+  --background-color: #f6f6f6;
   --ss-logo: url('#{$logo-dark}');
   --ss-menu-icon: url('#{$menu-dark}');
   --arrow-left: url('#{$arrow-left-dark}');
@@ -77,6 +83,7 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
 // Aplicadas a .style-selector y .style-selector-skeleton para que el
 // background sea consistente tanto en el estado cargado como en el skeleton.
 // =============================================================================
+/*
 .style-selector,
 .style-selector-skeleton {
   --ss-bg: url('./imgs/background/light/Device=Mobile, Mode=Light.png');
@@ -147,19 +154,23 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
     }
   }
 }
+*/
+
 
 // =============================================================================
 // Layout
 // =============================================================================
 .style-selector {
   min-height: 100vh;
-  background:
+  background-color: var(--background-color);
+  /*background:
     linear-gradient(
       180deg,
       var(--color-overlay-light-alpha-0) 87.07%,
       var(--color-generic-neutral-dark-background) 100%
     ),
     var(--ss-bg) var(--light-gray) center / cover no-repeat;
+  */
 
   &__elements {
     margin-top: 1rem;
@@ -209,3 +220,26 @@ $arrow-left-dark: './svg/wl/dark/arrow-left.svg';
     }
   }
 }
+
+/* =========================
+   SKELETON LOADING
+========================= */
+.yr-skeleton {
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+  color: transparent;
+  border-radius: 4px / 6.7px;
+  border-bottom: none;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
