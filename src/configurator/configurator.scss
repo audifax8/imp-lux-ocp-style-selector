@@ -3,6 +3,8 @@
 // Contiene: container, tipografía base, layout del configurador y skeleton inicial.
 // =============================================================================
 
+@use '../shared/components/dark-mode-switch';
+
 @keyframes skeleton-shimmer {
   0% {
     background-position: -200% 0;

@@ -1,7 +1,6 @@
 import type { Theme } from '@/shared/theme/darkMode'
 import { useLabels } from '@/labels/useLabels'
 
-import './index.scss';
 
 interface Props {
   theme: Theme

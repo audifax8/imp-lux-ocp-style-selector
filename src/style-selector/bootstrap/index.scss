@@ -1,5 +1,15 @@
 @use '../../shared/styles/variables' as *;
 @use '../../shared/styles/typography' as *;
+
+// ── Componentes del modo style-selector ──────────────────────────────────────
+@use '../../shared/components/dark-mode-switch';
+@use '../../shared/components/skeleton';
+/*@use '../components/header';
+@use '../components/sub-nav';
+@use '../components/card';
+@use '../components/category-button';
+@use '../components/category-filter';
+@use '../components/model';*/
 // =============================================================================
 // Logo paths — default brand (wl): 141×16px
 // rbn overrides --ss-logo en white-label/rbn/wizard.scss

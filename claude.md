@@ -47,7 +47,7 @@ export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use $(cat .node-versio
   - `@fluid.inc/cmol-utils` → `chunks/cmol-utils-[hash].js`
   - `@fluid.inc/imp-tools-lux` → `chunks/imp-tools-lux-[hash].js`
 - `base: './'` — relative paths for GitHub Pages subdirectory
-- `cssCodeSplit: false` — all non-`?inline` CSS goes to the single CSS bundle
+- `cssCodeSplit: true` — CSS en chunks lazy (si los hubiera sin `?inline`) se emite como archivo independiente; actualmente sin efecto porque todo el CSS de modo/componente usa `?inline`. `assetFileNames` es una función: entry CSS → `imp-lux-ocp-style-selector.css` (nombre estable); chunk CSS → `chunks/[name]-[hash].css` (evita colisión de nombres)
 - `resolve.alias` — `@/` path alias + stub de `jsonp-node.js` (Node-only, ver abajo)
 - `define` — `process.browser: true` + `FLUID_CONFIGURATIONS_VERSION` para `@cfg.plat/configure-core` + `global: 'globalThis'` (ver workarounds)
 

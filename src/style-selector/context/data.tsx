@@ -15,7 +15,7 @@ import { useInitStyleSelectorStrategy } from '@/style-selector/bootstrap/strateg
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const strategy = useMemo(() => new StyleSelectorInitStrategy(), []);
-  const { styleSelectorInitData, configuratorData } = useInitStyleSelectorStrategy(strategy);
+  const { styleSelectorInitData, configuratorData, phase1Error } = useInitStyleSelectorStrategy(strategy);
 
   // Servicios de fase 2 en ref — nunca en state ni en context directamente.
   // useRef no provoca re-renders; los callbacks de abajo leen .current en tiempo de ejecución.
@@ -54,6 +54,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       loadBrandFonts(activeBrand);
     }
   }, [styleSelectorInitData]);
+
+  // Si fase 1 falla, desbloquear igualmente la promesa diferida para que el
+  // skeleton no se quede colgado — App renderiza sin datos (estado vacío).
+  useEffect(() => {
+    if (phase1Error) completeStyleSelectorPromise();
+  }, [phase1Error]);
 
   return (
     <ConfiguratorActionsContext.Provider value={configuratorActions}>

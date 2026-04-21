@@ -58,7 +58,16 @@ export default defineConfig({
           if (chunkInfo.name === 'configurator-init') return 'chunks/configurator-init.js'
           return 'chunks/[name]-[hash].js'
         },
-        assetFileNames: 'imp-lux-ocp-style-selector.[ext]',
+        // Entry CSS (theme.scss) → nombre estable referenciado en public/index.html y audit.mjs.
+        // Chunk CSS (cssCodeSplit, si algún lazy chunk incluye CSS sin ?inline) → chunks/ con hash
+        // para evitar colisión de nombres y garantizar cache busting.
+        // Rolldown nombra el CSS de cada chunk igual que su JS asociado, de ahí el check por nombre.
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name?.endsWith('.css') && assetInfo.name !== 'imp-lux-ocp-style-selector.css') {
+            return 'chunks/[name]-[hash].[ext]'
+          }
+          return 'imp-lux-ocp-style-selector.[ext]'
+        },
         // Deps pesadas en chunks propios — se descargan solo cuando se necesitan
         manualChunks: (id) => {
           if (id.includes('node_modules/react-dom')) return 'react-dom'
@@ -69,7 +78,7 @@ export default defineConfig({
         },
       },
     },
-    cssCodeSplit: false,
+    cssCodeSplit: true,
   },
   test: {
     environment: 'happy-dom',

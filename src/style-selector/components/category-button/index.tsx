@@ -2,8 +2,7 @@ import React from 'react';
 import { Skeleton } from '@/shared/components/skeleton';
 import { SkeletonVariant } from '@/declarations/enums';
 
-import './index.scss';
-
+import './index.test';
 interface ButtonProps {
   className?: string;
   label?: string;

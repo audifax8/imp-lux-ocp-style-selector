@@ -1,6 +1,5 @@
 import type { SkeletonProps } from '@/declarations/interfaces';
 
-import './index.scss';
 
 export function Skeleton(props: SkeletonProps) {
   const { className, style } = props;

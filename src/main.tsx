@@ -1,8 +1,8 @@
 // SCSS base: variables de tema (light/dark), reset, sr-only — compartido entre modos.
 // No incluye nada específico de wizard ni de configurador.
-import '@/shared/styles/theme.scss'
+//import '@/shared/styles/theme.scss'
 import '@/shared/styles/reset.scss'
-import '@/shared/styles/critical.scss'
+//import '@/shared/styles/critical.scss'
 import { getInitialTheme, applyTheme } from '@/shared/theme/darkMode'
 import { activeMode } from '@/shared/mode/detect'
 

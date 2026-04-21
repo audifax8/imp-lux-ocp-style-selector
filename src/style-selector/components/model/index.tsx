@@ -6,7 +6,6 @@ import { useProducts } from '@/style-selector/context/products-context';
 import { useConfiguratorActions } from '@/style-selector/context/configurator-actions-context';
 
 import './index.scss';
-
 interface ModelCardProps {
   title?: string;
   imageSrc?: string;

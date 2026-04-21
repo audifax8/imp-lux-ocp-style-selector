@@ -5,7 +5,6 @@ import type { FlatModel } from '@/declarations/interfaces';
 import { useI18n } from '@/style-selector/context/i18n-context';
 
 import './index.scss';
-
 interface CategoryFilterProps {
   subCategories?: FlatModel[];
   selectedCategory?: FlatModel;

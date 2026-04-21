@@ -40,6 +40,12 @@ export const useInitStyleSelectorStrategy = (
       .loadAppData()
       .then(styleSelectorInitData => {
         if (cancelled) return
+
+        if (!styleSelectorInitData) {
+          setState(prev => ({ ...prev, phase1Error: new Error('[StyleSelector] loadAppData returned no data') }))
+          return
+        }
+
         setState(prev => ({ ...prev, styleSelectorInitData }))
 
         // Fase 2 arranca inmediatamente tras Fase 1 — sin bloquear

@@ -37,7 +37,7 @@ export class StyleSelectorInitStrategy
       const models = new Models(params, this.originator);
       return await models.init();
     } catch (e) {
-      this.logger?.error('');
+      this.logger?.error('[StyleSelectorInitStrategy] loadAppData error');
       this.logger?.object(e);
       return undefined!;
     }

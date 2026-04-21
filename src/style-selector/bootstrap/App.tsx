@@ -10,13 +10,12 @@ import { useData } from '@/style-selector/context/context';
 import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
 
 import { StepType } from '@/declarations/enums';
-import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
+import type { StyleSelectorInitData, LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
 
 
 const SKIN_NAME: Record<string, string> = { rbn: 'ray-ban' }
 
-const Style = () => {
-  const styleSelectorInitData = useData();
+const StyleWithData = ({ styleSelectorInitData }: { styleSelectorInitData: StyleSelectorInitData }) => {
   const darkMode = useDarkMode();
   const {
     modelsToRender,
@@ -123,6 +122,12 @@ const Style = () => {
       )}
     </div>
   );
+};
+
+const Style = () => {
+  const styleSelectorInitData = useData();
+  if (!styleSelectorInitData) return null;
+  return <StyleWithData styleSelectorInitData={styleSelectorInitData} />;
 };
 
 export default Style;

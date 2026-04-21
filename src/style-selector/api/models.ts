@@ -67,7 +67,7 @@ export class Models {
       this.performance?.logMeasure('parseModels');
       this.logger?.error('[MODELS] Error');
       this.logger?.object(e);
-      return undefined!;
+      throw e;
     }
   }
 

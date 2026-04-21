@@ -9,7 +9,6 @@ import DarkModeSwitch from '@/shared/components/dark-mode-switch';
 import { useI18n } from '@/style-selector/context/i18n-context';
 
 import './index.scss';
-
 interface HeaderProps {
   steps?: StepWithTranslation[];
   selectedStep?: StepWithTranslation;

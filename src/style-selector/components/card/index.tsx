@@ -3,7 +3,6 @@ import { Skeleton } from '@/shared/components/skeleton';
 import { SkeletonVariant } from '@/declarations/enums';
 
 import './index.scss';
-
 interface CardProps {
   length?: number;
   title?: string;
