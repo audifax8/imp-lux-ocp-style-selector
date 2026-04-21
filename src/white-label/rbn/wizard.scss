@@ -3,6 +3,10 @@
 // Brand: rbn
 $menu-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/rbn/assets/svg/dark/menu.svg';
 $menu-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/rbn/assets/svg/light/menu.svg';
+// Logo rbn: 112×49px (aspect ratio ~2.3:1, muy diferente al wl 141×16px)
+// Se escala al 50% del tamaño natural para encajar en el header.
+$logo-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/logo.svg';
+$logo-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/logo.svg';
 
 @mixin dark-vars {
   //TODO
@@ -69,12 +73,6 @@ $menu-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lu
 :root[data-theme='dark'] {
   @include dark-vars;
 }
-
-
-// Logo rbn: 112×49px (aspect ratio ~2.3:1, muy diferente al wl 141×16px)
-// Se escala al 50% del tamaño natural para encajar en el header.
-$logo-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/logo.svg';
-$logo-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/logo.svg';
 
 .style-selector-rbn {
   .header-logo {
