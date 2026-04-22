@@ -3,11 +3,12 @@ import { createRoot } from 'react-dom/client';
 
 import { injectSkinStyles } from '@/style-selector/bootstrap/skin-loader';
 import { activeBrand } from '@/white-label/detect';
+import { activeTokenVersion } from '@/style-selector/bootstrap/token-version';
 
 import { DataProvider } from '@/style-selector/context/data';
 import StyleSelector from '@/style-selector/bootstrap';
 
-injectSkinStyles(activeBrand);
+injectSkinStyles(activeBrand, activeTokenVersion);
 
 export function mount(container: HTMLElement): void {
   createRoot(container).render(

@@ -1,20 +1,4 @@
-
-:root {
-  --radius-default: 6px;
-  --color-stepper-light-active-border: #FFF;
-  --spacing-2xs: 4px;
-  --spacing-none: 0;
-  --color-stepper-light-checked-background: #FFF;
-  --color-stepper-light-default-background: rgba(255, 255, 255, 0.10);
-
-  /* Texts/Text 2xl Bold */
-  --typography-body-2xl-family: 'Inter';
-  --typography-body-2xl-size: 1.333rem; /* 24px */
-  --typography-body-2xl-line-height: 1.875rem; /* 30px  */
-  --typography-body-2xl-letter-spacing: 0;
-}
-
-.demo-scene {
+.skeleton-scene {
   width: 100%;
   min-height: 100vh;
   display: flex;
@@ -24,7 +8,7 @@
 
 // ── Overlay (centered content block) ─────────────────────────────────────────
 
-.demo-overlay {
+.skeleton-overlay {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,7 +17,7 @@
 
 // ── Brand label ───────────────────────────────────────────────────────────────
 
-.demo-brand {
+.skeleton-brand {
   display: flex;
   width: 9.75rem;
   height: 4.875rem;
@@ -43,7 +27,7 @@
   flex-shrink: 0;
   aspect-ratio: 2/1;
 
-  &-logo {
+  &__logo {
     height: 100%;
     width: 100%;
     background-image: var(--ss-loader);
@@ -54,25 +38,28 @@
 }
 
 // ── Title ─────────────────────────────────────────────────────────────────────
-.demo-title {
-  color: var(--color-generic-neutral-ultra-dark-text);
-  text-align: center;
-  font-family: var(--typography-body-2xl-family);
-  font-size: var(--typography-body-2xl-size);
-  font-style: normal;
-  font-weight: 700;
-  line-height: var(--typography-body-2xl-line-height);
-  letter-spacing: var(--typography-body-2xl-letter-spacing);
+.skeleton-title {
+  margin: 24px 16px 40px 16px;
+
+  &__label {
+    color: var(--color-generic-neutral-ultra-dark-text);
+    text-align: center;
+
+    /* Texts/Text 2xl Bold */
+    font-family: var(--typography-body-2xl-family);
+    font-size: var(--typography-body-2xl-size);
+    font-style: normal;
+    font-weight: 700;
+    line-height: var(--typography-body-2xl-line-height);
+    letter-spacing: var(--typography-body-2xl-letter-spacing);
+  }
 }
 
 // ── Progress bar ──────────────────────────────────────────────────────────────
-.demo-progress {
-  margin-top: var(--spacing-2xl);
-  width: 14.5rem;
-  background: var(--color-stepper-light-default-background);
-  overflow: hidden;
+.skeleton-progress {
   display: flex;
-  height: var(--spacing-xs);
+  height: 8px;
+  width: 232px;
   padding: var(--spacing-none);
   flex-direction: column;
   align-items: flex-start;
@@ -81,13 +68,12 @@
   border: 1px solid var(--color-stepper-light-active-border);
 }
 
-.demo-progress__fill {
+.skeleton-progress__fill {
   display: flex;
   padding: var(--spacing-2xs) var(--spacing-none);
   align-items: center;
   gap: var(--spacing-none);
   flex: 1 0 0;
-  //todo
-  width: 20%;
   background: var(--color-stepper-light-checked-background);
+  width: 20%;
 }

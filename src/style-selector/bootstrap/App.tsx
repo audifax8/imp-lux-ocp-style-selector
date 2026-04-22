@@ -8,14 +8,13 @@ import { ModelStep } from '@/style-selector/components/model-step';
 import { activeBrand } from '@/white-label/detect';
 import { useData } from '@/style-selector/context/context';
 import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
+import { activeTokenVersion, SKIN_NAME } from '@/style-selector/bootstrap/token-version';
 
 import { StepType } from '@/declarations/enums';
 import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
 
 import './index.scss';
 
-
-const SKIN_NAME: Record<string, string> = { rbn: 'ray-ban' };
 
 const Style = () => {
   const styleSelectorInitData = useData();
@@ -102,7 +101,7 @@ const Style = () => {
   return (
     <div
       className={`style-selector style-selector-${activeBrand}`}
-      data-token-version="1.0"
+      data-token-version={activeTokenVersion}
       data-skin={SKIN_NAME[activeBrand] ?? 'whitelabel'}
       data-mode={darkMode}
     >
