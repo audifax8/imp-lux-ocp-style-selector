@@ -1,8 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import demoStyles from '@/demo/demo.scss?inline'
-import { injectBrandStyles } from '@/white-label/loader-demo'
-import { activeBrand } from '@/white-label/detect'
+//import { injectBrandStyles } from '@/white-label/loader-demo'
+//import { activeBrand } from '@/white-label/detect'
 import AppDemo from '../AppDemo'
 
 const styleEl = document.createElement('style')
@@ -17,7 +17,7 @@ themeEl.textContent = themeStyles
 document.head.appendChild(themeEl)
 */
 
-injectBrandStyles(activeBrand)
+//injectBrandStyles(activeBrand)
 
 export function mount(container: HTMLElement): void {
   createRoot(container).render(

@@ -6,7 +6,6 @@ import { TypeStep } from '@/style-selector/components/type-step';
 import { ModelStep } from '@/style-selector/components/model-step';
 
 import { activeBrand } from '@/white-label/detect';
-console.log({ activeBrand });
 import { useData } from '@/style-selector/context/context';
 import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
 
