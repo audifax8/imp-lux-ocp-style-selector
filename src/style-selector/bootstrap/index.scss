@@ -1,32 +1,26 @@
-@use '../../shared/styles/variables' as *;
-@use '../../shared/styles/typography' as *;
-// =============================================================================
-// Logo paths — default brand (wl): 141×16px
-// rbn overrides --ss-logo en white-label/rbn/wizard.scss
-// dark = logo oscuro para fondos claros (light mode)
-// light = logo claro para fondos oscuros (dark mode)
-// =============================================================================
-$logo-wl-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/logo.svg';
-$logo-wl-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/logo.svg';
-$arrow-left-light: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/light/arrow-left.svg';
-$arrow-left-dark: 'https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/wl/assets/svg/dark/arrow-left.svg';
+//@use '../../shared/styles/variables' as *;
+//@use '../../shared/styles/typography' as *;
+@use '../styles/rbn/typography' as *;
+@use '../styles/rbn/variables' as *;
+
 
 // Light mode (default)
 .header-logo__icon {
-  --ss-logo: url('#{$logo-wl-dark}');
+  --ss-logo: url('#{$logo-dark}');
+  --arrow-left: url('#{$arrow-left-light}');
 }
 
 // Dark mode — sistema
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .header-logo__icon {
-    --ss-logo: url('#{$logo-wl-light}');
+    --ss-logo: url('#{$logo-light}');
     --arrow-left: url('#{$arrow-left-light}');
   }
 }
 
 // Dark mode — toggle explícito
 [data-theme='dark'] .header-logo__icon {
-  --ss-logo: url('#{$logo-wl-dark}');
+  --ss-logo: url('#{$logo-dark}');
   --arrow-left: url('#{$arrow-left-dark}');
 }
 

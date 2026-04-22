@@ -12,6 +12,8 @@ import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
 import { StepType } from '@/declarations/enums';
 import type { LuxApiModel, FlatModel, ModelsTranslated, StepWithTranslation } from '@/declarations/interfaces';
 
+import './index.scss';
+
 
 const SKIN_NAME: Record<string, string> = { rbn: 'ray-ban' }
 

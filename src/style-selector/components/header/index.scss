@@ -90,8 +90,8 @@
   }
 
   &__selected {
-    color: var(--color-stepper-brand-active-title);
-    border-bottom: var(--stroke-heavy) solid var(--color-stepper-brand-active-border);
+    color: var(--color-stepper-brand-checked-title);
+    border-bottom: var(--stroke-heavy) solid var(--color-stepper-brand-checked-title);
   }
 
   /*
