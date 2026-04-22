@@ -215,7 +215,7 @@ style-selector/styles/
 
 **Brand → skin mapping** (en `App.tsx`): `{ rbn: 'ray-ban' }` — si el brand no está en el mapa, usa `'whitelabel'`
 
-**Componentes SCSS** — todos usan `@use '../../styles/1.0/shared' as *` (breakpoints + typography mixins brand-agnostic; valores idénticos entre brands). Los SVG URL custom properties se definen en `styles/1.0/{brand}/index.scss` y se consumen vía CSS vars — sin import brand-específico en los componentes.
+**Componentes SCSS** — todos usan `@use '../../styles/shared' as *` (path sin versión; resuelve a `styles/_shared.scss` que reenvía desde `styles/1.0/`). Para cambiar de versión, solo se actualiza `styles/_shared.scss`. Los SVG URL custom properties se definen en `styles/1.0/{brand}/index.scss` y se consumen vía CSS vars — sin import brand-específico en los componentes.
 
 ## CSS architecture
 ```
@@ -518,6 +518,7 @@ src/
   style-selector/
     index.tsx                      — entry: injectSkinStyles(activeBrand, activeTokenVersion) + createRoot + DataProvider + StyleSelector
     styles/
+      _shared.scss                 — versioned entry point (sin número de versión en el path); @forward desde 1.0/; actualizar solo aquí al cambiar versión
       1.0/
         _shared.scss               — @forward breakpoints (show allowlist) + typography; brand-agnostic
         shared/

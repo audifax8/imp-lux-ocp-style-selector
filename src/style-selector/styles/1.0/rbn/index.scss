@@ -6,6 +6,8 @@
     --ss-logo: url('#{$logo-light}');
     --arrow-left: url('#{$arrow-left-light}');
     --ss-loader: url('#{$loader-light}');
+    --skeleton-base: #eee;
+    --skeleton-highlight: #ddd;
   }
 }
 
@@ -15,6 +17,8 @@
     --ss-logo: url('#{$logo-dark}');
     --arrow-left: url('#{$arrow-left-dark}');
     --ss-loader: url('#{$loader-dark}');
+    --skeleton-base: #3a3a3a;
+    --skeleton-highlight: #555;
   }
 }
 

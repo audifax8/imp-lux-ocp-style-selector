@@ -5,10 +5,13 @@ import { Header } from '@/style-selector/components/header';
 import { SubNav } from '@/style-selector/components/sub-nav';
 import { activeBrand } from '@/white-label/detect';
 import { useI18n } from '@/style-selector/context/i18n-context';
+import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
+import { activeTokenVersion, SKIN_NAME } from '@/style-selector/bootstrap/token-version';
 
 
 const StyleSelectorSkeleton = () => {
   const i18n = useI18n();
+  const darkMode = useDarkMode();
   const steps: StepWithTranslation[] = [
     {
       id: 0,
@@ -28,7 +31,12 @@ const StyleSelectorSkeleton = () => {
   ];
 
   return (
-    <div className={`style-selector-skeleton style-selector-skeleton-${activeBrand}`}>
+    <div
+      className={`style-selector-skeleton style-selector-skeleton-${activeBrand}`}
+      data-token-version={activeTokenVersion}
+      data-skin={SKIN_NAME[activeBrand] ?? 'whitelabel'}
+      data-mode={darkMode}
+    >
       <Header skeleton={true} steps={steps}/>
       <SubNav skeleton={true} />
       <section

@@ -6,9 +6,9 @@ export const activeTokenVersion: string = param ?? '1.0';
 
 export const SKIN_NAME: Record<Brand, string> = {
   rbn: 'ray-ban',
-  oak: '',
-  sgh: '',
-  bliz: '',
-  cdm: '',
-  whitelabel: ''
+  oak: 'whitelabel',
+  sgh: 'whitelabel',
+  bliz: 'whitelabel',
+  cdm: 'whitelabel',
+  whitelabel: 'whitelabel'
 };

@@ -1,0 +1,14 @@
+// =============================================================================
+// Versioned shared entry point — update this file when switching token versions.
+// Components import this path so they never need the version number hardcoded.
+// =============================================================================
+
+@forward './1.0/shared/variables' show
+  $bp-mobile,
+  $bp-tablet-p,
+  $bp-tablet-l,
+  $bp-desktop-xs,
+  $bp-desktop-biz,
+  $bp-desktop;
+
+@forward './1.0/shared/typography';
