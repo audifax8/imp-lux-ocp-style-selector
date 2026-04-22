@@ -1,0 +1,20 @@
+// =============================================================================
+// Shared SCSS — valores comunes a todos los brands del modo startWithStyleSelector
+//
+// Expone SOLO breakpoints y mixins de tipografía.
+// Ambos son idénticos en wl y rbn: un único import compile-time es suficiente.
+//
+// NO expone variables de SVG/assets ($logo-*, $arrow-left-*, $menu-*, $loader-*).
+// Esos valores difieren por brand y se inyectan en runtime vía skin-loader.ts
+// como CSS custom properties (--ss-logo, --arrow-left, etc.).
+// =============================================================================
+
+@forward './shared/variables' show
+  $bp-mobile,
+  $bp-tablet-p,
+  $bp-tablet-l,
+  $bp-desktop-xs,
+  $bp-desktop-biz,
+  $bp-desktop;
+
+@forward './shared/typography';

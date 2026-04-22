@@ -1,28 +1,4 @@
-//@use '../../shared/styles/variables' as *;
-//@use '../../shared/styles/typography' as *;
-@use '../styles/rbn/typography' as *;
-@use '../styles/rbn/variables' as *;
-
-
-// Light mode (default)
-.header-logo__icon {
-  --ss-logo: url('#{$logo-dark}');
-  --arrow-left: url('#{$arrow-left-light}');
-}
-
-// Dark mode — sistema
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .header-logo__icon {
-    --ss-logo: url('#{$logo-light}');
-    --arrow-left: url('#{$arrow-left-light}');
-  }
-}
-
-// Dark mode — toggle explícito
-[data-theme='dark'] .header-logo__icon {
-  --ss-logo: url('#{$logo-dark}');
-  --arrow-left: url('#{$arrow-left-dark}');
-}
+@use '../styles/shared' as *;
 
 // =============================================================================
 // Layout

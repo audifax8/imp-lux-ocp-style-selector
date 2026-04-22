@@ -8,7 +8,7 @@
 //
 // Los archivos inverse son auto-generados con @layer skin por error respecto
 // a la spec. Se corrige en tiempo de inyección reemplazando la declaración.
-import type { Brand } from '@/white-label/types';
+import type { Brand } from '@/declarations/types';
 
 import indexWlSkin from '@/style-selector/styles/wl/index.scss?inline';
 import wlSkin from '@/style-selector/styles/wl/skin.scss?inline';

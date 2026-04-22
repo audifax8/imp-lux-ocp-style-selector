@@ -4,6 +4,12 @@
 // NO incluyen font-weight (varía por uso: 400 regular / 700 bold).
 // Solo deben usarse en archivos SCSS dentro de src/style-selector/.
 // =============================================================================
+// =============================================================================
+// Typography mixins — style-selector mode only
+// Basados en las CSS vars definidas en white-label/rbn/wizard.scss.
+// NO incluyen font-weight (varía por uso: 400 regular / 700 bold).
+// Solo deben usarse en archivos SCSS dentro de src/style-selector/.
+// =============================================================================
 
 @mixin typography-h3 {
   font-family: var(--typography-h3-family);

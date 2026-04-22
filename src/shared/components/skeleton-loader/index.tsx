@@ -4,27 +4,31 @@
 // Se activa con ?skeletonLoader=true. Solo se descarga cuando se renderiza.
 // CSS inyectado a nivel de módulo (patrón del proyecto).
 // =============================================================================
-import skeletonStyles from './index.scss?inline'
-import { activeBrand } from '@/white-label/detect'
-import { useI18n } from '@/style-selector/context/i18n-context'
+import skeletonStyles from './index.scss?inline';
+import { activeBrand } from '@/white-label/detect';
+import { useI18n } from '@/style-selector/context/i18n-context';
+import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
 
-const styleEl = document.createElement('style')
-styleEl.dataset.id = 'shared-skeleton'
-styleEl.textContent = skeletonStyles
-document.head.appendChild(styleEl)
+const styleEl = document.createElement('style');
+styleEl.dataset.id = 'shared-skeleton';
+styleEl.textContent = skeletonStyles;
+document.head.appendChild(styleEl);
 
 //TODO Refactor by brand
-import rbnStyles from './white-label/rbn.scss?inline'
+import rbnStyles from './white-label/rbn.scss?inline';
 
 if (activeBrand === 'rbn') {
-  const rbnStyleEl = document.createElement('style')
-  rbnStyleEl.dataset.id = 'rbn-skeleton'
-  rbnStyleEl.textContent = rbnStyles
-  document.head.appendChild(rbnStyleEl)
+  const rbnStyleEl = document.createElement('style');
+  rbnStyleEl.dataset.id = 'rbn-skeleton';
+  rbnStyleEl.textContent = rbnStyles;
+  document.head.appendChild(rbnStyleEl);
 }
+
+const SKIN_NAME: Record<string, string> = { rbn: 'ray-ban' };
 
 const SharedSkeleton = () => {
   const i18n = useI18n();
+  const darkMode = useDarkMode();
   const loadingTitle = i18n?.getLabel('style_selector_loading_title', 'Starting your experience') ?? 'Starting your experience';
   const loadingLabel = i18n?.getLabel('style_selector_loading_label', 'Loading, please wait') ?? 'Loading, please wait';
 
@@ -34,6 +38,9 @@ const SharedSkeleton = () => {
       role="status"
       aria-label={loadingLabel}
       aria-busy="true"
+      data-token-version="1.0"
+      data-skin={SKIN_NAME[activeBrand] ?? 'whitelabel'}
+      data-mode={darkMode}
     >
       <div className="demo-scene">
         <div className="demo-overlay">

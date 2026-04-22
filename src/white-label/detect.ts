@@ -4,7 +4,7 @@
 // Uso desde el host:
 //   window.__IMP_LUX_BRAND__ = 'oak'  → antes de cargar el widget JS
 //   https://example.com/?brand=sgh     → via URL param
-import { BRANDS, type Brand } from './types'
+import { BRANDS, type Brand } from '@/declarations/types'
 
 const isBrand = (value: unknown): value is Brand =>
   typeof value === 'string' && (BRANDS as readonly string[]).includes(value)
@@ -19,5 +19,5 @@ export const activeBrand: Brand = (() => {
   if (isBrand(param)) return param
 
   // 3. Brand por defecto
-  return 'rbn'
+  return 'whitelabel'
 })()

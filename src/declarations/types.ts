@@ -51,3 +51,6 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 export type LuxApiModelsResponse = Record<string, LuxApiCategory[]>;
+
+export const BRANDS = ['rbn', 'oak', 'sgh', 'bliz', 'cdm', 'whitelabel'] as const;
+export type Brand = (typeof BRANDS)[number];

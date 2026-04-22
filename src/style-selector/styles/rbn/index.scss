@@ -1,2 +1,20 @@
 @use './variables' as *;
-@use './typography' as *;
+
+@layer skin {
+  [data-token-version="1.0"][data-skin="ray-ban"] {
+    --ss-menu-icon: url('#{$menu-light}');
+    --ss-logo: url('#{$logo-light}');
+    --arrow-left: url('#{$arrow-left-light}');
+    --ss-loader: url('#{$loader-light}');
+  }
+}
+
+@layer skin {
+  [data-token-version="1.0"][data-skin="ray-ban"][data-mode="inverse"] {
+    --ss-menu-icon: url('#{$menu-dark}');
+    --ss-logo: url('#{$logo-dark}');
+    --arrow-left: url('#{$arrow-left-dark}');
+    --ss-loader: url('#{$loader-dark}');
+  }
+}
+

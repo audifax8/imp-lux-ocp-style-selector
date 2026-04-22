@@ -1,7 +1,7 @@
 // Carga los estilos de brand específicos del modo configurador.
 // Cada brand SCSS se importa con ?inline: compilado en build-time, embebido como
 // string en el chunk bootstrap-configurator. Solo se inyecta el brand activo.
-import type { Brand } from './types'
+import type { Brand } from '@/declarations/types'
 
 import rbnStyles from './rbn/configurator.scss?inline'
 import oakStyles from './oak/configurator.scss?inline'
@@ -15,6 +15,7 @@ const brandStyles: Record<Brand, string> = {
   sgh: sghStyles,
   bliz: blizStyles,
   cdm: cdmStyles,
+  whitelabel: rbnStyles
 }
 
 export const injectBrandStyles = (brand: Brand): void => {

@@ -1,4 +1,4 @@
-import type { Brand } from '@/white-label/types'
+import type { Brand } from '@/declarations/types'
 import { runIdle } from '@/libs/helpers'
 
 // import.meta.env.BASE_URL:

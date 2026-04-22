@@ -1,6 +1,6 @@
 // Carga los estilos de brand para el modo demo.
 // Reutiliza los wizard.scss de cada brand — suficiente para probar layouts.
-import type { Brand } from './types'
+import type { Brand } from '@/declarations/types'
 
 import rbnStyles from './rbn/wizard.scss?inline'
 import oakStyles from './oak/wizard.scss?inline'
@@ -14,6 +14,7 @@ const brandStyles: Record<Brand, string> = {
   sgh: sghStyles,
   bliz: blizStyles,
   cdm: cdmStyles,
+  whitelabel: rbnStyles
 }
 
 export const injectBrandStyles = (brand: Brand): void => {

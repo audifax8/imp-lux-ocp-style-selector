@@ -1,4 +1,4 @@
-import type { Brand } from '@/white-label/types'
+import type { Brand } from '@/declarations/types'
 
 // ── Resolución de configuración en runtime ───────────────────────────────────
 // Prioridad para cada valor:
@@ -43,6 +43,7 @@ export const BRAND_STORE_IDS: Record<Brand, string> = {
   sgh:  '10151', // TODO
   bliz: '10151', // TODO
   cdm:  '10151', // TODO
+  whitelabel: ''
 }
 
 //examples
@@ -56,4 +57,5 @@ export const BRAND_URLS: Record<Brand, string> = {
   sgh:  'https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=',
   bliz: 'https://www.bliz.com/wcs/shop/colorama/models?language=',
   cdm:  'https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language=',
+  whitelabel: 'https://www.ray-ban.com/wcs/resources/store/10151/remix/models?language='
 }

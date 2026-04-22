@@ -1,8 +1,7 @@
 import type { AttributeValue } from '@fluid.inc/yr-configure-wrapper/core';
 
 import type { FetchPriority, ResolutionType, SkeletonVariant, StepType } from '@/declarations/enums';
-import type { KeyString } from '@/declarations/types';
-import type { Brand } from '@/white-label/types';
+import type { KeyString, Brand } from '@/declarations/types';
 import type { i18n } from '@/models/i18n';
 import type { Core } from '@/style-selector/models/core';
 import type { RTRSkeleton } from '@/style-selector/models/rtr-skeleton';
