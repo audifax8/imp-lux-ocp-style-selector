@@ -8,6 +8,14 @@
 
 @layer skin {
   [data-token-version="1.0"][data-skin="ray-ban"][data-mode="inverse"] {
+    --stroke-heavy: 4px;
+    --spacing-none: 0;
+    --spacings-none: 0;
+    --spacing-base: 16px;
+    --spacing-2xl: 40px;
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+
     --background-color: #1f1f24;
     --brand-badge-default: Regular;
     --brand-badge-off: Fill;

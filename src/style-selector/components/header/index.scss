@@ -1,4 +1,3 @@
-
 @use '../../styles/shared' as *;
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -20,8 +19,7 @@
   flex-direction: column;
   justify-content: center;
   width: 8.75rem;
-  height: 5rem;
-  aspect-ratio: 8.75/0.953;
+  height: 100%;
 
   & .yr-skeleton {
     display: block;
@@ -34,7 +32,12 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    height: 0.953rem;
+    height: 100%;
+
+    @media (max-width: $bp-mobile) {
+      margin-top: 8px;
+      background-position: left;
+    }
   }
 }
 
@@ -64,19 +67,13 @@
 }
 
 .header-nav-item {
-  white-space: nowrap;
-  padding: var(--stroke-thin) var(--spacing-2xl) var(--spacing-base) var(--spacing-2xl);
-
   display: flex;
+  padding: var(--spacing-none) var(--spacing-2xl) var(--spacing-base) var(--spacing-2xl);
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-none);
+  gap: var(--spacing-none, 0);
   flex: 1 0 0;
-  border-bottom: var(--stroke-heavy) solid var(--color-stepper-brand-default-border);
-
-  color: var(--color-stepper-brand-default-title);
-  text-align: center;
 
   @include typography-h5;
   font-weight: 700;
