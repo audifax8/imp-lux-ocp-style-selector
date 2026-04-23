@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { SkeletonVariant } from '@/declarations/enums';
 import { Skeleton } from '@/shared/components/skeleton';
 import type { StepWithTranslation } from '@/declarations/interfaces';
+import type { Brand } from '@/declarations/types';
 
-import { getCurrentTheme, toggleTheme, type Theme } from '@/shared/theme/darkMode'
+/*
 import DarkModeSwitch from '@/shared/components/dark-mode-switch';
+<div className="header-switch">
+        <DarkModeSwitch
+          theme={theme}
+          onToggle={() => setTheme(prev => toggleTheme(prev))}
+        />
+      </div>
+*/
+
 import { useI18n } from '@/style-selector/context/i18n-context';
+import { useDarkMode } from '@/style-selector/bootstrap/useDarkMode';
+import { activeBrand } from '@/white-label/detect';
 
 import './index.scss';
 
+type ColorMode = 'inverse' | undefined;
 interface HeaderProps {
   steps?: StepWithTranslation[];
   selectedStep?: StepWithTranslation;
@@ -25,8 +37,11 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const isClickable = typeof onClick === 'function';
   const i18n = useI18n();
+  const darkMode = useDarkMode();
 
-  const [theme, setTheme] = useState<Theme>(getCurrentTheme);
+  const getLogoURL = (brand: Brand, darkMode: ColorMode, iconName: string) => {
+    return `https://cdn-prod.fluidconfigure.com/static/fluid-implementation-lux.s3.amazonaws.com/lux-ocp/${brand}/assets/svg/${!darkMode ? 'light' : 'dark'}/${iconName}.svg`;
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLOListElement>) => {
     if (!steps?.length) return;
@@ -50,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="header">
       <div className="header-logo" aria-hidden="true">
         {!skeleton ?
-          <div className="header-logo__icon"></div> :
+          <img src={getLogoURL(activeBrand, darkMode, 'logo')} alt="icono" className="header-logo__icon" fetchPriority={'high'} /> :
           <Skeleton className="header-logo__icon yr-skeleton" variant={SkeletonVariant.text} />
         }
       </div>
@@ -88,16 +103,11 @@ export const Header: React.FC<HeaderProps> = ({
         </ol>
       </nav>
 
-      <div className="header-switch">
-        <DarkModeSwitch
-          theme={theme}
-          onToggle={() => setTheme(prev => toggleTheme(prev))}
-        />
-      </div>
-
       <div className="header-menu">
         {!skeleton ?
-          <button className="header-menu__icon" aria-label={i18n?.getLabel('style_selector_header_menu_label', 'Menu') ?? 'Menu'} type="button"></button> :
+          <button className="header-menu__icon" aria-label={i18n?.getLabel('style_selector_header_menu_label', 'Menu') ?? 'Menu'} type="button">
+            <img src={getLogoURL(activeBrand, darkMode, 'menu')} alt="icono" className="header-menu__icon" fetchPriority={'high'} />
+          </button> :
           <Skeleton className='header-menu__icon yr-skeleton' variant={SkeletonVariant.text} />
         }
       </div>

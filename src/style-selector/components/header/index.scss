@@ -1,43 +1,35 @@
 @use '../../styles/shared' as *;
 
-// ── Header ────────────────────────────────────────────────────────────────────
 .header {
   display: flex;
-  align-items: center;
-  margin: 0 1.25rem;
+  height: 5rem;
+  padding: 0 2rem;
 
   @media (max-width: $bp-mobile) {
-    justify-content: space-between;
     height: 3.25rem;
-    margin-bottom: 0.5rem;
+    justify-content: space-between;
+    padding: 0.5rem;
     align-items: center;
   }
 }
 
 .header-logo {
+  width: 7.5rem;
+  height: 3.25rem;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 8.75rem;
-  height: 100%;
+  align-items: center;
 
   & .yr-skeleton {
-    display: block;
-    height: 0.953rem;
-    width: inherit;
+    margin: 0.5rem;
+    height: 2rem;
+    width: 7rem;
   }
 
   &__icon:not(.yr-skeleton) {
-    background-image: var(--ss-logo);
     background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 100%;
-
-    @media (max-width: $bp-mobile) {
-      margin-top: 8px;
-      background-position: left;
-    }
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
   }
 }
 
@@ -104,38 +96,17 @@
 
 .header-menu {
   display: flex;
-  height: 5rem;
-  width: 2.5rem;
-  align-items: center;
   justify-content: center;
-
-  @media (max-width: $bp-mobile) {
-    height: 3.25rem;
-  }
+  align-items: center;
+  width: 1.25rem;
 
   &__icon {
     display: flex;
-    width: 1.25rem;
     height: 1.25rem;
+    width: 1.25rem;
   }
 
-  &__icon:not(.yr-skeleton) {
-    background-image: var(--ss-menu-icon);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-
-    &:focus-visible {
-      outline: 3px solid var(--color-generic-focus-border);
-      outline-offset: 3px;
-    }
-  }
-
-  &.yr-skeleton {
+  & .yr-skeleton {
     display: flex;
     height: 1.25rem;
     width: 1.25rem;
