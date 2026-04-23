@@ -47,6 +47,11 @@
   }
 }
 
+.model-card__promo-badge {
+  text-align: center;
+  @include typography-body-xs;
+}
+
 .model-card__content {
   display: flex;
   padding: var(--spacing-2xl) var(--spacing-none) var(--spacing-base) var(--spacing-none);

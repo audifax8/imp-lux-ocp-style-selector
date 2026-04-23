@@ -41,7 +41,6 @@
   }
 
   &__inspiration {
-    flex: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -76,7 +75,6 @@
     }
 
     &-list {
-      flex: 1;
       overflow-y: auto;
       display: flex;
       gap: 1rem;
@@ -84,9 +82,11 @@
       justify-content: center;
       margin-bottom: 1rem;
       padding: 0 16rem;
+      padding-bottom: var(--spacing-base);
 
       @media (max-width: $bp-tablet-p) {
         padding: 0 0;
+        padding-bottom: var(--spacing-base);
       }
     }
   }

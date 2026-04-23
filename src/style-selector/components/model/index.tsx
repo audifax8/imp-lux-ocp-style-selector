@@ -13,6 +13,7 @@ interface ModelCardProps {
   imageAlt?: string;
   skeleton?: boolean;
   vendorId?: string;
+  promoBadge?: string;
   onClick?: (e: React.MouseEvent) => void;
 }
 
@@ -21,6 +22,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   imageSrc,
   imageAlt,
   vendorId,
+  promoBadge,
   onClick,
 }) => {
   // Datos del catálogo headless — solo HProduct[], sin servicios de infraestructura.
@@ -62,6 +64,13 @@ export const ModelCard: React.FC<ModelCardProps> = ({
         'aria-label': title,
       })}
     >
+      {promoBadge && (
+        <div
+          className='model-card__promo-badge'
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: promoBadge }}
+        />
+      )}
       <div className='model-card__image-wrapper' aria-hidden="true">
         {!imageSrc ?
           <Skeleton className="model-card__image__skeleton yr-skeleton" variant={SkeletonVariant.text} /> :

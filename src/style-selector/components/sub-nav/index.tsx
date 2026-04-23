@@ -58,6 +58,16 @@ export const SubNav: React.FC<SubNavProps> = ({
       </div>
       <div className='subnav-close'>
         {skeleton && <Skeleton className='subnav-close' variant={SkeletonVariant.rectangular} />}
+        {!skeleton && onClick && (selectedStep?.id === 0) ?
+          <button
+            className='subnav-close-button'
+            type="button"
+            aria-label={backLabel}
+            onClick={() => onClick?.(steps && steps[0])}
+          >
+            <div className='subnav-close-button__icon' aria-hidden="true"></div>
+          </button> : <></>
+        }
       </div>
     </nav>
   );

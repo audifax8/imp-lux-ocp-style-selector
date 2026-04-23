@@ -389,7 +389,7 @@ Archivos disponibles:
 - `category-filter/` — `CategoryFilterComponent`; usa `useI18n()` internamente; `aria-label` del radiogroup: prop `label` > `style_selector_category_filter_label` > `'Filter by category'`; patrón ARIA: `<ul role="radiogroup">` + `<li role="presentation">` + `<Button role="radio">`; roving tabindex; selection-follows-focus (ArrowRight/Left/Down/Up/Home/End)
 - `category-button/` — `Button`; acepta `label?`, `skeleton?`, `selected?`, `tabIndex?`, `onClick?`; `role="radio"` + `aria-checked` (no `aria-current`); `aria-label` en el button, `aria-hidden` en el `<span>` interior; `:focus-visible` con `--color-generic-focus-border`
 - `card/` — `Card`; tarjeta de tipo de gafa (step 0); se renderiza como `<button>` o `<div>` según si `onClick` está presente; hijos con `aria-hidden="true"` — VoiceOver solo lee el `aria-label` del botón
-- `model/` — `ModelCard`; tarjeta de modelo (step 1); imagen con `loading='eager'`
+- `model/` — `ModelCard`; tarjeta de modelo (step 1); imagen con `loading='eager'`; acepta `promoBadge?: string` — markup HTML de la API (e.g. `<b style="color:black">BEST SELLER</b>`); se renderiza con `dangerouslySetInnerHTML` en `.model-card__promo-badge` entre la imagen y el título, solo cuando está presente
 - `type-step/` — `TypeStep`; extrae el step TYPE de `bootstrap/App.tsx`; props: `modelsTypes`, `onClick(type)`; usa `useI18n()` + `Card` + `getSVGURLByType`; importado estáticamente → mismo chunk que `App.tsx`
 - `model-step/` — `ModelStep`; extrae los steps MODEL e INSPIRATIONS de `bootstrap/App.tsx`; props: `selectedStep`, `subCategories`, `selectedFlatModel`, `filteredModels`, `selectedModel`, `onCategoryClick`, `onModelClick`; acepta `ref` via `React.forwardRef` → la sección raíz recibe el ref para focus management; usa `useI18n()` + `CategoryFilterComponent` + `ModelCard`; importado estáticamente → mismo chunk que `App.tsx`
 - `logo/` — `Logo`; renderiza SVG via URL
@@ -459,7 +459,7 @@ Ambos modos tienen su propia infraestructura de estado en `bootstrap/state/`:
 - `enums.ts` — `SkeletonVariant`, `ResolutionType`, `Media`, `Theme`, `RTRBackground`, `FetchPriority`, `ApiType`, `CheckPointType`
 - `types.ts` — `MergedParams`, `ConfigureJsons`, `GraphSettings`, `Preferences`, `ButtonProps`, etc.
 - `constants.ts` — Customer IDs (`RBN_CUSTOMER_ID`, `OAK_CUSTOMER_ID`), API key map, CDN/RTR URLs, skeleton resolution helpers
-- `interfaces.ts` — `ConfigureParams`, `ConfigureInitParams` (incluye `mockMyDesigns?`, `mockInspirations?`), `RtrBaseAPI`, `InitRTRPayload`, `RtrAssetsAPI`, `QuickLink`, etc.; también `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data` (compartidos entre configurator y style-selector)
+- `interfaces.ts` — `ConfigureParams`, `ConfigureInitParams` (incluye `mockMyDesigns?`, `mockInspirations?`), `RtrBaseAPI`, `InitRTRPayload`, `RtrAssetsAPI`, `QuickLink`, etc.; también `IInitStrategy<P1,P2>`, `InitPhase1Data`, `InitPhase2Data` (compartidos entre configurator y style-selector); `LuxApiModel` incluye `promoBadge?: string` — markup HTML de la API para badge promocional
 - `cfg-configure-core.d.ts` — module declaration for `@cfg.plat/configure-core`
 
 ## Models
